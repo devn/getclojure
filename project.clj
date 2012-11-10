@@ -5,8 +5,6 @@
             :url "http://www.eclipse.org/legal/epl-v10.html"}
   :dependencies [[org.clojure/clojure "1.4.0"]
                  [clojurewerkz/elastisch "1.0.2"]
-                 [org.clojure/data.json "0.2.0"]
                  [clojail "1.0.3"]
                  [org.clojars.semperos/enlive "1.0.1"]
-                 [net.cgrand/moustache "1.1.0"]
-                 [yokogiri "0.0.2"]])
+                 [me.raynes/conch "0.4.0"]])
