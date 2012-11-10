@@ -1,3 +1,4 @@
+/tmp/*
 /logs/*.html
 /target
 /lib
