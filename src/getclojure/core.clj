@@ -1,7 +1,8 @@
 (ns getclojure.core
   (:use [getclojure.jail :only (run-sexp-in-sandbox)]
         [getclojure.scrape :only (local-logs get-missing-logs)]
-        [getclojure.extract :only (log->mapseq)])
+        [getclojure.extract :only (log->mapseq)]
+        [taoensso.timbre :as timbre :only (trace debug info warn error fatal spy)])
   (:require [clojurewerkz.elastisch.rest :as esr]
             [clojurewerkz.elastisch.rest.index :as esi]
             [clojurewerkz.elastisch.rest.document :as esd]
@@ -9,6 +10,7 @@
   (:import java.util.concurrent.TimeoutException))
 
 (def connect-elastisch (esr/connect! "http://127.0.0.1:9200"))
+
 (def mappings
   {:sexp
    {:properties
@@ -22,9 +24,12 @@
                   :stopwords ["(" ")" "[" "]" "{" "}" "#" "%"]}})
 
 (defn create-getclojure-index []
-  (esi/create "getclojure_development"
-              :settings {:index {:analysis {:analyzer clojure-analyzer}}}
-              :mappings mappings))
+  (when-not (esi/exists? "getclojure_development")
+    (esi/create "getclojure_development"
+                :settings {:index {:analysis {:analyzer clojure-analyzer}}}
+                :mappings mappings)))
+
+(create-getclojure-index)
 
 (defn uuid []
   (str (java.util.UUID/randomUUID)))
@@ -41,16 +46,19 @@
       (let [id (uuid)]
         (try
           (let [sexp-output-map (run-sexp-in-sandbox sexp)]
-            (add-sexp-to-sexps-atom (assoc sexp-output-map :id (uuid)))
-            (esd/put "getclojure_development" "sexp" id sexp-output-map))
+            (spy :info (time (add-sexp-to-sexps-atom (assoc sexp-output-map :id (uuid)))))
+            (spy :info (time (esd/put "getclojure_development" "sexp" id sexp-output-map))))
           (catch TimeoutException _ "Execution timed out!")
           (catch Throwable t))))))
 
 (defn process-all-logs [fcoll]
   (doseq [log fcoll]
-    (process-log log)))d
+    (process-log log)))
 
 (comment
+  (doseq [log (take 1000 local-logs)]
+    (process-log log))
+
   (process-log (nth local-logs 4))
   (process-all-logs local-logs)
 

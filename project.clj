@@ -7,4 +7,5 @@
                  [clojurewerkz/elastisch "1.0.2"]
                  [clojail "1.0.3"]
                  [org.clojars.semperos/enlive "1.0.1"]
+                 [com.taoensso/timbre "1.0.0"]
                  [me.raynes/conch "0.4.0"]])
