@@ -1,7 +1,6 @@
 (ns getclojure.extract
-  (:require [net.cgrand.enlive-html :as enlive]
-            [clojure.string :as str]
-            [clojure.java.io :as io]))
+  (:require [clojure.string :as str]
+            [net.cgrand.enlive-html :as enlive]))
 
 (defn get-lines [f]
   (enlive/select (enlive/html-resource f) [:p]))
@@ -72,7 +71,7 @@
     (fix-empty-nicknames
      (map #(node->map % date) log-lines))))
 
-(defn logs->mapseq [fcoll]
-  (doseq [f fcoll]
-    (println "Processing" (str f))
-    (log->mapseq f)))
+;; (defn logs->mapseq [fcoll]
+;;   (doseq [f fcoll]
+;;     (println "Processing" (str f))
+;;     (log->mapseq f)))

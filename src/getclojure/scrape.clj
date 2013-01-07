@@ -1,7 +1,7 @@
 (ns getclojure.scrape
   (:require [clojure.java.io :as io]
-            [clojure.string :as str]
-            [clojure.set :as set]))
+            [clojure.set :as set]
+            [clojure.string :as str]))
 
 (def dates-url "http://clojure-log.n01se.net/date/")
 
@@ -16,13 +16,17 @@
 (defn missing-logs []
   (set/difference
    (set (butlast (sort (remote-logs))))
-   (set (map name local-logs))))
+   (set (map #(str/replace % #"logs\/" "") local-logs))))
+
+(defn get-missing-log [lf]
+  (let [log-data (slurp (str dates-url lf))]
+    (spit (io/file "logs" lf) log-data)))
 
 (defn get-missing-logs []
-  (if (not (empty? missing-logs))
-    (do (println ";;-> You are missing" (count missing-logs) "logs")
-      (doseq [log missing-logs]
-        (println ";;-> Downloading" log)
-        (let [log-data (slurp (str dates-url log))]
-          (spit (io/file "logs" log) log-data))))
-    (println ";;-> You are currently up to date!")))
+  (let [missing (missing-logs)]
+   (if-not (empty? missing)
+     (do (println ";;-> You are missing" (count missing) "logs")
+         (doseq [log missing]
+           (println ";;-> Downloading" log)
+           (get-missing-log log)))
+     (println ";;-> You are currently up to date!"))))

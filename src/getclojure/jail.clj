@@ -10,8 +10,7 @@
         (tester/blacklist-symbols '#{print-method})
         (tester/blacklist-packages ["java.util.regex.Pattern"])))
 
-;; TODO: Add jail/eagerly-consume?
-(def sb (jail/sandbox getclojure-tester :timeout 2500))
+(def sb (jail/sandbox getclojure-tester :timeout 1000))
 
 (defn truncate [x]
   (if string?
