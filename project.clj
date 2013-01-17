@@ -9,7 +9,6 @@
                  [org.clojars.semperos/enlive "1.0.1"
                   :exclusions [org.clojure/clojure]]
                  [me.raynes/laser "0.1.15"]
-                 [org.clojure/data.csv "0.1.2"]
                  ;; Web
                  [lib-noir "0.3.5"]
                  [compojure "1.1.3"]
@@ -24,6 +23,7 @@
                        :stacktraces?  false
                        :auto-reload?  false}}
    :dev {:dependencies [[ring-mock "0.1.3"]
-                        [ring/ring-devel "1.1.0"]]}}
+                        [ring/ring-devel "1.1.0"]
+                        [org.clojure/data.csv "0.1.2"]]}}
   :jvm-opts ["-Xmx2g" "-server"]
   :min-lein-version "2.0.0")
