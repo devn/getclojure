@@ -6,31 +6,36 @@
   (:require [clojure.java.io :as io])
   (:import [java.util.concurrent.TimeoutException]))
 
-(def sexps (atom #{}))
+;; (def sexps (atom #{}))
 
-(defn extract-sexps-from-log [log]
-  (println "Extracting nodes from" (str log))
-  (doseq [sexp-node (filter #(not (empty? (:sexp %))) (log->mapseq log))]
-    (doseq [sexp (:sexp sexp-node)]
-      (swap! sexps conj sexp)))
-  nil)
+;; (defn extract-sexps-from-log [log]
+;;   (println "Extracting nodes from" (str log))
+;;   (doseq [sexp-node (filter #(not (empty? (:sexp %))) (log->mapseq log))]
+;;     (doseq [sexp (:sexp sexp-node)]
+;;       (swap! sexps conj sexp)))
+;;   nil)
 
-(defn extract-sexps-from-all-logs [fcoll]
-  (doseq [logfile fcoll]
-    (extract-sexps-from-log logfile)))
+;; (defn extract-sexps-from-all-logs [fcoll]
+;;   (doseq [logfile fcoll]
+;;     (extract-sexps-from-log logfile)))
 
-(defn process-log [log]
-  (println "Extracting nodes from" (str log))
-  (doseq [sexp-node (filter #(not (empty? (:sexp %))) (log->mapseq log))]
-    (doseq [sexp (:sexp sexp-node)]
-      (try
-        (run-sexp-in-sandbox sexp)
-           (catch java.util.concurrent.TimeoutException _ "Execution timed out!")
-           (catch Throwable t)))))
+;; (defn process-log [log]
+;;   (println "Extracting nodes from" (str log))
+;;   (doseq [sexp-node (filter #(not (empty? (:sexp %))) (log->mapseq log))]
+;;     (doseq [sexp (:sexp sexp-node)]
+;;       (try
+;;         (run-sexp-in-sandbox sexp)
+;;            (catch java.util.concurrent.TimeoutException _ "Execution timed out!")
+;;            (catch Throwable t)))))
 
-(defn process-all-logs [fcoll]
-  (doseq [log fcoll]
-    (process-log log)))
+;; (defn process-all-logs [fcoll]
+;;   (doseq [log fcoll]
+;;     (process-log log)))
+
+(def sexps (atom (read-string (slurp "sexps.db"))))
+
+(defn process-sexp [s]
+  (try))
 
 (comment
   (defn -main []
