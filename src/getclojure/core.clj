@@ -1,6 +1,6 @@
 (ns getclojure.core
   (:use [getclojure.jail :only (run-sexp-in-sandbox)]
-        [getclojure.scrape :only (local-logs missing-logs get-missing-log get-missing-logs)]
+        [getclojure.scrape :only (local-logs missing-logs get-missing-log get-missing-logs clojuredocs-sexp-harvest get-sexps-from-clojuredocs)]
         [getclojure.extract :only (log->mapseq)]
         [getclojure.queue])
   (:require [clojure.java.io :as io])
