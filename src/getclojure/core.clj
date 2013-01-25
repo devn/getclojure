@@ -4,6 +4,7 @@
         [getclojure.extract :only (log->mapseq)]
         [getclojure.search :only (create-getclojure-index add-to-index)]
         [getclojure.repl :only (start-server)]
+        [clojurewerkz.elastisch.rest :as esr]
         [clojure.data.csv :as csv])
   (:require [clojure.java.io :as io])
   (:import [java.util.concurrent.TimeoutException]))
@@ -20,6 +21,10 @@
     (add-to-index :getclojure_development sexp)))
 
 (defn -main []
+  (println "Attempting to connect to searchbox...")
+  (println "The searchbox URL is" (System/getenv "SEARCHBOX_URL"))
+  (esr/connect! (or (System/getenv "SEARCHBOX_URL")
+                    "http://127.0.0.1:9200"))
   (create-getclojure-index)
   (println "Adding sexps to the index...")
   (time (add-sexps-to-index))
