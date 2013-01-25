@@ -13,7 +13,7 @@
   (set! *print-level* 10))
 
 (def sexps
-  (into #{} (read-string (slurp (io/file "working-sexps-with-clojuredocs.db")))))
+  (into #{} (read-string (slurp (io/file "working-sexps.db")))))
 
 (defn add-sexps-to-index []
   (doseq [sexp sexps]
