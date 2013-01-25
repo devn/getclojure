@@ -1,16 +1,18 @@
 (ns getclojure.routes.home
-  (:use compojure.core hiccup.element)
+  (:use [compojure.core]
+        [hiccup.element])
   (:require [getclojure.views.layout :as layout]
             [getclojure.util :as util]))
 
 (defn home-page [] 
   (layout/common
-    (util/md->html "/md/docs.md")))
+   (layout/search-form)))
 
-(defn about-page []
+(defn search-page [q]
   (layout/common
-   "this is the story of getclojure... work in progress"))
+   (layout/search-form)
+   (layout/search-results q)))
 
 (defroutes home-routes 
   (GET "/" [] (home-page))
-  (GET "/about" [] (about-page)))
+  (GET "/search" [q] (search-page q)))

@@ -5,11 +5,6 @@
             [clojurewerkz.elastisch.query :as q]
             [getclojure.util :as util]))
 
-;; (defonce connect-elastisch
-;;   (let [uri (or (System/getenv "SEARCHBOX_URL")
-;;                 "http://127.0.0.1:9200")]
-;;     (esr/connect! uri)))
-
 (def mappings
   {:sexp
    {:properties
@@ -18,21 +13,37 @@
     {:value {:type "string" :store "yes" :analyzer "clojure_code"}}}})
 
 (def clojure-analyzer
-  {:clojure_code {:type "standard"
-                  :filter ["standard" "lowercase" "stop"]
-                  :stopwords ["(" ")" "{" "}" "&" "@" "^" ":" "'" "," " "]}})
+  {:clojure_code {:type "custom"
+                  :filter ["lowercase" "stop"]
+                  :stopwords ["(" ")" "{" "}" "&" "@" "^" ":" "'" ","]}})
 
 (defn create-getclojure-index []
-  (when-not (esi/exists? "getclojure_development")
-    (esi/create "getclojure_development"
+  (when-not (esi/exists? "getclojure")
+    (esi/create "getclojure"
                 :settings {:index {:analysis {:analyzer clojure-analyzer}}}
                 :mappings mappings)))
 
 (defn add-to-index [env sexp-map]
   (esd/put (name env) "sexp" (util/uuid) sexp-map))
 
+;; :from, :size
+(defn search-sexps [q]
+  (esd/search "getclojure"
+              "sexp"
+              :query (q/query-string :query q
+                                     :allow_leading_wildcard true
+                                     :default_operator "AND")
+              :size 25))
+
+(defn get-search-hits [result-map]
+  (map :_source (get-in result-map [:hits :hits])))
+
+(defn search-results-for [q]
+  (get-search-hits (search-sexps q)))
+
 (comment
-  (esi/delete "getclojure_development")
+  (esr/connect! "url_for_elasticsearch")
+  (esi/delete "getclojure")
   (create-getclojure-index)
   (esd/search "getclojure_development" "sexp" :query (q/text :input "test"))
   (esd/search "getclojure_development" "sexp" :query (q/text :input "let"))
