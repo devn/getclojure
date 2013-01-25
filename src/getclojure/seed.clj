@@ -1,6 +1,7 @@
 (ns getclojure.seed
   (:use [getclojure.search :only (create-getclojure-index add-to-index)]
-        [clojurewerkz.elastisch.rest :only (connect!)]))
+        [clojurewerkz.elastisch.rest :only (connect!)])
+  (:require [clojure.java.io :as io]))
 
 (def sexps
   (into #{} (read-string (slurp (io/file "working-sexps.db")))))
