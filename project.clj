@@ -19,6 +19,7 @@
                  [com.taoensso/tower "1.2.0"]
                  [markdown-clj "0.9.19"]]
   :plugins [[lein-ring "0.8.0"]]
+  :ring {:handler getclojure.handler/app}
   :profiles
   {:production {:ring {:open-browser? false
                        :stacktraces?  false

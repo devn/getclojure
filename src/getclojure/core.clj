@@ -4,31 +4,32 @@
         [getclojure.extract :only (log->mapseq)]
         [getclojure.search :only (create-getclojure-index add-to-index)]
         [getclojure.repl :only (start-server)]
-        [clojurewerkz.elastisch.rest :as esr])
-  (:require [clojure.java.io :as io])
+        [getclojure.handler :only (init)])
+  (:require [clojure.java.io :as io]
+            [clojurewerkz.elastisch.rest :as esr])
   (:import [java.util.concurrent.TimeoutException]))
 
 (comment
   (set! *print-length* 10)
   (set! *print-level* 10))
 
-(def sexps
-  (into #{} (read-string (slurp (io/file "working-sexps.db")))))
+;; (def sexps
+;;   (into #{} (read-string (slurp (io/file "working-sexps.db")))))
 
-(defn add-sexps-to-index []
-  (doseq [sexp sexps]
-    (add-to-index :getclojure_development sexp)))
+;; (defn add-sexps-to-index []
+;;   (doseq [sexp sexps]
+;;     (add-to-index :getclojure_development sexp)))
 
-(defn -main []
-  (println "Attempting to connect to searchbox...")
-  (println "The searchbox URL is" (System/getenv "SEARCHBOX_URL"))
-  (esr/connect! (or (System/getenv "SEARCHBOX_URL")
-                    "http://127.0.0.1:9200"))
-  (create-getclojure-index)
-  (println "Adding sexps to the index...")
-  (time (add-sexps-to-index))
-  (println "Starting the server...")
-  (start-server (System/getenv "PORT")))
+;; (defn -main []
+;;   (println "Attempting to connect to searchbox...")
+;;   (println "The searchbox URL is" (System/getenv "SEARCHBOX_URL"))
+;;   (esr/connect! (or (System/getenv "SEARCHBOX_URL")
+;;                     "http://127.0.0.1:9200"))
+;;   (create-getclojure-index)
+;;   (println "Adding sexps to the index...")
+;;   (time (add-sexps-to-index))
+;;   (println "Starting the server...")
+;;   (start-server (System/getenv "PORT")))
 
 ;; (def sexps (atom #{}))
 
