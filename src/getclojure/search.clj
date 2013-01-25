@@ -3,9 +3,14 @@
             [clojurewerkz.elastisch.rest.index :as esi]
             [clojurewerkz.elastisch.rest.document :as esd]
             [clojurewerkz.elastisch.query :as q]
+            [clojurewerkz.elastisch.rest.response :as esrr]
+            [clojurewerkz.elastisch.rest.utils :as esru]
             [getclojure.util :as util]))
 
-(defonce connect-elastisch (esr/connect! "http://127.0.0.1:9200"))
+(defonce connect-elastisch
+  (let [uri (or (System/getenv "SEARCHBOX_URL")
+                "http://127.0.0.1:9200")]
+    (esr/connect! uri)))
 
 (def mappings
   {:sexp
@@ -17,7 +22,7 @@
 (def clojure-analyzer
   {:clojure_code {:type "standard"
                   :filter ["standard" "lowercase" "stop"]
-                  :stopwords ["(" ")" "[" "]" "{" "}" "#" "%"]}})
+                  :stopwords ["(" ")" "{" "}" "&" "@" "^" ":" "'" "," " "]}})
 
 (defn create-getclojure-index []
   (when-not (esi/exists? "getclojure_development")
@@ -26,7 +31,7 @@
                 :mappings mappings)))
 
 (defn add-to-index [env sexp-map]
-  (esd/put env "sexp" (util/uuid) sexp-map))
+  (esd/put (name env) "sexp" (util/uuid) sexp-map))
 
 (comment
   (esi/delete "getclojure_development")

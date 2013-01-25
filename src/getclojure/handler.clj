@@ -1,23 +1,21 @@
 (ns getclojure.handler
   (:use getclojure.routes.home
-        compojure.core)  
+        compojure.core)
   (:require [noir.util.middleware :as middleware]
             [compojure.route :as route]))
 
-(defroutes app-routes  
+(defroutes app-routes
   (route/resources "/")
   (route/not-found "Not Found"))
 
 (defn init
-  "init will be called once when
-   app is deployed as a servlet on 
-   an app server such as Tomcat
-   put any initialization code here"
+  "init will be called once when app is deployed as a servlet on an
+   app server such as Tomcat put any initialization code here"
   []
-  (println "getclojure started successfully..."))
+  (println "GetClojure started successfully..."))
 
 (defn destroy []
-  (println "shutting down..."))
+  (println "Shutting down..."))
 
 ;;append your application routes to the all-routes vector
 (def all-routes [home-routes app-routes])

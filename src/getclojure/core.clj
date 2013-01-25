@@ -2,9 +2,29 @@
   (:use [getclojure.jail :only (run-sexp-in-sandbox)]
         [getclojure.scrape :only (local-logs missing-logs get-missing-log get-missing-logs clojuredocs-sexp-harvest get-sexps-from-clojuredocs)]
         [getclojure.extract :only (log->mapseq)]
-        [getclojure.queue])
+        [getclojure.search :only (create-getclojure-index add-to-index)]
+        [getclojure.repl :only (start-server)]
+        [clojure.data.csv :as csv])
   (:require [clojure.java.io :as io])
   (:import [java.util.concurrent.TimeoutException]))
+
+(comment
+  (set! *print-length* 10)
+  (set! *print-level* 10))
+
+(def sexps
+  (into #{} (read-string (slurp (io/file "working-sexps-with-clojuredocs.db")))))
+
+(defn add-sexps-to-index []
+  (doseq [sexp sexps]
+    (add-to-index :getclojure_development sexp)))
+
+(defn -main []
+  (create-getclojure-index)
+  (println "Adding sexps to the index...")
+  (time (add-sexps-to-index))
+  (println "Starting the server...")
+  (start-server))
 
 ;; (def sexps (atom #{}))
 
@@ -32,14 +52,37 @@
 ;;   (doseq [log fcoll]
 ;;     (process-log log)))
 
-(def sexps (atom (read-string (slurp "sexps.db"))))
+;; (def sexps (atom (read-string (slurp "sexps.db"))))
 
-(defn process-sexp [s]
-  (try))
+;; (def sandboxed-sexps-results (atom (read-string (slurp "sandboxed-sexps-results.db"))))
 
-(comment
-  (defn -main []
-    (doseq [f local-logs]
-      (println f)
-      (process-log f)))
-)
+;; (def working-sexps (atom []))
+;; (def n-of-sexps (atom 0))
+;; (def total-sexps (count @clojuredocs-sexp-harvest))
+
+;; (defn process-sexps [ss]
+;;   (doseq [s ss]
+;;     (swap! n-of-sexps inc)
+;;     (println (str @n-of-sexps "/" total-sexps))
+;;     (try (swap! working-sexps conj (run-sexp-in-sandbox s))
+;;          (catch java.util.concurrent.TimeoutException _ "Execution timed out!")
+;;          (catch java.lang.Throwable t))))
+
+;; 4203 stalls.
+
+;; (def working-sexps (atom (read-string (slurp "working-sexps.db"))))
+
+;; (defn write-working-sexps-to-csv [wsexps]
+;;   (with-open [o (io/writer "working-sexps-with-clojuredocs.csv")]
+;;     (csv/write-csv o (into [] (map #(into [] (vals %)) wsexps)))))
+
+;; (write-working-sexps-to-csv (set @sandboxed-sexps-results))
+
+;; (binding [*print-dup* true]
+;;   (spit (io/file "working-sexps-with-clojuredocs.db")
+;;         (set @sandboxed-sexps-results)))
+
+;; (defn -main []
+;;   (process-sexps @sexps)
+;;   (binding [*print-dup* true]
+;;     (spit (io/file "working-sexps.db") @working-sexps)))

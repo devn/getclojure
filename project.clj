@@ -26,5 +26,6 @@
    :dev {:dependencies [[ring-mock "0.1.3"]
                         [ring/ring-devel "1.1.0"]
                         [org.clojure/data.csv "0.1.2"]]}}
+  :main getclojure.core
   :jvm-opts ["-Xmx2g" "-server"]
   :min-lein-version "2.0.0")
