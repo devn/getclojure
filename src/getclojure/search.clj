@@ -13,7 +13,7 @@
     {:value {:type "string" :store "yes" :analyzer "clojure_code"}}}})
 
 (def clojure-analyzer
-  {:clojure_code {:type "custom"
+  {:clojure_code {:type "standard"
                   :filter ["lowercase" "stop"]
                   :stopwords ["(" ")" "{" "}" "&" "@" "^" ":" "'" ","]}})
 
