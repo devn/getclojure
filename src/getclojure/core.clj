@@ -4,8 +4,7 @@
         [getclojure.extract :only (log->mapseq)]
         [getclojure.search :only (create-getclojure-index add-to-index)]
         [getclojure.repl :only (start-server)]
-        [clojurewerkz.elastisch.rest :as esr]
-        [clojure.data.csv :as csv])
+        [clojurewerkz.elastisch.rest :as esr])
   (:require [clojure.java.io :as io])
   (:import [java.util.concurrent.TimeoutException]))
 

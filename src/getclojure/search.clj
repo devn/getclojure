@@ -3,14 +3,12 @@
             [clojurewerkz.elastisch.rest.index :as esi]
             [clojurewerkz.elastisch.rest.document :as esd]
             [clojurewerkz.elastisch.query :as q]
-            [clojurewerkz.elastisch.rest.response :as esrr]
-            [clojurewerkz.elastisch.rest.utils :as esru]
             [getclojure.util :as util]))
 
-(defonce connect-elastisch
-  (let [uri (or (System/getenv "SEARCHBOX_URL")
-                "http://127.0.0.1:9200")]
-    (esr/connect! uri)))
+;; (defonce connect-elastisch
+;;   (let [uri (or (System/getenv "SEARCHBOX_URL")
+;;                 "http://127.0.0.1:9200")]
+;;     (esr/connect! uri)))
 
 (def mappings
   {:sexp
