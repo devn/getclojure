@@ -24,7 +24,7 @@
   (println "Adding sexps to the index...")
   (time (add-sexps-to-index))
   (println "Starting the server...")
-  (start-server))
+  (start-server (System/getenv "PORT")))
 
 ;; (def sexps (atom #{}))
 
