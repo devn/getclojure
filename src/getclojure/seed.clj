@@ -13,8 +13,8 @@
 
 (defn -main []
   (println "Attempting to connect to searchbox...")
-  (println "The searchbox URL is" (System/getenv "SEARCHBOX_URL"))
-  (connect! (or (System/getenv "SEARCHBOX_URL")
+  (println "The Bonsai URL is" (System/getenv "BONSAI_URL"))
+  (connect! (or (System/getenv "BONSAI_URL")
                 "http://127.0.0.1:9200"))
   (create-getclojure-index)
   (println "Adding sexps to the index...")
