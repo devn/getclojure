@@ -8,9 +8,12 @@
   (into #{} (read-string (slurp (io/file "working-sexps.db")))))
 
 (defn add-sexps-to-index []
-  (doseq [sexp sexps]
-    (print ".")
-    (add-to-index :getclojure_development sexp)))
+  (let [num-sexps (count sexps)
+        cnt (atom 0)]
+    (doseq [sexp sexps]
+      (swap! cnt inc)
+      (println (str @cnt "/" num-sexps))
+      (add-to-index :getclojure sexp))))
 
 (defn -main []
   (println "Attempting to connect to searchbox...")

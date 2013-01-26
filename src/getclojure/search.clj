@@ -13,9 +13,9 @@
     {:value {:type "string" :store "yes" :analyzer "clojure_code"}}}})
 
 (def clojure-analyzer
-  {:clojure_code {:type "standard"
-                  :filter ["lowercase" "stop"]
-                  :stopwords ["(" ")" "{" "}" "&" "@" "^" ":" "'" ","]}})
+  {:clojure_code {:type "custom"
+                  :tokenizer "lowercase"
+                  :filter "lowercase"}})
 
 (defn create-getclojure-index []
   (when-not (esi/exists? "getclojure")
