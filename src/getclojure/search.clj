@@ -42,10 +42,11 @@
   (get-search-hits (search-sexps q)))
 
 (comment
+  (esr/connect! "http://6ooyks68:mijf5fy0wrca3gmh@oak-8299758.us-east-1.bonsai.io")
   (esr/connect! "url_for_elasticsearch")
   (esi/delete "getclojure")
   (create-getclojure-index)
-  (esd/search "getclojure_development" "sexp" :query (q/text :input "test"))
+  (esd/search "getclojure" "sexp" :query (q/text :input "test"))
   (esd/search "getclojure_development" "sexp" :query (q/text :input "let"))
   (esd/search "getclojure_development" "sexp" :query (q/fuzzy :input "let"))
   (esd/search "getclojure_development" "sexp" :query (q/fuzzy-like-this :input "let"))
