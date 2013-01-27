@@ -9,9 +9,9 @@
             [clojurewerkz.elastisch.rest :as esr])
   (:import [java.util.concurrent.TimeoutException]))
 
-(comment
-  (set! *print-length* 10)
-  (set! *print-level* 10))
+;; (comment
+;;   (set! *print-length* 10)
+;;   (set! *print-level* 10))
 
 ;; (def sexps
 ;;   (into #{} (read-string (slurp (io/file "working-sexps.db")))))
