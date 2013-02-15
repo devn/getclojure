@@ -58,23 +58,25 @@ header > p {
 pre {
   margin: 0;
   padding: 10px;
-  border-left-width: 4px;
-  border-left-style: solid;
+  border: none !important;
+  border-left-width: 4px !important;
+  border-left-style: solid !important;
   overflow: auto;
 }
 
 .result {
-  margin: 10px 0;
+  margin: 10px 0 !important;
 }
 
 pre.input {
-  border-left-color: #5881d8;
+  border-left-color: #5881d8 !important;
+  border: none;
 }
 
 pre.value {
-  border-left-color: #8fb4fe;
+  border-left-color: #8fb4fe !important;
 }
 
 pre.output {
-  border-left-color: #91dc46;
+  border-left-color: #91dc46 !important;
 }

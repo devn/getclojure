@@ -91,3 +91,7 @@
 ;;   (process-sexps @sexps)
 ;;   (binding [*print-dup* true]
 ;;     (spit (io/file "working-sexps.db") @working-sexps)))
+
+(comment
+  (count (filter #(.contains (:input %) "(let") sexps))
+)

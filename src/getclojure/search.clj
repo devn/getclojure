@@ -15,7 +15,8 @@
 (def clojure-analyzer
   {:clojure_code {:type "custom"
                   :tokenizer "lowercase"
-                  :filter "lowercase"}})
+                  :stopwords [" "]
+                  :filter ["lowercase" "stop"]}})
 
 (defn create-getclojure-index []
   (when-not (esi/exists? "getclojure")
@@ -27,26 +28,29 @@
   (esd/put (name env) "sexp" (util/uuid) sexp-map))
 
 ;; :from, :size
-(defn search-sexps [q]
-  (esd/search "getclojure"
-              "sexp"
-              :query (q/query-string :query q
-                                     :allow_leading_wildcard true
-                                     :default_operator "AND")
-              :size 25))
+(defn search-sexps [q page-num]
+  (let [offset (* page-num 25)]
+    (esd/search "getclojure"
+                "sexp"
+                :query (q/query-string :query q
+                                       :allow_leading_wildcard true
+                                       :default_operator "AND")
+                :from offset
+                :size 25)))
 
 (defn get-search-hits [result-map]
   (map :_source (get-in result-map [:hits :hits])))
 
-(defn search-results-for [q]
-  (get-search-hits (search-sexps q)))
+(defn search-results-for
+  ([q page-num] (get-search-hits (search-sexps q page-num))))
 
 (comment
   (esr/connect! "http://6ooyks68:mijf5fy0wrca3gmh@oak-8299758.us-east-1.bonsai.io")
+  (esr/connect! "http://127.0.0.1:9200")
   (esr/connect! "url_for_elasticsearch")
   (esi/delete "getclojure")
   (create-getclojure-index)
-  (esd/search "getclojure" "sexp" :query (q/text :input "test"))
+  (take 3 (map :_source  (get-in (esd/search "getclojure" "sexp" :query (q/text :input "foo")) [:hits :hits])))
   (esd/search "getclojure_development" "sexp" :query (q/text :input "let"))
   (esd/search "getclojure_development" "sexp" :query (q/fuzzy :input "let"))
   (esd/search "getclojure_development" "sexp" :query (q/fuzzy-like-this :input "let"))
