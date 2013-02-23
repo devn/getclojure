@@ -10,10 +10,10 @@
 
 (defn search-page [q num]
   (layout/common
-   (layout/search-form)
+   (layout/search-form q)
    (layout/search-results q num)))
 
 (defroutes home-routes 
   (GET "/" [] (home-page))
   (GET "/search" [q num]
-       (println num)))
+       (search-page q num)))

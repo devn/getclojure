@@ -1,6 +1,8 @@
 (ns getclojure.util
   (:require [noir.io :as io]
-            [markdown.core :as md]))
+            [markdown.core :as md]
+            [clojure.string :as str :only (join)])
+  (:import java.net.URLEncoder))
 
 (defn uuid []
   (str (java.util.UUID/randomUUID)))
@@ -18,3 +20,22 @@
   (->>
    (io/slurp-resource filename)
    (md/md-to-html-string)))
+
+;; Web Utils
+(defn url-encode
+  "Returns an UTF-8 URL encoded version of the given string."
+  [unencoded]
+  (URLEncoder/encode unencoded "UTF-8"))
+
+(defn generate-query-string [params]
+  (str/join "&"
+            (mapcat (fn [[k v]]
+                      (if (sequential? v)
+                        (map #(str (url-encode (name %1))
+                                   "="
+                                   (url-encode (str %2)))
+                             (repeat k) v)
+                        [(str (url-encode (name k))
+                              "="
+                              (url-encode (str v)))]))
+                    params)))

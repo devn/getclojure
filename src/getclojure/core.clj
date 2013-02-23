@@ -1,7 +1,7 @@
 (ns getclojure.core
   (:use [getclojure.jail :only (run-sexp-in-sandbox)]
         [getclojure.scrape :only (local-logs missing-logs get-missing-log get-missing-logs clojuredocs-sexp-harvest get-sexps-from-clojuredocs)]
-        [getclojure.extract :only (log->mapseq)]
+        [getclojure.extract :only (logfile->mapseq)]
         [getclojure.search :only (create-getclojure-index add-to-index)]
         [getclojure.repl :only (start-server)]
         [getclojure.handler :only (init)])
@@ -13,23 +13,14 @@
 ;;   (set! *print-length* 10)
 ;;   (set! *print-level* 10))
 
-;; (def sexps
-;;   (into #{} (read-string (slurp (io/file "working-sexps.db")))))
+(def sexps (into #{} (read-string (slurp (io/file "working-sexps.db")))))
 
-;; (defn add-sexps-to-index []
-;;   (doseq [sexp sexps]
-;;     (add-to-index :getclojure_development sexp)))
+(defn add-sexps-to-index []
+  (doseq [sexp sexps]
+    (add-to-index :getclojure sexp))
+  (println "Work complete!"))
 
-;; (defn -main []
-;;   (println "Attempting to connect to searchbox...")
-;;   (println "The searchbox URL is" (System/getenv "SEARCHBOX_URL"))
-;;   (esr/connect! (or (System/getenv "SEARCHBOX_URL")
-;;                     "http://127.0.0.1:9200"))
-;;   (create-getclojure-index)
-;;   (println "Adding sexps to the index...")
-;;   (time (add-sexps-to-index))
-;;   (println "Starting the server...")
-;;   (start-server (System/getenv "PORT")))
+;; (add-sexps-to-index)
 
 ;; (def sexps (atom #{}))
 

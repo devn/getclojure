@@ -80,3 +80,13 @@ pre.value {
 pre.output {
   border-left-color: #91dc46 !important;
 }
+
+#pagination {
+  margin-left: auto;
+  margin-right: auto;
+  text-align: center;
+}
+
+.page_num {
+  padding: 5px;
+ }

@@ -2,21 +2,30 @@
   (:require [clojure.string :as str]
             [net.cgrand.enlive-html :as enlive]))
 
-(defn get-lines [f]
-  (enlive/select (enlive/html-resource f) [:p]))
+(defn get-lines
+  "Gets all of the 'p' tags from a logfile."
+  [^java.io.File logfile]
+  (enlive/select (enlive/html-resource logfile) [:p]))
 
-(defn text-for [node kw]
+(defn text-for
+  "Gets the text for an enlive node specified by its keyword."
+  [node kw]
   (first (enlive/texts (enlive/select node [kw]))))
 
-(defn trim-nickname [s]
+(defn trim-nickname
+  "Takes \"foo: \" and returns \"foo\"."
+  [^String s]
   (if s (str/replace s #": " "")))
 
-(defn trim-content [s]
+(defn trim-content
+  "Trim the left and right sides of a string of its whitespace and
+  trailing newline.Takes and returns a string."
+  [^String s]
   (str/trimr (str/triml (str/trim-newline s))))
 
 (defn extract-sexps
-  "Extracts sexps."
-  [string]
+  "Extracts sexps. Using 0s and 1s, ostensibly."
+  [^String string]
   (second
    (reduce (fn [[exp exps state cnt] c]
              (cond
@@ -45,33 +54,55 @@
            [(java.lang.StringBuilder.) '() :text 0]
            string)))
 
+(defn extracted-sexps-or-nil
+  "Takes a string and returns the s-expressions that were extracted a
+  sequence of string, otherwise it returns nil."
+  [^String s]
+  (let [extracted-sexps (extract-sexps s)]
+    (when-not (empty? extracted-sexps) extracted-sexps)))
+
 (defn node->map [node date]
   (let [nickname  (trim-nickname (text-for node :b))
         timestamp (text-for node :a)
         content   (trim-content (last (:content node)))
-        sexps     (let [sexps (extract-sexps content)]
-                    (if-not (empty? sexps) sexps))]
-    {:nickname nickname
-     :date date
-     :timestamp timestamp
-     :content content
-     :sexp sexps}))
+        sexps     (extracted-sexps-or-nil content)]
+    {:nickname  nickname,
+     :date      date,
+     :timestamp timestamp,
+     :content   content,
+     :sexp      sexps}))
 
-(defn fix-empty-nicknames [mapseq]
+(defn forward-propagate
+  "If the keyword (kw) specified does not exist in the next map in the
+  sequence, use the previous value of the keyword (kw).
+
+  Example:
+  (forward-propagate :nickname '({:nickname \"Fred\"} {:nickname nil}))
+  => ({:nickname \"Fred\"} {:nickname \"Fred\"})"
+  [mapseq kw]
   (rest
    (reductions
-    (fn [{prev :nickname} next]
-      (update-in next [:nickname] #(or % prev)))
+    (fn [{prev kw} next]
+      (update-in next [kw] #(or % prev)))
     {}
     mapseq)))
 
-(defn log->mapseq [f]
-  (let [date (str/replace (.getName f) #"\.html" "")
-        log-lines (get-lines f)]
-    (fix-empty-nicknames
-     (map #(node->map % date) log-lines))))
+(defn logfile->mapseq
+  "Takes a java.io.File and returns a sequence of hash maps which have
+  the following keys: :nickname, :date, :timestamp, :content, :sexp."
+  [^java.io.File logfile]
+  (let [parsed-date  (str/replace (.getName logfile) #"\.html" "")
+        loglines     (get-lines logfile)
+        dated-mapseq (map #(node->map % parsed-date) loglines)]
+    (forward-propagate :nickname dated-mapseq)))
 
-;; (defn logs->mapseq [fcoll]
-;;   (doseq [f fcoll]
-;;     (println "Processing" (str f))
-;;     (log->mapseq f)))
+(defn logfiles->mapseqs
+  "Takes a sequence of java.io.File objects and returns a sequence of
+  sequences containing maps which contains extracted information from
+  each log line encountered.
+
+  Example:
+  (logs->mapseqs (map #(java.io.File. %) [\"pathto/file\" \"pathto/file2\"]))
+  => ({:..})"
+  [logfiles]
+  (doseq [logfile logfiles] (logfile->mapseq logfiles)))

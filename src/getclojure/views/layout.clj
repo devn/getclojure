@@ -7,20 +7,30 @@
         [getclojure.search :only (search-results-for)]
         [getclojure.views.helpers :only (format-input format-output format-value)]
         [clojail.core :only (safe-read)]
-        [clojure.pprint :as pp]))
+        [clojure.pprint :as pp]
+        [getclojure.util :only (generate-query-string)]))
 
 (defn header []
   [:header
    [:h1 "GetClojure"]
    [:p "(find {:clojure :examples})"]])
 
-(defn search-form []
-  [:section.search
-   (form-to
-    [:get "/search"]
-    (text-field {:placeholder "comp AND juxt"} "q")
-    (hidden-field "num" 0)
-    (submit-button "search"))])
+(defn search-form [& q]
+  (let [query (first q)]
+    [:section.search
+     (form-to
+      [:get "/search"]
+      (if query
+        (text-field {:placeholder "comp AND juxt"} "q" query)
+        (text-field {:placeholder "comp AND juxt"} "q"))
+      (hidden-field "num" 0)
+      (submit-button "search"))]))
+
+(defn pagination [q]
+  [:div#pagination
+   (map #(link-to {:class "page_num"}
+                  (str "/search?" (generate-query-string {"q" q "num" %})) %)
+        (range 0 10))])
 
 (defn search-results [q page-num]
   [:section.results
@@ -30,7 +40,9 @@
        (format-input input)
        (format-value value)
        (format-output output)])]
-   [:div#pagination (map #(link-to (str "/search?num=" %) %) (range 0 10))]])
+   [:div#pagination (map #(link-to {:class "page_num"}
+                                   (str "/search?" (generate-query-string {"q" q "num" %})) %)
+                         (range 0 10))]])
 
 (defn footer []
   [:footer "Created with Love by '(Devin Walters)"])
