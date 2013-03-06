@@ -1,10 +1,11 @@
 (ns getclojure.extract
   (:require [clojure.string :as str]
-            [net.cgrand.enlive-html :as enlive]))
+            [net.cgrand.enlive-html :as enlive])
+  (:import java.io.File))
 
 (defn get-lines
   "Gets all of the 'p' tags from a logfile."
-  [^java.io.File logfile]
+  [^File logfile]
   (enlive/select (enlive/html-resource logfile) [:p]))
 
 (defn text-for
@@ -90,7 +91,7 @@
 (defn logfile->mapseq
   "Takes a java.io.File and returns a sequence of hash maps which have
   the following keys: :nickname, :date, :timestamp, :content, :sexp."
-  [^java.io.File logfile]
+  [^File logfile]
   (let [parsed-date  (str/replace (.getName logfile) #"\.html" "")
         loglines     (get-lines logfile)
         dated-mapseq (map #(node->map % parsed-date) loglines)]
@@ -102,7 +103,7 @@
   each log line encountered.
 
   Example:
-  (logs->mapseqs (map #(java.io.File. %) [\"pathto/file\" \"pathto/file2\"]))
-  => ({:..})"
+  (logs->mapseqs (map #(File. %) [\"pathto/file\" \"pathto/file2\"]))
+  => ({:input \"(+ 1 1)\" ...} {:input \"(+ 1 2)\"})"
   [logfiles]
   (doseq [logfile logfiles] (logfile->mapseq logfiles)))
