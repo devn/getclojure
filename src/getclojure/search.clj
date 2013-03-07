@@ -52,10 +52,12 @@
   (get-search-hits (search-sexps q page-num)))
 
 (comment
-  (esr/connect! "http://6ooyks68:mijf5fy0wrca3gmh@oak-8299758.us-east-1.bonsai.io")
   (esr/connect! "http://127.0.0.1:9200")
   (esr/connect! "url_for_elasticsearch")
-  (esi/delete "getclojure")
+  (if (esi/exists? "getclojure")
+    (do (println "The getclojure index already exists!")
+        (println "Delete it if you'd like to create a new version."))
+    (create-getclojure-index))
   (create-getclojure-index)
   (doseq [input  (map #(:input (:_source %))
                       (get-in (esd/search "getclojure"
