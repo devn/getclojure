@@ -16,15 +16,20 @@
       (add-to-index :getclojure sexp))))
 
 (defn -main []
-  (println "Attempting to connect to searchbox...")
-  (println "The Bonsai URL is" (System/getenv "BONSAI_URL"))
-  (connect! (or (System/getenv "BONSAI_URL")
-                "http://127.0.0.1:9200"))
-  (doseq [idx ["getclojure" "getclojure_development"]]
-    (if (exists? idx)
-      (println "Deleting" idx "...")
-      (delete idx)))
-  (println "Creating getclojure index...")
-  (create-getclojure-index)
-  (println "Adding sexps to the index...")
-  (time (add-sexps-to-index)))
+  (println "Attempting to connect to elastic search...")
+  (let [search-endpoint (or (System/getenv "BONSAI_URL") "http://127.0.0.1:9200")]
+    (println "The elastic search endpoint is" search-endpoint)
+
+    (println "Connecting to" search-endpoint)
+    (connect! search-endpoint)
+
+    (let [idx-name "getclojure"]
+      (if (exists? idx-name)
+        (do (println "The index" idx-name "already existed!")
+            (println "Deleting" idx-name "...")
+            (delete idx-name))
+        (println "The" idx-name "index doesn't exist..."))
+      (println "Creating" idx-name "index...")
+      (create-getclojure-index))
+    (println "Populating the index...")
+    (time (add-sexps-to-index))))
