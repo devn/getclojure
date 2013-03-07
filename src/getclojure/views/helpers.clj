@@ -10,15 +10,16 @@
 
 (defn format-input [input]
   (if (string? input)
-    [:pre.input.prettyprint.lang-clj (print-with-code-dispatch input)]
-    [:pre.input.prettyprint.lang-clj (str input "\n")]))
+    [:pre {:class "brush: clojure;"} (print-with-code-dispatch input)]
+    [:pre {:class "brush: clojure;"} (str input "\n")]))
 
 (defn format-value [value]
-  [:pre.value.prettyprint.lang-clj (escape-html value)])
+  [:pre {:class "brush: clojure;"} (escape-html value)])
 
 (defn format-output [output]
   (if-not (= output "\"\"")
-    [:pre.output.prettyprint.lang-clj (safe-read
-                                       (with-out-str
-                                         (pp/with-pprint-dispatch pp/code-dispatch
-                                           (pp/pprint output))))]))
+    [:pre {:class "brush: clojure;"}
+     (safe-read
+      (with-out-str
+        (pp/with-pprint-dispatch pp/code-dispatch
+          (pp/pprint output))))]))

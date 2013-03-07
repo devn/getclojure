@@ -1,3 +1,0 @@
-$(window).load(function() {
-  prettyPrint();
-});
