@@ -5,14 +5,16 @@
   (:require [clojure.java.io :as io]))
 
 (def sexps
-  (into #{} (read-string (slurp (io/file "working-sexps.db")))))
+  (->> (io/file "working-sexps.db")
+       slurp
+       read-string
+       (into #{})))
 
-(defn add-sexps-to-index []
-  (let [num-sexps (count sexps)
-        cnt (atom 0)]
-    (doseq [sexp sexps]
-      (swap! cnt inc)
-      (println (str @cnt "/" num-sexps))
+(defn add-sexps-to-index [sexp-set]
+  (let [numbered-sexps (sort-by key (zipmap (iterate inc 1) sexp-set))
+        cnt (count numbered-sexps)]
+    (doseq [[n sexp] numbered-sexps]
+      (println (str n "/" cnt))
       (add-to-index :getclojure sexp))))
 
 (defn -main []
