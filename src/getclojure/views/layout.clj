@@ -47,12 +47,6 @@
 (defn footer []
   [:footer "Created with Love by '(Devin Walters)"])
 
-(defhtml syntax-highlighter-initialize []
-  [:script {:type "text/javascript"}
-   "SyntaxHighlighter.defaults['gutter'] = false;"
-   "SyntaxHighlighter.defaults['toolbar'] = false;"
-   "SyntaxHighlighter.all();"])
-
 (defhtml base [& content]
   [:head
    [:title "GetClojure"]
