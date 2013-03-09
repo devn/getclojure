@@ -10,3 +10,9 @@ pom.xml
 .lein-deps-sum
 .lein-failures
 .lein-plugins
+/lib/
+/classes/
+/targets/
+.lein-deps-sum
+.lein-repl-history
+/resources/pygments
