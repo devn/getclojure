@@ -47,21 +47,12 @@
 (defn footer []
   [:footer "Created with Love by '(Devin Walters)"])
 
-(defhtml syntax-highlighter-initialize []
-  [:script {:type "text/javascript"}
-   "SyntaxHighlighter.defaults['gutter'] = false;"
-   "SyntaxHighlighter.defaults['toolbar'] = false;"
-   "SyntaxHighlighter.all();"])
-
 (defhtml base [& content]
   [:head
    [:title "GetClojure"]
-   (include-css "/css/screen.css")
-   (include-css "/css/shClojureExtra.css" "/css/shCoreDefault.css")
-   (include-js "//ajax.googleapis.com/ajax/libs/jquery/1.9.0/jquery.min.js")
-   (include-js "/js/shCore.js" "/js/shBrushClojure.js")
-   (syntax-highlighter-initialize)]
-  [:body content])
+   (include-css "/css/screen.css" "/css/github.css")]
+  [:body content
+   (include-js "//ajax.googleapis.com/ajax/libs/jquery/1.9.0/jquery.min.js")])
 
 (defn common [& content]
   (base

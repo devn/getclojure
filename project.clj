@@ -9,6 +9,8 @@
                  [clojail "1.0.3"]
                  [org.clojars.semperos/enlive "1.0.1"
                   :exclusions [org.clojure/clojure]]
+                 [me.raynes/laser "0.1.15"]
+                 [me.raynes/conch "0.5.0"]
                  [org.thnetos/cd-client "0.3.6"]
                  ;; Web
                  [lib-noir "0.3.5"]

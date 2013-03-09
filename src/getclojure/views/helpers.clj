@@ -1,7 +1,13 @@
 (ns getclojure.views.helpers
   (:use [clojail.core :only (safe-read)]
-        [hiccup.util :only (escape-html)])
+        [hiccup.util :only (escape-html)]
+        [me.raynes.conch :only (let-programs)])
   (:require [clojure.pprint :as pp]))
+
+(defn pygmentize [s]
+  (let-programs [colorize "./pygmentize"
+                 pwd "pwd"]
+    (colorize "-fhtml" "-lclojure" {:in s :dir "resources/pygments"})))
 
 (defn print-with-code-dispatch [code]
   (with-out-str
@@ -10,16 +16,16 @@
 
 (defn format-input [input]
   (if (string? input)
-    [:pre {:class "brush: clojure;"} (print-with-code-dispatch input)]
-    [:pre {:class "brush: clojure;"} (str input "\n")]))
+    (pygmentize (print-with-code-dispatch input))
+    (pygmentize (str input "\n"))))
 
 (defn format-value [value]
-  [:pre {:class "brush: clojure;"} (escape-html value)])
+  (pygmentize value))
 
 (defn format-output [output]
   (if-not (= output "\"\"")
-    [:pre {:class "brush: clojure;"}
-     (safe-read
-      (with-out-str
-        (pp/with-pprint-dispatch pp/code-dispatch
-          (pp/pprint output))))]))
+    (pygmentize
+      (safe-read
+        (with-out-str
+          (pp/with-pprint-dispatch pp/code-dispatch
+            (pp/pprint output)))))))
