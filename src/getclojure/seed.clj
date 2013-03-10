@@ -40,7 +40,7 @@
     (println "The elastic search endpoint is" search-endpoint)
 
     (println "Connecting to MongoDB")
-    (if (= "development" (:environment (make-connection! (System/getenv "MONGOHQ_URL"))))
+    (if (= "development" (:environment (make-connection!)))
       (do (println "Deleting all users")
           (mc/remove :users)
           (println "Deleting all existing sexps")

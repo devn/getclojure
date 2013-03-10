@@ -17,7 +17,7 @@
   "init will be called once when app is deployed as a servlet on an
    app server such as Tomcat put any initialization code here"
   []
-  (make-connection! (System/getenv "MONGOHQ_URL"))
+  (make-connection!)
   (esr/connect! (or (System/getenv "BONSAI_URL") "http://127.0.0.1:9200"))
   (println "GetClojure started successfully..."))
 

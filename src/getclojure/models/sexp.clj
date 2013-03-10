@@ -6,7 +6,7 @@
             [getclojure.db :refer [make-connection!]]
             [getclojure.format :refer [format-input format-output format-value]]))
 
-(make-connection! (System/getenv "MONGOHQ_URL"))
+(make-connection!)
 
 (def sexp-id
   "The current highest sexp-id."
