@@ -8,9 +8,10 @@
 (def mappings
   {:sexp
    {:properties
-    {:input {:type "string" :store "yes" :analyzer "clojure_code" :tokenizer "clojure_tokenizer" :filter "clojure_filter"}
-     :output {:type "string" :store "yes" :analyzer "clojure_code"}
-     :value {:type "string" :store "yes" :analyzer "clojure_code"}}}})
+    {:id {:type "integer" :store "yes"}
+     :input {:type "string" :store "yes" :analyzer "clojure_code" :tokenizer "clojure_tokenizer" :filter "clojure_filter"}
+     :output {:type "string" :store "yes" :analyzer "clojure_code" :tokenizer "clojure_tokenizer" :filter "clojure_filter"}
+     :value {:type "string" :store "yes" :analyzer "clojure_code" :tokenizer "clojure_tokenizer" :filter "clojure_filter"}}}})
 
 (def clojure-analyzer
   {:clojure_code {:type "custom"
