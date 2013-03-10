@@ -3,7 +3,10 @@
   (:require [monger.collection :as mc]
             [monger.core :as mg]
             [monger.query :refer [with-collection find sort limit paginate]]
+            [getclojure.db :refer [make-connection!]]
             [getclojure.format :refer [format-input format-output format-value]]))
+
+(make-connection!)
 
 (def sexp-id
   "The current highest sexp-id."
