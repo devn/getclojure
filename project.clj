@@ -7,6 +7,9 @@
                  [clojurewerkz/elastisch "1.0.2"]
                  [iota "1.0.2"]
                  [clojail "1.0.3"]
+                 [com.novemberain/monger "1.5.0-beta1"]
+                 [com.novemberain/validateur "1.2.0"]
+                 [clj-config "0.2.0"]
                  [org.clojars.semperos/enlive "1.0.1"
                   :exclusions [org.clojure/clojure]]
                  [me.raynes/laser "0.1.15"]
