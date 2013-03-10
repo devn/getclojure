@@ -16,8 +16,8 @@
                  [me.raynes/conch "0.5.0"]
                  [org.thnetos/cd-client "0.3.6"]
                  ;; Web
-                 [lib-noir "0.3.5"]
-                 [compojure "1.1.3"]
+                 [lib-noir "0.3.8"]
+                 [compojure "1.1.5"]
                  [hiccup "1.0.2"]
                  [ring-server "0.2.5"]
                  [com.taoensso/timbre "1.2.0"]
