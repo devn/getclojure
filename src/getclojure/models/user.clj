@@ -69,9 +69,9 @@
 
 (defn user-sexps [username page & [others]]
   (with-collection "sexps"
-    (find (merge {:username (str (:_id (get-user username)))} others))
+    (find (merge {:user (:_id (get-user username))} others))
     (sort {:date -1})
     (paginate :page page :per-page 10)))
 
 (defn count-user-sexps [username & [others]]
-  (mc/count "sexps" (merge {:username (str (:_id (get-user username)))} others)))
+  (mc/count "sexps" (merge {:user (:_id (get-user username))} others)))
