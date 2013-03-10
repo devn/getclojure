@@ -3,20 +3,10 @@
   (:require [monger.collection :as mc]
             [monger.core :as mg]
             [monger.query :refer [with-collection find sort limit paginate]]
+            [getclojure.db :refer [make-connection!]]
             [getclojure.views.helpers :refer [pygmentize]]))
 
-(let [mongolab (get (System/getenv) "MONGOLAB_URI" false)
-      uri (or mongolab "mongodb://127.0.0.1/getclojure_development")]
-  (mg/connect-via-uri! uri)
-  ;; TODO: This should be pushed to somewhere more config-like.
-  (if mongolab
-    (mg/use-db! "getclojure")
-    (mg/use-db! "getclojure_development"))
-  (mc/ensure-index "sexps" {:user 1})
-  (mc/ensure-index "sexps" {:id 1} {:unique true})
-  (mc/ensure-index "sexps" {:raw-input 1} {:unique true})
-  (mc/ensure-index "sexps" {:raw-output 1})
-  (mc/ensure-index "sexps" {:raw-value 1}))
+(make-connection!)
 
 (def sexp-id
   "The current highest sexp-id."

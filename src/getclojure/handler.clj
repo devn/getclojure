@@ -3,6 +3,9 @@
         [compojure.core])
   (:require [noir.util.middleware :as middleware]
             [clojurewerkz.elastisch.rest :as esr]
+            [getclojure.db :refer [make-connection!]]
+            [monger.core :as mg]
+            [monger.collection :as mc]
             [compojure.route :as route]))
 
 (defroutes app-routes
@@ -14,8 +17,8 @@
   "init will be called once when app is deployed as a servlet on an
    app server such as Tomcat put any initialization code here"
   []
-  (esr/connect! (or (System/getenv "BONSAI_URL")
-                    "http://127.0.0.1:9200"))
+  (make-connection!)
+  (esr/connect! (or (System/getenv "BONSAI_URL") "http://127.0.0.1:9200"))
   (println "GetClojure started successfully..."))
 
 (defn destroy []

@@ -1,14 +1,28 @@
 (ns getclojure.seed
-  (:use [getclojure.search :only (create-getclojure-index add-to-index)]
-        [clojurewerkz.elastisch.rest :only (connect!)]
-        [clojurewerkz.elastisch.rest.index :only (exists? create delete)])
-  (:require [clojure.java.io :as io]))
+  (:require [clojure.java.io :as io]
+            [clojurewerkz.elastisch.rest :refer [connect!]]
+            [clojurewerkz.elastisch.rest.index :refer [exists? create delete]]
+            [monger.core :as mg]
+            [monger.collection :as mc]
+            [getclojure.db :refer [make-connection!]]
+            [getclojure.search :refer [create-getclojure-index add-to-index]]
+            [getclojure.models.user :refer [create-user!]]
+            [getclojure.models.sexp :refer [create-sexp!]]))
 
 (def sexps
   (->> (io/file "working-sexps.db")
        slurp
        read-string
        (into #{})))
+
+(defn seed-sexps [sexp-set]
+  (let [numbered-sexps (sort-by key (zipmap (iterate inc 1) sexp-set))
+        cnt (count numbered-sexps)
+        user (create-user! "admin@getclojure.org" "admin")]
+    (doseq [[n sexp] numbered-sexps]
+      (println (str n "/" cnt))
+      (let [id (:id (create-sexp! user sexp))]
+        (add-to-index :getclojure (assoc sexp :id id))))))
 
 (defn add-sexps-to-index [sexp-set]
   (let [numbered-sexps (sort-by key (zipmap (iterate inc 1) sexp-set))
@@ -19,8 +33,12 @@
 
 (defn -main []
   (println "Attempting to connect to elastic search...")
-  (let [search-endpoint (or (System/getenv "BONSAI_URL") "http://127.0.0.1:9200")]
+  (let [search-endpoint (or (System/getenv "BONSAI_URL")
+                            "http://127.0.0.1:9200")]
     (println "The elastic search endpoint is" search-endpoint)
+
+    (println "Connecting to MongoDB")
+    (make-connection!)
 
     (println "Connecting to" search-endpoint)
     (connect! search-endpoint)
@@ -34,4 +52,4 @@
       (println "Creating" idx-name "index...")
       (create-getclojure-index))
     (println "Populating the index...")
-    (time (add-sexps-to-index))))
+    (time (seed-sexps sexps))))

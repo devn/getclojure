@@ -39,3 +39,9 @@
                               "="
                               (url-encode (str v)))]))
                     params)))
+
+(defn inclusive-range
+  ([] (inclusive-range 0 Double/POSITIVE_INFINITY 1))
+  ([end] (inclusive-range 0 end 1))
+  ([start end] (inclusive-range start end 1))
+  ([start end step] (range start (inc end) step)))
