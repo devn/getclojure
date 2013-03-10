@@ -21,8 +21,9 @@
         user (create-user! "admin@getclojure.org" "admin")]
     (doseq [[n sexp] numbered-sexps]
       (println (str n "/" cnt))
-      (let [id (:id (create-sexp! user sexp))]
-        (add-to-index :getclojure (assoc sexp :id id))))))
+      (if-not (mc/any? "sexps" {:raw-input (:input sexp)})
+        (let [id (:id (create-sexp! user sexp))]
+          (add-to-index :getclojure (assoc sexp :id id)))))))
 
 (defn add-sexps-to-index [sexp-set]
   (let [numbered-sexps (sort-by key (zipmap (iterate inc 1) sexp-set))
