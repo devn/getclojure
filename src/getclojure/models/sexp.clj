@@ -4,7 +4,7 @@
             [monger.core :as mg]
             [monger.query :refer [with-collection find sort limit paginate]]
             [getclojure.db :refer [make-connection!]]
-            [getclojure.views.helpers :refer [pygmentize]]))
+            [getclojure.format :refer [format-input format-output format-value]]))
 
 (make-connection!)
 
@@ -29,9 +29,9 @@
      :raw-input input
      :raw-value value
      :raw-output output
-     :input (pygmentize input)
-     :value (pygmentize value)
-     :output (pygmentize output)}))
+     :input (format-input input)
+     :value (format-value value)
+     :output (format-output output)}))
 
 (defn create-sexp!
   "Create a new sexp"

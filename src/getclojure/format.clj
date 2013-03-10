@@ -1,4 +1,4 @@
-(ns getclojure.views.helpers
+(ns getclojure.format
   (:use [clojail.core :only (safe-read)]
         [hiccup.util :only (escape-html)]
         [me.raynes.conch :only (let-programs)])
@@ -9,10 +9,14 @@
                  pwd "pwd"]
     (colorize "-fhtml" "-lclojure" {:in s :dir "resources/pygments"})))
 
+;; TODO: There's a problem code-dispatch on the following:
+;; (fn* [x] x). See http://dev.clojure.org/jira/browse/CLJ-1181
 (defn print-with-code-dispatch [code]
-  (with-out-str
-    (pp/with-pprint-dispatch pp/code-dispatch
-      (pp/pprint (safe-read code)))))
+  (if (.contains code "fn*")
+    (with-out-str (pp/pprint (safe-read code)))
+    (with-out-str
+      (pp/with-pprint-dispatch pp/code-dispatch
+        (pp/pprint (safe-read code))))))
 
 (defn format-input [input]
   (if (string? input)
