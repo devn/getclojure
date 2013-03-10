@@ -1,14 +1,11 @@
 (ns getclojure.views.layout
-  (:use hiccup.form
-        [hiccup.def :only [defhtml]]
+  (:use [hiccup.def :only [defhtml]]
         [hiccup.element :only [link-to]]
         [hiccup.form]
         [hiccup.page :only [html5 include-js include-css]]
         [getclojure.search :only (search-results-for)]
-        [getclojure.views.helpers :only (format-input format-output format-value)]
-        [clojail.core :only (safe-read)]
-        [clojure.pprint :as pp]
-        [getclojure.util :only (generate-query-string)]))
+        [getclojure.util :only (generate-query-string)])
+  (:require [monger.collection :as mc]))
 
 (defn header []
   [:header
@@ -32,14 +29,18 @@
                   (str "/search?" (generate-query-string {"q" q "num" %})) %)
         (range 0 10))])
 
+(defn find-sexps-from-search [q page-num]
+  (map #(mc/find-one-as-map "sexps" {:id %})
+       (map :id (search-results-for q page-num))))
+
 (defn search-results [q page-num]
   [:section.results
    [:ul
-    (for [{:keys [input value output]} (search-results-for q page-num)]
+    (for [{:keys [input value output]} (find-sexps-from-search q page-num)]
       [:li.result
-       (format-input input)
-       (format-value value)
-       (format-output output)])]
+       input
+       value
+       output])]
    [:div#pagination (map #(link-to {:class "page_num"}
                                    (str "/search?" (generate-query-string {"q" q "num" %})) %)
                          (range 0 10))]])
