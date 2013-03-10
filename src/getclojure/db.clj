@@ -10,6 +10,8 @@
 (defn make-connection! []
   (let [db-uri (get-db-uri)
         environment (if (.contains db-uri "heroku") "production" "development")]
+    (println "Environment:" environment)
+    (println "DB URI:" db-uri)
     (mg/connect-via-uri! db-uri)
     (if (.contains db-uri "heroku")
       (mg/use-db! "getclojure")
