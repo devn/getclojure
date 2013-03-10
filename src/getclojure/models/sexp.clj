@@ -25,7 +25,7 @@
 (defn sexp-record-map [id user sexp-map]
   (let [{:keys [input value output]} sexp-map]
     {:id id
-     :user (:id user)
+     :user (:_id user)
      :raw-input input
      :raw-value value
      :raw-output output
