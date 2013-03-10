@@ -13,4 +13,5 @@
     (mc/ensure-index "sexps" {:id 1} {:unique true})
     (mc/ensure-index "sexps" {:raw-input 1} {:unique true})
     (mc/ensure-index "sexps" {:raw-output 1})
-    (mc/ensure-index "sexps" {:raw-value 1})))
+    (mc/ensure-index "sexps" {:raw-value 1})
+    {:environment (if mongolab "production" "development")}))
