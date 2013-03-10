@@ -3,9 +3,8 @@
             [monger.collection :as mc]))
 
 (defn get-db-uri []
-  (get (System/getenv)
-       "MONGOLAB_URI"
-       "mongodb://127.0.0.1/getclojure_development"))
+  (or (System/getenv "MONGOLAB_URI")
+      "mongodb://127.0.0.1/getclojure_development"))
 
 (defn make-connection! []
   (let [db-uri (get-db-uri)
