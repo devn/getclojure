@@ -2,17 +2,12 @@
   (:require [monger.core :as mg]
             [monger.collection :as mc]))
 
-(defn get-db-uri []
-  (or (System/getenv "MONGOHQ_URI")
-      "mongodb://127.0.0.1/getclojure_development"))
-
-(defn make-connection! []
-  (let [db-uri (get-db-uri)
-        environment (if (.contains db-uri "heroku") "production" "development")]
+(defn make-connection! [uri]
+  (let [environment (if (.contains uri "heroku") "production" "development")]
     (println "Environment:" environment)
-    (println "DB URI:" db-uri)
-    (mg/connect-via-uri! (System/getenv "MONGOHQ_URL"))
-    (if (.contains db-uri "heroku")
+    (println "DB URI:" uri)
+    (mg/connect-via-uri! uri)
+    (if (= "production" environment)
       (mg/use-db! "getclojure")
       (mg/use-db! "getclojure_development"))
     (mc/ensure-index "sexps" {:user 1})
