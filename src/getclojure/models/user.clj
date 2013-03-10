@@ -27,6 +27,7 @@
         errors (validate-user-map qmap)]
     (if (and (unique-user? name) (empty? errors))
       (let [user (mc/insert-and-return "users" qmap)]
+        ;; TODO: Finish building out users
         ;;(session/put! :user (assoc qmap :id (str (:_id user))))
         user)
       errors)))
