@@ -11,7 +11,7 @@
         environment (if (.contains db-uri "heroku") "production" "development")]
     (println "Environment:" environment)
     (println "DB URI:" db-uri)
-    (mg/connect-via-uri! db-uri)
+    (mg/connect-via-uri! (System/getenv "MONGOHQ_URL"))
     (if (.contains db-uri "heroku")
       (mg/use-db! "getclojure")
       (mg/use-db! "getclojure_development"))
