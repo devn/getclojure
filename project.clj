@@ -29,7 +29,10 @@
   :profiles
   {:production {:ring {:open-browser? false
                        :stacktraces?  false
-                       :auto-reload?  false}}
+                       :auto-reload?  false}
+                :offline true
+                :mirror {#"central|clojars"
+                         "http://s3pository.herokuapp.com/clojure"}}
    :dev {:dependencies [[ring-mock "0.1.3"]
                         [ring/ring-devel "1.1.0"]
                         [org.clojure/data.csv "0.1.2"]]}}
