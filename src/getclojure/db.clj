@@ -2,26 +2,25 @@
   (:require [monger.core :as mg]
             [monger.collection :as mc]))
 
-(def mongo-uri
-  (let [uri (or (System/getenv "MONGOLAB_URI")
-                "mongodb://127.0.0.1/getclojure_development")]))
-
-(defn env? []
+(defn env? [mongo-uri]
   (if (.contains mongo-uri "heroku")
     "production"
     "development"))
 
+(defn- make-indices []
+  (mc/ensure-index "sexps" {:user 1})
+  (mc/ensure-index "sexps" {:id 1} {:unique true})
+  (mc/ensure-index "sexps" {:raw-input 1} {:unique true})
+  (mc/ensure-index "sexps" {:raw-output 1})
+  (mc/ensure-index "sexps" {:raw-value 1}))
+
 (defn make-connection! []
-  (let [env (env?)]
-    (println "Environment:" env)
-    (println "DB URI:" mongo-uri)
+  (let [mongo-uri (or (System/getenv "MONGOLAB_URI")
+                      "mongodb://127.0.0.1/getclojure_development")
+        env (env? mongo-uri)]
     (mg/connect-via-uri! mongo-uri)
     (if (= "production" env)
       (mg/use-db! "getclojure")
       (mg/use-db! "getclojure_development"))
-    (mc/ensure-index "sexps" {:user 1})
-    (mc/ensure-index "sexps" {:id 1} {:unique true})
-    (mc/ensure-index "sexps" {:raw-input 1} {:unique true})
-    (mc/ensure-index "sexps" {:raw-output 1})
-    (mc/ensure-index "sexps" {:raw-value 1})
+    (make-indices)
     {:environment env}))
