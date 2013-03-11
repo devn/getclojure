@@ -26,8 +26,7 @@
         (if-not (mc/any? "sexps" {:raw-input (:input sexp)})
           (let [id (:id (create-sexp! user sexp))]
             (add-to-index :getclojure (assoc sexp :id id))))
-        (catch clojure.lang.LispReader _ (str sexp ": failed to be seeded!"))
-        (catch Throwable t)))))
+        (catch Exception _ (str sexp ": failed to be seeded!"))))))
 
 (defn clean-db! []
   (let [conn (make-connection!)
