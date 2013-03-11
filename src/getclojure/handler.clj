@@ -2,6 +2,7 @@
   (:use [getclojure.routes.home]
         [compojure.core])
   (:require [getclojure.db :refer [make-connection!]]
+            [getclojure.models.sexp :refer [sexp-id set-highest-sexp-id!]]
             [noir.util.middleware :as middleware]
             [clojurewerkz.elastisch.rest :as esr]
             [monger.core :as mg]
@@ -18,6 +19,7 @@
    app server such as Tomcat put any initialization code here"
   []
   (make-connection!)
+  (set-highest-sexp-id!)
   (esr/connect! (or (System/getenv "BONSAI_URL") "http://127.0.0.1:9200"))
   (println "GetClojure started successfully..."))
 

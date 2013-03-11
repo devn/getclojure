@@ -2,21 +2,30 @@
   (:refer-clojure :exclude [sort find])
   (:require [monger.collection :as mc]
             [monger.query :refer [with-collection find sort limit paginate]]
-            [getclojure.db :refer [make-connection!]]
             [getclojure.format :refer [format-input format-output format-value]]))
 
-(make-connection!)
+(def sexp-id (atom 0))
 
-(def sexp-id
-  "The current highest sexp-id."
-  (atom
-   (-> (with-collection "sexps"
-         (find {})
-         (sort {:id -1})
-         (limit 1))
-       first
-       :id
-       (or 0))))
+(defn set-highest-sexp-id! []
+  (reset! sexp-id
+          (-> (with-collection "sexps"
+                (find {})
+                (sort {:id -1})
+                (limit 1))
+              first
+              :id
+              (or 0))))
+
+;; (def sexp-id
+;;   "The current highest sexp-id."
+;;   (atom
+;;    (-> (with-collection "sexps"
+;;          (find {})
+;;          (sort {:id -1})
+;;          (limit 1))
+;;        first
+;;        :id
+;;        (or 0))))
 
 (defn sexp-exists? [{:keys [raw-input]}]
   (mc/any? "sexps" {:raw-input raw-input}))
