@@ -4,8 +4,8 @@
 
 (defn env? [mongo-uri]
   (if (.contains mongo-uri "heroku")
-    "production"
-    "development"))
+    :production
+    :development))
 
 (defn- make-indices []
   (mc/ensure-index "sexps" {:user 1})
@@ -20,4 +20,4 @@
         env (env? mongo-uri)]
     (mg/connect-via-uri! mongo-uri)
     (make-indices)
-    {:environment env}))
+    {:environment env :uri mongo-uri}))

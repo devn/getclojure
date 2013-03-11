@@ -4,7 +4,7 @@
             [clojurewerkz.elastisch.rest.index :refer [exists? create delete]]
             [monger.core :as mg]
             [monger.collection :as mc]
-            [getclojure.db :refer [make-connection!]]
+            [getclojure.db :refer [make-connection! env?]]
             [getclojure.search :refer [create-getclojure-index add-to-index]]
             [getclojure.models.user :refer [create-user!]]
             [getclojure.models.sexp :refer [create-sexp!]]))
@@ -26,28 +26,17 @@
         (let [id (:id (create-sexp! user sexp))]
           (add-to-index :getclojure (assoc sexp :id id)))))))
 
-(defn add-sexps-to-index [sexp-set]
-  (let [numbered-sexps (sort-by key (zipmap (iterate inc 1) sexp-set))
-        cnt (count numbered-sexps)]
-    (doseq [[n sexp] numbered-sexps]
-      (println (str n "/" cnt))
-      (add-to-index :getclojure sexp))))
+(defn clean-db! []
+  (let [conn (make-connection!)
+        env (:environment conn)]
+    (if (= :development env)
+      (do (mc/remove :users)
+          (mc/remove :sexps)))))
 
 (defn -main []
   (println "Attempting to connect to elastic search...")
   (let [search-endpoint (or (System/getenv "BONSAI_URL")
                             "http://127.0.0.1:9200")]
-    (println "The elastic search endpoint is" search-endpoint)
-
-    (println "Connecting to MongoDB...")
-    (let [mongo-uri (make-connection!)]
-      (if (= "development" (if (.contains mongo-uri "heroku")
-                             "production"
-                             "development"))
-        (do (println "Deleting all users")
-            (mc/remove :users)
-            (println "Deleting all existing sexps")
-            (mc/remove :sexps))))
 
     (println "Connecting to" search-endpoint)
     (connect! search-endpoint)
