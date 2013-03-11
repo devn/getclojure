@@ -1,7 +1,6 @@
 (ns getclojure.models.sexp
   (:refer-clojure :exclude [sort find])
   (:require [monger.collection :as mc]
-            [monger.core :as mg]
             [monger.query :refer [with-collection find sort limit paginate]]
             [getclojure.db :refer [make-connection!]]
             [getclojure.format :refer [format-input format-output format-value]]))
