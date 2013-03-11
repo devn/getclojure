@@ -1,1 +1,1 @@
-web: sh scripts/bootstrap.sh && lein with-profile production ring server
+web: sh script/bootstrap.sh && lein with-profile production ring server
