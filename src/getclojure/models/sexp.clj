@@ -3,10 +3,13 @@
   (:require [monger.collection :as mc]
             [monger.core :as mg]
             [monger.query :refer [with-collection find sort limit paginate]]
-            [getclojure.db :refer [make-connection!]]
             [getclojure.format :refer [format-input format-output format-value]]))
 
-(make-connection!)
+(let [uri (or (System/getenv "MONGODB_URI")
+              "mongodb://127.0.0.1/getclojure_development")
+      uri "mongodb://heroku_app11300183:5i1uhb3oojqo6da8qe829f58c0@ds029297.mongolab.com:29297/heroku_app11300183"]
+  (println "Connecting to Mongo URI:" uri)
+  (mg/connect-via-uri! uri))
 
 (def sexp-id
   "The current highest sexp-id."

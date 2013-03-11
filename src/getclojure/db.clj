@@ -3,10 +3,9 @@
             [monger.collection :as mc]))
 
 (def mongo-uri
-  (let [uri (get (System/getenv)
-                 "MONGOLAB_URI"
-                 "mongodb://127.0.0.1/getclojure_development")]
-    (println "Mongo URI:" mongo-uri)))
+  (let [uri (or (System/getenv "MONGODB_URI")
+                "mongodb://127.0.0.1/getclojure_development")]
+    (println "Mongo URI:" uri)))
 
 (defn env? []
   (if (.contains mongo-uri "heroku")

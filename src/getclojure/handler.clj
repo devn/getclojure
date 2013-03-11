@@ -3,7 +3,6 @@
         [compojure.core])
   (:require [noir.util.middleware :as middleware]
             [clojurewerkz.elastisch.rest :as esr]
-            [getclojure.db :refer [make-connection!]]
             [monger.core :as mg]
             [monger.collection :as mc]
             [compojure.route :as route]))
@@ -17,7 +16,11 @@
   "init will be called once when app is deployed as a servlet on an
    app server such as Tomcat put any initialization code here"
   []
-  (make-connection!)
+  (let [uri (or (System/getenv "MONGODB_URI")
+              "mongodb://127.0.0.1/getclojure_development")
+        hard-coded-uri "mongodb://heroku_app11300183:5i1uhb3oojqo6da8qe829f58c0@ds029297.mongolab.com:29297/heroku_app11300183"]
+    (println "Connecting to Mongo URI:" hard-coded-uri)
+    (mg/connect-via-uri! hard-coded-uri))
   (esr/connect! (or (System/getenv "BONSAI_URL") "http://127.0.0.1:9200"))
   (println "GetClojure started successfully..."))
 
