@@ -21,7 +21,6 @@
   "Used for starting the server in development mode from REPL"
   [& [port]]
   (let [port (if port (Integer/parseInt port) 2600)]
-    (init)
     (reset! server
             (serve (get-handler)
                    {:port port

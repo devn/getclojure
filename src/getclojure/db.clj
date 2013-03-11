@@ -19,8 +19,5 @@
                       "mongodb://127.0.0.1/getclojure_development")
         env (env? mongo-uri)]
     (mg/connect-via-uri! mongo-uri)
-    (if (= "production" env)
-      (mg/use-db! "getclojure")
-      (mg/use-db! "getclojure_development"))
     (make-indices)
     {:environment env}))
