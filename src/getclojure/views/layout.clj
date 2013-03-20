@@ -41,9 +41,12 @@
        input
        value
        output])]
-   [:div#pagination (map #(link-to {:class "page_num"}
-                                   (str "/search?" (generate-query-string {"q" q "num" %})) %)
-                         (range 0 10))]])
+   [:div#pagination
+    (link-to {:class "prev"} (str "/search?" (generate-query-string {"q" q "num" (dec (Integer/parseInt page-num))})) "<<-")
+    (map #(link-to {:class "page_num"}
+                   (str "/search?" (generate-query-string {"q" q "num" %})) %)
+         (range 0 10))
+    (link-to {:class "next"} (str "/search?" (generate-query-string {"q" q "num" (inc (Integer/parseInt page-num))})) "->>")]])
 
 (defn footer []
   [:footer "Created with Love by '(Devin Walters)"])
