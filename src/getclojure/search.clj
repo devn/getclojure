@@ -18,7 +18,6 @@
                   :tokenizer "lowercase"
                   :filter ["lowercase" "clojure_filter"]}})
 
-
 (def clojure-tokenizer
   {:clojure_tokenizer {:type "lowercase"}})
 
@@ -55,31 +54,5 @@
 (defn search-results-for [q page-num]
   (get-search-hits (search-sexps q page-num)))
 
-(comment
-  (esr/connect! "http://127.0.0.1:9200")
-  (esr/connect! "url_for_elasticsearch")
-  (if (esi/exists? "getclojure")
-    (do (println "The getclojure index already exists!")
-        (println "Delete it if you'd like to create a new version."))
-    (create-getclojure-index))
-  (create-getclojure-index)
-  (doseq [input  (map #(:input (:_source %))
-                      (get-in (esd/search "getclojure"
-                                          "sexp"
-                                          :query (q/text :input "for")
-                                          :size 50)
-                              [:hits :hits]))]
-    (println input))
-
-    (doseq [input  (map #(:input (:_source %))
-                      (get-in (esd/search "getclojure"
-                                          "sexp"
-                                          :query (q/query-string :query "for")
-                                          :size 50)
-                              [:hits :hits]))]
-    (println input))
-  
-  (esd/search "getclojure_development" "sexp" :query (q/text :input "let"))
-  (esd/search "getclojure_development" "sexp" :query (q/fuzzy :input "let"))
-  (esd/search "getclojure_development" "sexp" :query (q/fuzzy-like-this :input "let"))
-)
+(comment "Development"
+  (esr/connect! "http://127.0.0.1:9200"))
