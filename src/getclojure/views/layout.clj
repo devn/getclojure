@@ -3,7 +3,7 @@
         [hiccup.element :only [link-to]]
         [hiccup.form]
         [hiccup.page :only [html5 include-js include-css]]
-        [getclojure.search :only (search-results-for)]
+        [getclojure.search :only (search-results-for get-num-hits)]
         [getclojure.util :only (generate-query-string)])
   (:require [monger.collection :as mc]))
 
@@ -23,11 +23,22 @@
       (hidden-field "num" 0)
       (submit-button "search"))]))
 
-(defn pagination [q]
-  [:div#pagination
-   (map #(link-to {:class "page_num"}
-                  (str "/search?" (generate-query-string {"q" q "num" %})) %)
-        (range 0 10))])
+(defn pagination [q page-num]
+  (let [num (Integer/parseInt page-num)
+        total-hits (get-num-hits q page-num)
+        num-pages (/ total-hits 25)
+        prev-page-num (dec num)
+        next-page-num (inc num)]
+    [:div#pagination
+     (link-to {:class "prev"}
+              (str "/search?" (generate-query-string {"q" q "num" prev-page-num}))
+              "<<-")
+     (map #(link-to {:class "page_num"}
+                    (str "/search?" (generate-query-string {"q" q "num" %})) %)
+          (range 0 num-pages))
+     (link-to {:class "next"}
+              (str "/search?" (generate-query-string {"q" q "num" next-page-num}))
+              "->>")]))
 
 (defn find-sexps-from-search [q page-num]
   (map #(mc/find-one-as-map "sexps" {:id %})
@@ -41,12 +52,7 @@
        input
        value
        output])]
-   [:div#pagination
-    (link-to {:class "prev"} (str "/search?" (generate-query-string {"q" q "num" (dec (Integer/parseInt page-num))})) "<<-")
-    (map #(link-to {:class "page_num"}
-                   (str "/search?" (generate-query-string {"q" q "num" %})) %)
-         (range 0 10))
-    (link-to {:class "next"} (str "/search?" (generate-query-string {"q" q "num" (inc (Integer/parseInt page-num))})) "->>")]])
+   (pagination q page-num)])
 
 (defn footer []
   [:footer "Created with Love by '(Devin Walters)"])

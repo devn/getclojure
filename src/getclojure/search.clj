@@ -46,6 +46,9 @@
                 :from offset
                 :size 25)))
 
+(defn get-num-hits [q page-num]
+  (get-in (search-sexps q page-num) [:hits :total]))
+
 (defn get-search-hits [result-map]
   (map :_source (get-in result-map [:hits :hits])))
 
