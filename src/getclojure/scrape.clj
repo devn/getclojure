@@ -36,8 +36,7 @@
 ;; ClojureDocs
 (cd/set-local-mode! (io/file "clojuredocs-snapshot-latest.txt"))
 
-(def core-publics
-  (map first (ns-publics 'clojure.core)))
+(def core-publics (map first (ns-publics 'clojure.core)))
 
 (defn- remove-markdown
   "Remove basic markdown syntax from a string."
