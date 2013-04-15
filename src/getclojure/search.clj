@@ -5,14 +5,6 @@
             [clojurewerkz.elastisch.query :as q]
             [getclojure.util :as util]))
 
-;; (def mappings
-;;   {:sexp
-;;    {:properties
-;;     {:id {:type "integer" :store "yes"}
-;;      :input {:type "string" :store "yes" :analyzer "clojure_code" :tokenizer "clojure_tokenizer" :filter "clojure_filter"}
-;;      :output {:type "string" :store "yes" :analyzer "clojure_code" :tokenizer "clojure_tokenizer" :filter "clojure_filter"}
-;;      :value {:type "string" :store "yes" :analyzer "clojure_code" :tokenizer "clojure_tokenizer" :filter "clojure_filter"}}}})
-
 (def mappings
   {:sexp
    {:properties
@@ -21,18 +13,10 @@
      :output {:type "string" :store "yes" :analyzer "clojure_code" :tokenizer "clojure_tokenizer" :filter "clojure_filter"}
      :value {:type "string" :store "yes" :analyzer "clojure_code" :tokenizer "clojure_tokenizer" :filter "clojure_filter"}}}})
 
-;; (def clojure-analyzer
-;;   {:clojure_code {:type "custom"
-;;                   :tokenizer "lowercase"
-;;                   :filter ["lowercase" "clojure_filter"]}})
-
 (def clojure-analyzer
   {:clojure_code {:type "pattern"
                   :lowercase true
                   :pattern "\\s+|\\(|\\)|\\{|\\}|\\[|\\]"}})
-
-;; (def clojure-tokenizer
-;;   {:clojure_tokenizer {:type "lowercase"}})
 
 (def clojure-tokenizer
   {:clojure_tokenizer {:type "pattern"
