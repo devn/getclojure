@@ -16,17 +16,6 @@
               :id
               (or 0))))
 
-;; (def sexp-id
-;;   "The current highest sexp-id."
-;;   (atom
-;;    (-> (with-collection "sexps"
-;;          (find {})
-;;          (sort {:id -1})
-;;          (limit 1))
-;;        first
-;;        :id
-;;        (or 0))))
-
 (defn sexp-exists? [{:keys [raw-input]}]
   (mc/any? "sexps" {:raw-input raw-input}))
 
