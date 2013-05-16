@@ -8,25 +8,24 @@
             [getclojure.search :refer [create-getclojure-index add-to-index]]
             [getclojure.models.user :refer [create-user!]]
             [getclojure.models.sexp :refer [create-sexp!]]
-            [taoensso.timbre :refer [spy info]]))
+            [taoensso.timbre :refer [spy]]))
 
 (def sexps
-  (->> (io/file "working-sexps.db")
-       slurp
-       read-string
-       (into #{})))
+  (-> (io/file "working-sexps.db")
+      slurp
+      read-string
+      lazy-seq))
 
-(defn seed-sexps [sexp-set]
-  (let [numbered-sexps (sort-by key (zipmap (iterate inc 1) sexp-set))
-        cnt (count numbered-sexps)
-        user (create-user! "admin@getclojure.org" "admin")]
-    (doseq [[n sexp] numbered-sexps]
-      (info (str n "/" cnt))
-      (try
-        (if-not (mc/any? "sexps" {:raw-input (:input sexp)})
-          (let [id (:id (create-sexp! user sexp))]
-            (add-to-index :getclojure (assoc sexp :id id))))
-        (catch Exception _ (str sexp ": failed to be seeded!"))))))
+(defn seed-sexp [sexp-map]
+  (let [user (create-user! "admin@getclojure.org" "admin")]
+    (try
+      (if-not (p :check-sexp-exists (mc/any? "sexps" {:raw-input (:input sexp-map)}))
+        (let [id (:id (p :create-sexp! (create-sexp! user sexp-map)))]
+          (p :add-to-index (add-to-index :getclojure (assoc sexp-map :id id)))))
+      (catch Exception _ (str "[ERROR] Could not seed: " sexp-map)))))
+
+(defn seed-sexps [sexp-maps]
+  (dorun (map seed-sexp sexp-maps)))
 
 (defn clean-db! []
   (let [conn (make-connection!)
@@ -44,4 +43,13 @@
     (connect! search-endpoint)
     (if (exists? idx-name) (delete idx-name))
     (create-getclojure-index)
-    (spy (time (seed-sexps sexps)))))
+    (spy (seed-sexps sexps))))
+
+(comment
+  (do
+    (clean-db!)
+    (connect! "http://127.0.0.1:9200")
+    (if (exists? "getclojure") (delete "getclojure"))
+    (create-getclojure-index)
+    (spy (seed-sexps sexps)))
+)

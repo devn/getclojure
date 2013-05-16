@@ -5,25 +5,23 @@
             :url "http://www.eclipse.org/legal/epl-v10.html"}
   :dependencies [[org.clojure/clojure "1.5.1"]
                  [clojurewerkz/elastisch "1.0.2"]
-                 [iota "1.0.2"]
                  [clojail "1.0.3"]
-                 [com.novemberain/monger "1.5.0-beta1"]
-                 [com.novemberain/validateur "1.2.0"]
+                 [com.novemberain/monger "1.5.0"]
+                 [com.novemberain/validateur "1.4.0"]
                  [clj-config "0.2.0"]
                  [org.clojars.semperos/enlive "1.0.1"
                   :exclusions [org.clojure/clojure]]
-                 [me.raynes/laser "0.1.15"]
-                 [me.raynes/conch "0.5.0"]
+                 [me.raynes/conch "0.5.1"]
                  [org.thnetos/cd-client "0.3.6"]
                  ;; Web
-                 [lib-noir "0.3.8"]
+                 [lib-noir "0.5.0"]
+                 [com.cemerick/friend "0.1.5"]
                  [compojure "1.1.5"]
-                 [hiccup "1.0.2"]
-                 [ring-server "0.2.5"]
-                 [com.taoensso/timbre "1.5.2"]
-                 [com.taoensso/tower "1.2.0"]
+                 [hiccup "1.0.3"]
+                 [ring-server "0.2.8"]
+                 [com.taoensso/timbre "1.5.3"]
                  [markdown-clj "0.9.19"]]
-  :plugins [[lein-ring "0.8.0"]]
+  :plugins [[lein-ring "0.8.3"]]
   :ring {:handler getclojure.handler/app
          :init getclojure.handler/init}
   :profiles
@@ -34,7 +32,7 @@
                 :mirror {#"central|clojars"
                          "http://s3pository.herokuapp.com/clojure"}}
    :dev {:dependencies [[ring-mock "0.1.3"]
-                        [ring/ring-devel "1.1.0"]
+                        [ring/ring-devel "1.1.8"]
                         [org.clojure/data.csv "0.1.2"]]}}
   ;; :main getclojure.core
   ;; :jvm-opts ["-Xmx2g" "-server"]

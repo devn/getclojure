@@ -9,9 +9,9 @@
   {:sexp
    {:properties
     {:id {:type "integer" :store "yes"}
-     :input {:type "string" :store "yes" :analyzer "clojure_code" :tokenizer "clojure_tokenizer" :filter "clojure_filter"}
-     :output {:type "string" :store "yes" :analyzer "clojure_code" :tokenizer "clojure_tokenizer" :filter "clojure_filter"}
-     :value {:type "string" :store "yes" :analyzer "clojure_code" :tokenizer "clojure_tokenizer" :filter "clojure_filter"}}}})
+     :input {:type "string" :store "yes" :analyzer "clojure_code"}
+     :output {:type "string" :store "yes" :analyzer "clojure_code"}
+     :value {:type "string" :store "yes" :analyzer "clojure_code"}}}})
 
 (def clojure-analyzer
   {:clojure_code {:type "pattern"
@@ -31,9 +31,10 @@
 (defn create-getclojure-index []
   (when-not (esi/exists? "getclojure")
     (esi/create "getclojure"
-                :settings {:index {:analysis {:analyzer clojure-analyzer
-                                              :tokenizer clojure-tokenizer
-                                              :filter clojure-filter}}}
+                :settings {:index
+                           {:analysis {:analyzer clojure-analyzer
+                                       :tokenizer clojure-tokenizer}
+                            :filter clojure-filter}}
                 :mappings mappings)))
 
 (defn add-to-index [env sexp-map]
@@ -61,7 +62,5 @@
 (comment "Development"
   (esr/connect! "http://127.0.0.1:9200")
   (esi/delete "getclojure")
-  (defn pprint-code [code]
-    (pp/with-pprint-dispatch pp/code-dispatch
-      (pp/pprint code)))
-  )
+  (create-getclojure-index)
+)
