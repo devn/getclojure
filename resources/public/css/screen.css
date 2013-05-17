@@ -1,6 +1,6 @@
 body {
   color: #999;
-  background-color: #fff;
+  background-color: white;
   margin: 0 auto;
   padding: 0;
   font-family: Helvetica, sans-serif;
@@ -43,7 +43,7 @@ input, input:focus {
   outline-color: #d4d4d4;
 }
 
-input[id="search-box"] {
+input#search-box {
   display: none;
 }
 
