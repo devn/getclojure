@@ -42,10 +42,11 @@
 
 ;; :from, :size
 (defn search-sexps [q page-num]
-  (let [offset (* (Integer/parseInt page-num) 25)]
+  (let [offset (* (Integer/parseInt page-num) 25)
+        query (if (empty? q) "comp AND juxt" q)]
     (esd/search "getclojure"
                 "sexp"
-                :query (q/query-string :query q
+                :query (q/query-string :query query
                                        :fields ["input^5" :value :output])
                 :from offset
                 :size 25)))
