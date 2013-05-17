@@ -56,7 +56,8 @@
 (defn footer []
   [:footer
    "Created with "
-   [:span.love "Love"]
+   [:a {:href "https://github.com/devn/getclojure" :target "_blank"}
+     [:span.love "Love"]]
    " by '(Devin Walters)"])
 
 (defhtml base [& content]
