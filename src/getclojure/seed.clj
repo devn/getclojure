@@ -49,7 +49,7 @@
   (do
     (clean-db!)
     (connect! "http://127.0.0.1:9200")
-    (if (exists? "getclojure") (delete "getclojure"))
+    (when (exists? "getclojure") (delete search-endpoint))
     (create-getclojure-index)
     (spy (seed-sexps sexps)))
 )
