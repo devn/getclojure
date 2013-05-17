@@ -1,11 +1,14 @@
 (ns getclojure.views.layout
-  (:use [hiccup.def :only [defhtml]]
-        [hiccup.element :only [link-to image]]
-        [hiccup.form]
-        [hiccup.page :only [html5 include-js include-css]]
-        [getclojure.search :only (search-results-for get-num-hits)]
-        [getclojure.util :only (generate-query-string)])
-  (:require [monger.collection :as mc]))
+  (:require [monger.collection :as mc]
+            [getclojure.search :refer [get-num-hits search-results-for]]
+            [getclojure.util :refer [generate-query-string]]
+            [hiccup.def :refer [defhtml]]
+            [hiccup.element :refer [image link-to]]
+            [hiccup.form :refer [form-to
+                                 hidden-field
+                                 submit-button
+                                 text-field]]
+            [hiccup.page :refer [include-css include-js]]))
 
 (defn header []
   [:header

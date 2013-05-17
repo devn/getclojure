@@ -1,6 +1,6 @@
 (ns getclojure.db
-  (:require [monger.core :as mg]
-            [monger.collection :as mc]))
+  (:require [monger.collection :as mc]
+            [monger.core :as mg]))
 
 (defn env? [mongo-uri]
   (if (.contains mongo-uri "heroku")

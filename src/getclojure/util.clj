@@ -1,8 +1,8 @@
 (ns getclojure.util
-  (:require [noir.io :as io]
+  (:require [clojure.string :as str]
             [markdown.core :as md]
-            [clojure.string :as str :only (join)])
-  (:import java.net.URLEncoder))
+            [noir.io :as io])
+  (:import (java.net URLEncoder)))
 
 (defn uuid []
   (str (java.util.UUID/randomUUID)))

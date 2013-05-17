@@ -1,13 +1,11 @@
 (ns getclojure.handler
-  (:use [getclojure.routes.home]
-        [compojure.core])
-  (:require [getclojure.db :refer [make-connection!]]
-            [getclojure.models.sexp :refer [sexp-id set-highest-sexp-id!]]
+  (:require [compojure.route :as route]
+            [monger.core :as esr]
             [noir.util.middleware :as middleware]
-            [clojurewerkz.elastisch.rest :as esr]
-            [monger.core :as mg]
-            [monger.collection :as mc]
-            [compojure.route :as route]))
+            [compojure.core :refer [defroutes]]
+            [getclojure.db :refer [make-connection!]]
+            [getclojure.models.sexp :refer [set-highest-sexp-id!]]
+            [getclojure.routes.home :refer [home-routes]]))
 
 (defroutes app-routes
   (route/resources "/")

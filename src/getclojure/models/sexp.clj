@@ -1,8 +1,10 @@
 (ns getclojure.models.sexp
-  (:refer-clojure :exclude [sort find])
   (:require [monger.collection :as mc]
-            [monger.query :refer [with-collection find sort limit paginate]]
-            [getclojure.format :refer [format-input format-output format-value]]))
+            [getclojure.format :refer [format-input
+                                       format-output
+                                       format-value]]
+            [monger.query :refer [find limit sort with-collection]])
+  (:refer-clojure :exclude [sort find]))
 
 (def sexp-id (atom 0))
 

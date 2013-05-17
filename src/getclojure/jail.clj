@@ -1,8 +1,7 @@
 (ns getclojure.jail
   (:require [clojail.core :as jail]
-            [clojail.testers :as tester]
-            [clojure.stacktrace :as trace])
-  (:import java.io.StringWriter))
+            [clojail.testers :as tester])
+  (:import (java.io StringWriter)))
 
 ;; print-method added due to 2008-11-09
 (def ^{:private true} getclojure-tester

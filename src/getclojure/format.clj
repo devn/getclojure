@@ -1,8 +1,7 @@
 (ns getclojure.format
-  (:use [clojail.core :only (safe-read)]
-        [hiccup.util :only (escape-html)]
-        [me.raynes.conch :only (let-programs)])
-  (:require [clojure.pprint :as pp]))
+  (:require [clojure.pprint :as pp]
+            [clojail.core :refer [safe-read]]
+            [me.raynes.conch :refer [let-programs]]))
 
 (defn pygmentize [s]
   (let-programs [colorize "./pygmentize"

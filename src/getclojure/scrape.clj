@@ -1,9 +1,9 @@
 (ns getclojure.scrape
-  (:require [clojure.java.io :as io]
+  (:require [cd-client.core :as cd]
+            [clojure.java.io :as io]
             [clojure.set :as set]
             [clojure.string :as str]
-            [getclojure.extract :as e]
-            [cd-client.core :as cd]))
+            [getclojure.extract :as e]))
 
 (def dates-url "http://clojure-log.n01se.net/date/")
 

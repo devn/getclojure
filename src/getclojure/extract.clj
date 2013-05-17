@@ -1,7 +1,7 @@
 (ns getclojure.extract
   (:require [clojure.string :as str]
             [net.cgrand.enlive-html :as enlive])
-  (:import java.io.File))
+  (:import (java.io File)))
 
 (defn get-lines
   "Gets all of the 'p' tags from a logfile."

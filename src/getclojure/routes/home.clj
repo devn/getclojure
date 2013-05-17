@@ -1,8 +1,6 @@
 (ns getclojure.routes.home
-  (:use [compojure.core]
-        [hiccup.element])
   (:require [getclojure.views.layout :as layout]
-            [getclojure.util :as util]))
+            [compojure.core :refer [GET defroutes]]))
 
 (defn home-page [] 
   (layout/common

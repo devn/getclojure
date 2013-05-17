@@ -1,7 +1,9 @@
 (ns getclojure.repl
-  (:use getclojure.handler
-        ring.server.standalone
-        [ring.middleware file-info file params keyword-params]))
+  (:require [getclojure.handler :refer [app destroy init]]
+            [ring.middleware.file :refer [wrap-file]]
+            [ring.middleware.file-info :refer [wrap-file-info]]
+            [ring.middleware.params :refer [wrap-params]]
+            [ring.server.standalone :refer [serve]]))
 
 (defonce server (atom nil))
 

@@ -1,15 +1,17 @@
 (ns getclojure.models.user
-  (:refer-clojure :exclude [sort find])
-  (:use [validateur.validation])
   (:require [cheshire.core :as json]
             [clj-http.client :as http]
             [clojure.string :as s]
+            [monger.collection :as mc]
+            [noir.session :as session]
             [getclojure.config :refer [config]]
             [getclojure.util :refer [inclusive-range]]
-            [monger.collection :as mc]
-            [monger.query :refer [with-collection find sort paginate]]
-            [noir.session :as session])
-  (:import org.bson.types.ObjectId))
+            [monger.query :refer [sort find paginate with-collection]]
+            [validateur.validation :refer [format-of
+                                           length-of
+                                           validation-set]])
+  (:import (org.bson.types ObjectId))
+  (:refer-clojure :exclude [sort find]))
 
 ;; TODO: It would be nice to have uniqueness-of in here
 (def validate-user-map

@@ -1,17 +1,17 @@
 (ns getclojure.seed
   (:require [clojure.java.io :as io]
-            [clojurewerkz.elastisch.rest :refer [connect!]]
-            [clojurewerkz.elastisch.rest.index :refer [exists? create delete]]
-            [monger.core :as mg]
             [monger.collection :as mc]
-            [getclojure.db :refer [make-connection! env?]]
-            [getclojure.search :refer [create-getclojure-index add-to-index]]
-            [getclojure.models.user :refer [create-user!]]
+            [clojurewerkz.elastisch.rest :refer [connect! delete]]
+            [clojurewerkz.elastisch.rest.index :refer [exists?]]
+            [getclojure.db :refer [make-connection!]]
             [getclojure.models.sexp :refer [create-sexp!]]
+            [getclojure.models.user :refer [create-user!]]
+            [getclojure.search :refer [add-to-index
+                                       create-getclojure-index]]
             [taoensso.timbre :refer [spy]]))
 
 (def sexps
-  (-> (io/file "working-sexps.db")
+  (-> (io/file "resources/sexps/working-sexps.db")
       slurp
       read-string
       lazy-seq))

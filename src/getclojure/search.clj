@@ -1,8 +1,7 @@
 (ns getclojure.search
-  (:require [clojurewerkz.elastisch.rest :as esr]
-            [clojurewerkz.elastisch.rest.index :as esi]
+  (:require [clojurewerkz.elastisch.query :as q]
             [clojurewerkz.elastisch.rest.document :as esd]
-            [clojurewerkz.elastisch.query :as q]
+            [clojurewerkz.elastisch.rest.index :as esi]
             [getclojure.util :as util]))
 
 (def mappings
