@@ -58,15 +58,21 @@
        output])]
    (pagination q page-num)])
 
-(defn footer []
-  [:footer
-   "Created with "
-   [:a {:href "https://github.com/devn/getclojure" :target "_blank"}
-     [:span.love "Love"]]
-   " by '(Devin Walters)"
-   [:a.powered-by-clojure {:href "http://clojure.org/" :title "Clojure's Home Page"}
-     [:img {:src "img/clojure-icon.gif" :alt "Powered by Clojure" :height "32" :width "32"}]
-     "Powered by Clojure"]])
+(defhtml powered-by []
+  [:a.powered-by-clojure {:href "http://clojure.org/"
+                          :title "Clojure"}
+   (image {:height 32 :width 32}
+          "img/clojure-icon.gif"
+          "Powered by Clojure")
+   "Powered by Clojure"])
+
+(defhtml created-by []
+  [:div.created-by
+   (image {:class "heart"} "img/heart.png" "heart")
+   "Created with Love by '(Devin Walters)"])
+
+(defhtml footer []
+  [:footer (created-by) (powered-by)])
 
 (defhtml base [& content]
   [:head

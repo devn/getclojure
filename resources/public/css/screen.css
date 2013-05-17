@@ -14,6 +14,10 @@ header {
 footer {
   padding: 20px;
   text-align: center;
+  font-weight: bold;
+  font-size: 0.8em;
+  text-transform: uppercase;
+  color: #a8a8a8;
 }
 
 header {
@@ -24,7 +28,7 @@ section {
   padding: 10px 20px;
 }
 
-input[type="text"] {
+input[type=text] {
   min-width: 100%;
   min-height: 100px;
   padding: 0 100px;
@@ -57,6 +61,7 @@ ul {
 }
 
 a {
+  text-transform: uppercase;
   color: #444;
 }
 
@@ -128,5 +133,10 @@ pre {
 
 .powered-by-clojure img {
   vertical-align: middle;
+  margin-right: 10px;
+}
+
+.created-by img {
+  vertical-align: bottom;
   margin-right: 10px;
 }
