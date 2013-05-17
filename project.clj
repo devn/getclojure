@@ -9,8 +9,7 @@
                  [com.novemberain/monger "1.5.0"]
                  [com.novemberain/validateur "1.4.0"]
                  [clj-config "0.2.0"]
-                 [org.clojars.semperos/enlive "1.0.1"
-                  :exclusions [org.clojure/clojure]]
+                 [org.clojars.semperos/enlive "1.0.1" :exclusions [org.clojure/clojure]]
                  [me.raynes/conch "0.5.1"]
                  [org.thnetos/cd-client "0.3.6"]
                  ;; Web
@@ -34,6 +33,4 @@
    :dev {:dependencies [[ring-mock "0.1.3"]
                         [ring/ring-devel "1.1.8"]
                         [org.clojure/data.csv "0.1.2"]]}}
-  ;; :main getclojure.core
-  ;; :jvm-opts ["-Xmx2g" "-server"]
   :min-lein-version "2.0.0")
