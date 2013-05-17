@@ -17,8 +17,10 @@
      (form-to
       [:get "/search"]
       (if query
-        (text-field {:placeholder "COMP AND JUXT"} "q" query)
-        (text-field {:placeholder "COMP AND JUXT"} "q"))
+        (text-field {:autocorrect "off" :autocapitalize "off" :autocomplete "off"
+                     :spellcheck "false" :placeholder "COMP AND JUXT"} "q" query)
+        (text-field {:autocorrect "off" :autocapitalize "off" :autocomplete "off"
+                     :spellcheck "false" :placeholder "COMP AND JUXT"} "q"))
       (hidden-field "num" 0)
       (submit-button {:id "search-box"} "search"))]))
 
