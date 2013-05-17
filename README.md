@@ -31,7 +31,7 @@ following:
 
 * To Bendyworks for 20% time.
 * To ClojureWerkz for providing great libraries.
-* To Anthony Grimes (Raynes) for letting meb steal some of his code
+* To Anthony Grimes (Raynes) for letting me steal some of his code
   from RefHeap to speed things along.
 * To Phil Hagelberg (technomancy) for his help with Heroku-related
   issues.
