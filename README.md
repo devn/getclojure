@@ -22,6 +22,20 @@ following:
 * Start the server: `lein ring server`
 * Compute.
 
+### Note to python 3 users
+
+If the default python on your system is python 3, you'll need to edit
+pygments so that it uses python 2. To do so, run the following command
+after running `./script/bootstrap.sh`:
+
+    sed --in-place 's$#!/usr/bin/env python$#!/usr/bin/env python2$' resources/pygments/pygmentize
+
+You'll also need a `python2` symlink, which should exist as of python
+2.7.3. If `command -v python2` returns nothing, run the following
+command to create the symlink:
+
+    ln -s "$(command -v python)" /usr/local/bin/python2
+
 ## Contributors
 
 * Anthony Grimes
