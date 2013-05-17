@@ -1,17 +1,23 @@
 body {
   color: #999;
-  background-color: #eee;
-  margin: 0;
+  background-color: #fff;
+  margin: 0 auto;
   padding: 0;
   font-family: Helvetica, sans-serif;
-}
-
-header, footer {
-  padding: 20px;
+  width: 80%;
 }
 
 header {
-  padding-bottom: 0;
+  padding: 20px;
+}
+
+footer {
+  padding: 20px;
+  text-align: center;
+}
+
+header {
+  padding-bottom: 20px;
 }
 
 section {
@@ -19,19 +25,26 @@ section {
 }
 
 input[type="text"] {
-  min-width: 400px;
-  padding: 0 5px;
+  min-width: 100%;
+  min-height: 100px;
+  padding: 0 100px;
+  background-image: url(../img/glass.svg), none;
+  background-repeat: no-repeat;
+  background-position: left;
+  color: #d4d4d4;
 }
 
-input {
-  line-height: 32px;
-  font-size: 20px;
+input, input:focus {
+  line-height: 60px;
+  font-size: 48px;
+  border: none;
+  outline-size: 1px;
+  outline-style: solid;
+  outline-color: #d4d4d4;
 }
 
-.results {
-  background-color: white;
-  border-top: 1px solid #666;
-  border-bottom: 1px solid #666;
+input[id="search-box"] {
+  display: none;
 }
 
 li {
@@ -56,29 +69,38 @@ header > p {
 }
 
 pre {
-  margin: 0;
+  margin: 2px;
   padding: 10px;
-  border: none !important;
-  border-left-width: 4px !important;
-  border-left-style: solid !important;
+  font-size: 18px;
   overflow: auto;
+}
+
+.results {
+  background-color: white;
+  /* border-top: 1px solid #eee; */
+  /* border-bottom: 1px solid #eee; */
 }
 
 .result {
   margin: 10px 0 !important;
+  border-bottom: 1px solid #eee;
 }
 
-pre.input {
-  border-left-color: #5881d8 !important;
-  border: none;
+.result:last-child {
+  margin: 10px 0 !important;
+  border-bottom: none;
 }
 
-pre.value {
-  border-left-color: #8fb4fe !important;
+.result > .highlight:nth-child(1) {
+  border-left: #0091d0 5px solid !important;
 }
 
-pre.output {
-  border-left-color: #91dc46 !important;
+.result > .highlight:nth-child(2) {
+  border-left: #78c157 5px solid !important;
+}
+
+.result > .highlight:nth-child(3) {
+  border-left: #de06dd 5px solid !important;
 }
 
 #pagination {
@@ -89,4 +111,14 @@ pre.output {
 
 .page_num {
   padding: 5px;
- }
+}
+
+#content {
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.love {
+  color: #0091d0;
+  font-weight: bold;
+}

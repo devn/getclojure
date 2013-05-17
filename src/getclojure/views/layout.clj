@@ -1,6 +1,6 @@
 (ns getclojure.views.layout
   (:use [hiccup.def :only [defhtml]]
-        [hiccup.element :only [link-to]]
+        [hiccup.element :only [link-to image]]
         [hiccup.form]
         [hiccup.page :only [html5 include-js include-css]]
         [getclojure.search :only (search-results-for get-num-hits)]
@@ -9,8 +9,7 @@
 
 (defn header []
   [:header
-   [:h1 "GetClojure"]
-   [:p "(find {:clojure :examples})"]])
+   (image {:class "getclojure-logo" :alt "Get Clojure"} "img/getclojure-logo.png")])
 
 (defn search-form [& q]
   (let [query (first q)]
@@ -18,10 +17,10 @@
      (form-to
       [:get "/search"]
       (if query
-        (text-field {:placeholder "comp AND juxt"} "q" query)
-        (text-field {:placeholder "comp AND juxt"} "q"))
+        (text-field {:placeholder "COMP AND JUXT"} "q" query)
+        (text-field {:placeholder "COMP AND JUXT"} "q"))
       (hidden-field "num" 0)
-      (submit-button "search"))]))
+      (submit-button {:id "search-box"} "search"))]))
 
 (defn pagination [q page-num]
   (let [num (Integer/parseInt page-num)
@@ -55,7 +54,10 @@
    (pagination q page-num)])
 
 (defn footer []
-  [:footer "Created with Love by '(Devin Walters)"])
+  [:footer
+   "Created with "
+   [:span.love "Love"]
+   " by '(Devin Walters)"])
 
 (defhtml base [& content]
   [:head
