@@ -19,9 +19,9 @@
 (defn seed-sexp [sexp-map]
   (let [user (create-user! "admin@getclojure.org" "admin")]
     (try
-      (if-not (p :check-sexp-exists (mc/any? "sexps" {:raw-input (:input sexp-map)}))
-        (let [id (:id (p :create-sexp! (create-sexp! user sexp-map)))]
-          (p :add-to-index (add-to-index :getclojure (assoc sexp-map :id id)))))
+      (if-not (mc/any? "sexps" {:raw-input (:input sexp-map)})
+        (let [id (:id (create-sexp! user sexp-map))]
+          (add-to-index :getclojure (assoc sexp-map :id id))))
       (catch Exception _ (str "[ERROR] Could not seed: " sexp-map)))))
 
 (defn seed-sexps [sexp-maps]
