@@ -60,7 +60,7 @@
   sequence of string, otherwise it returns nil."
   [^String s]
   (let [extracted-sexps (extract-sexps s)]
-    (when-not (empty? extracted-sexps) extracted-sexps)))
+    (when (seq extracted-sexps) extracted-sexps)))
 
 (defn node->map [node date]
   (let [nickname  (trim-nickname (text-for node :b))
