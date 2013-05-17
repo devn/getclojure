@@ -22,7 +22,7 @@ following:
 * Start the server: `lein ring server`
 * Compute.
 
-## Contibutors
+## Contributors
 
 * Anthony Grimes
 * Joshua Hoff
@@ -42,6 +42,6 @@ following:
 
 ## License
 
-Copyright © 2012 Devin Walters
+Copyright © 2013 Devin Walters
 
 Distributed under the Eclipse Public License, the same as Clojure.
