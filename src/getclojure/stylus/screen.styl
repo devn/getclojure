@@ -1,3 +1,8 @@
+default-padding = 20px
+blue = #0091d0
+green = #78c157
+pink = #de06dd
+
 body {
   color: #999;
   background-color: white;
@@ -8,11 +13,11 @@ body {
 }
 
 header {
-  padding: 20px;
+  padding: default-padding;
 }
 
 footer {
-  padding: 20px;
+  padding: default-padding;
   text-align: center;
   font-weight: bold;
   font-size: 0.8em;
@@ -20,12 +25,8 @@ footer {
   color: #a8a8a8;
 }
 
-header {
-  padding-bottom: 20px;
-}
-
 section {
-  padding: 10px 20px;
+  padding: 10px default-padding;
 }
 
 input[type=text] {
@@ -94,15 +95,15 @@ pre {
 }
 
 .result > .highlight:nth-child(1) {
-  border-left: #0091d0 5px solid !important;
+  border-left: blue 5px solid !important;
 }
 
 .result > .highlight:nth-child(2) {
-  border-left: #78c157 5px solid !important;
+  border-left: green 5px solid !important;
 }
 
 .result > .highlight:nth-child(3) {
-  border-left: #de06dd 5px solid !important;
+  border-left: pink 5px solid !important;
 }
 
 #pagination {
