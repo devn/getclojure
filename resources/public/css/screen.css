@@ -77,13 +77,10 @@ pre {
 
 .results {
   background-color: white;
-  /* border-top: 1px solid #eee; */
-  /* border-bottom: 1px solid #eee; */
 }
 
 .result {
   margin: 10px 0 !important;
-  border-bottom: 1px solid #eee;
 }
 
 .result:last-child {
