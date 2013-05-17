@@ -119,3 +119,14 @@ pre {
   color: #0091d0;
   font-weight: bold;
 }
+
+.powered-by-clojure {
+  line-height: 32px;
+  margin-top: 10px;
+  display: block;
+}
+
+.powered-by-clojure img {
+  vertical-align: middle;
+  margin-right: 10px;
+}
