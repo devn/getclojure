@@ -63,7 +63,10 @@
    "Created with "
    [:a {:href "https://github.com/devn/getclojure" :target "_blank"}
      [:span.love "Love"]]
-   " by '(Devin Walters)"])
+   " by '(Devin Walters)"
+   [:a.powered-by-clojure {:href "http://clojure.org/" :title "Clojure's Home Page"}
+     [:img {:src "img/clojure-icon.gif" :alt "Powered by Clojure" :height "32" :width "32"}]
+     "Powered by Clojure"]])
 
 (defhtml base [& content]
   [:head
