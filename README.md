@@ -25,6 +25,7 @@ following:
 ## Contributors
 
 * Anthony Grimes
+* Joe Nelson
 * Joshua Hoff
 
 ## Thanks
