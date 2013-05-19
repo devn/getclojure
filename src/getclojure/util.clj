@@ -2,7 +2,7 @@
   (:require [clojure.string :as str]
             [markdown.core :as md]
             [noir.io :as io])
-  (:import (java.net URLEncoder)))
+  (:import java.net.URLEncoder))
 
 (defn uuid []
   (str (java.util.UUID/randomUUID)))

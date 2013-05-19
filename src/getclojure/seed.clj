@@ -8,7 +8,7 @@
             [getclojure.models.user :refer [create-user!]]
             [getclojure.search :refer [add-to-index
                                        create-getclojure-index]]
-            [taoensso.timbre :refer [spy]]))
+            [taoensso.timbre :refer [info]]))
 
 (def sexps
   (-> (io/file "resources/sexps/working-sexps.db")
@@ -35,22 +35,24 @@
           (mc/remove :sexps)))))
 
 (defn -main []
-  (println "Attempting to connect to elastic search...")
   (let [search-endpoint (or (System/getenv "BONSAI_URL")
                             "http://127.0.0.1:9200")
         idx-name "getclojure"
         db-uri (str search-endpoint "/" idx-name)]
-    (clean-db!)
-    (connect! search-endpoint)
-    (if (exists? idx-name) (delete db-uri))
-    (create-getclojure-index)
-    (spy (seed-sexps sexps))))
+    (info (clean-db!))
+    (info (connect! search-endpoint))
+    (info (when (exists? idx-name)
+            (delete db-uri)))
+    (info (create-getclojure-index))
+    (info "Seeding...")
+    (seed-sexps sexps)))
 
 (comment
   (do
     (clean-db!)
     (connect! "http://127.0.0.1:9200")
-    (when (exists? "getclojure") (delete search-endpoint))
+    (when (exists? "getclojure")
+      (delete "http://127.0.0.1:9200/getclojure"))
     (create-getclojure-index)
-    (spy (seed-sexps sexps)))
+    (seed-sexps sexps))
 )
