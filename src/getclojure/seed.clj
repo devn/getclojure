@@ -38,10 +38,11 @@
   (println "Attempting to connect to elastic search...")
   (let [search-endpoint (or (System/getenv "BONSAI_URL")
                             "http://127.0.0.1:9200")
-        idx-name "getclojure"]
+        idx-name "getclojure"
+        db-uri (str search-endpoint "/" idx-name)]
     (clean-db!)
     (connect! search-endpoint)
-    (if (exists? idx-name) (delete idx-name))
+    (if (exists? idx-name) (delete db-uri))
     (create-getclojure-index)
     (spy (seed-sexps sexps))))
 
