@@ -39,6 +39,7 @@
                             "http://127.0.0.1:9200")
         idx-name "getclojure"
         db-uri (str search-endpoint "/" idx-name)]
+    (info "Search Endpoint:" search-endpoint)
     (info (clean-db!))
     (info (connect! search-endpoint))
     (info (when (exists? idx-name)
