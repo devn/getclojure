@@ -22,6 +22,20 @@ following:
 * Start the server: `lein ring server`
 * Compute.
 
+### Modifying the styles
+
+Note: you'll need node.js to install the tools needed to compile stylus
+files to css.  Instructions for installing node can be found on [its
+website](http://nodejs.org/).
+
+To change the style of the site, edit the files in
+`src/getclojure/stylus/*.styl`.  Then run `watch make` in your terminal
+(note: this may take a moment and will require an internet connection
+the first time it's run).  After that, refresh your browser to see your
+changes!
+
+For more information on stylus, see http://learnboost.github.io/stylus/.
+
 ### Note to python 3 users
 
 If the default python on your system is python 3, you'll need to edit

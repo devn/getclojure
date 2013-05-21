@@ -1,0 +1,145 @@
+default-padding = 20px
+blue = #0091d0
+green = #78c157
+pink = #de06dd
+
+body {
+  color: #999;
+  background-color: white;
+  margin: 0 auto;
+  padding: 0;
+  font-family: Helvetica, sans-serif;
+  width: 80%;
+}
+
+header {
+  padding: default-padding;
+}
+
+footer {
+  padding: default-padding;
+  text-align: center;
+  font-weight: bold;
+  font-size: 0.8em;
+  text-transform: uppercase;
+  color: #a8a8a8;
+}
+
+section {
+  padding: 10px default-padding;
+}
+
+input[type=text] {
+  min-width: 100%;
+  min-height: 100px;
+  padding: 0 100px;
+  background-image: url(../img/glass.svg), none;
+  background-repeat: no-repeat;
+  background-position: left;
+  color: #555;
+}
+
+input, input:focus {
+  line-height: 60px;
+  font-size: 48px;
+  border: none;
+  outline-size: 1px;
+  outline-style: solid;
+  outline-color: #d4d4d4;
+}
+
+input#search-box {
+  display: none;
+}
+
+li {
+  list-style-type: none;
+}
+
+ul {
+  margin: 0;
+  padding: 0;
+}
+
+a {
+  text-transform: uppercase;
+  color: #444;
+}
+
+h1 {
+  color: #5881d8;
+}
+
+header > p {
+  color: #8fb4fe;
+}
+
+pre {
+  margin: 2px;
+  padding: 10px;
+  font-size: 18px;
+  overflow: auto;
+}
+
+.results {
+  background-color: white;
+}
+
+.result {
+  margin: 10px 0 !important;
+}
+
+.result:last-child {
+  margin: 10px 0 !important;
+  border-bottom: none;
+}
+
+.result > .highlight:nth-child(1) {
+  border-left: blue 5px solid !important;
+}
+
+.result > .highlight:nth-child(2) {
+  border-left: green 5px solid !important;
+}
+
+.result > .highlight:nth-child(3) {
+  border-left: pink 5px solid !important;
+}
+
+#pagination {
+  margin-left: auto;
+  margin-right: auto;
+  text-align: center;
+}
+
+.page_num {
+  padding: 5px;
+}
+
+#content {
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.love {
+  color: #0091d0;
+  font-weight: bold;
+}
+
+.powered-by-clojure {
+  line-height: 32px;
+  margin-top: 10px;
+  display: block;
+}
+
+.powered-by-clojure img {
+  vertical-align: middle;
+  margin-right: 10px;
+}
+
+.created-by img {
+  vertical-align: bottom;
+  margin-right: 10px;
+}
+
+// vim: ft=css:
