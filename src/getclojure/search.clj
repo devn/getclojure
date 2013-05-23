@@ -43,14 +43,7 @@
         lowercased-query (string/lower-case query)]
     (esd/search "getclojure"
                 "sexp"
-                :query (q/dis-max :queries [(q/term :input query
-                                                    :boost 2.0)
-                                            (q/term :input lowercased-query
-                                                    :boost 2.0)
-                                            (q/term :output query)
-                                            (q/term :output lowercased-query)
-                                            (q/term :value query)
-                                            (q/term :value lowercased-query)])
+                :query (q/term :input [query lowercased-query])
                 :from offset
                 :size 25)))
 
