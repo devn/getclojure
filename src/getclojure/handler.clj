@@ -5,7 +5,8 @@
             [compojure.core :refer [defroutes]]
             [getclojure.db :refer [make-connection!]]
             [getclojure.models.sexp :refer [set-highest-sexp-id!]]
-            [getclojure.routes.home :refer [home-routes]]))
+            [getclojure.routes.home :refer [home-routes]]
+            [taoensso.timbre :refer [info]]))
 
 (defroutes app-routes
   (route/resources "/")
@@ -16,9 +17,10 @@
   "init will be called once when app is deployed as a servlet on an
    app server such as Tomcat put any initialization code here"
   []
-  (make-connection!)
+  (info "DB:" (make-connection!))
   (set-highest-sexp-id!)
-  (esr/connect! (or (System/getenv "BONSAI_URL") "http://127.0.0.1:9200"))
+  (info "SEARCH:" (esr/connect! (or (System/getenv "BONSAI_URL")
+                                    "http://127.0.0.1:9200")))
   (println "GetClojure started successfully..."))
 
 (defn destroy []
