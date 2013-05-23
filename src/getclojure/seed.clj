@@ -21,7 +21,7 @@
     (try
       (if-not (mc/any? "sexps" {:raw-input (:input sexp-map)})
         (let [id (:id (create-sexp! user sexp-map))]
-          (add-to-index :getclojure (assoc sexp-map :id id))))
+          (info (add-to-index :getclojure (assoc sexp-map :id id)))))
       (catch Exception _ (str "[ERROR] Could not seed: " sexp-map)))))
 
 (defn seed-sexps [sexp-maps]
@@ -38,13 +38,13 @@
   (let [search-endpoint (or (System/getenv "BONSAI_URL")
                             "http://127.0.0.1:9200")
         idx-name "getclojure"
-        db-uri (str search-endpoint "/" idx-name)]
+        search-idx-uri (str search-endpoint "/" idx-name)]
     (info "Search Endpoint:" search-endpoint)
-    (info (clean-db!))
-    (info (connect! search-endpoint))
-    (info (when (exists? idx-name)
-            (delete db-uri)))
-    (info (create-getclojure-index))
+    (info "DB -- Cleaning:" (clean-db!))
+    (info "Search -- Connecting to endpoint:" (connect! search-endpoint))
+    (info "Search -- Deleting index:" (when (exists? "getclojure")
+                                        (delete search-idx-uri)))
+    (info "Search -- Creating indices:" (create-getclojure-index))
     (info "Seeding...")
     (seed-sexps sexps)))
 

@@ -4,36 +4,28 @@
             [clojurewerkz.elastisch.rest.index :as esi]
             [getclojure.util :as util]))
 
+(def custom-analyzer
+  {:custom_analyzer {:type "custom"
+                     :tokenizer "custom_tokenizer"
+                     :filter []}})
+
+(def custom-tokenizer
+  {:custom_tokenizer {:type "pattern"
+                      :pattern "[\\s\\(\\)\\[\\]\\{\\}]+"}})
+
 (def mappings
   {:sexp
    {:properties
     {:id {:type "integer" :store "yes"}
-     :input {:type "string" :store "yes" :analyzer "clojure_code"}
-     :output {:type "string" :store "yes" :analyzer "clojure_code"}
-     :value {:type "string" :store "yes" :analyzer "clojure_code"}}}})
-
-(def clojure-analyzer
-  {:clojure_code {:type "pattern"
-                  :lowercase true
-                  :pattern "\\s+|\\(|\\)|\\{|\\}|\\[|\\]"}})
-
-(def clojure-tokenizer
-  {:clojure_tokenizer {:type "pattern"
-                       :lowercase true
-                       :pattern "\\s+|\\(|\\)|\\{|\\}|\\[|\\]"}})
-
-(def clojure-filter
-  {:clojure_filter {:type "pattern"
-                    :lowercase true
-                    :pattern "\\s+"}})
+     :input {:type "string" :store "yes" :analyzer "custom_analyzer"}
+     :output {:type "string" :store "yes" :analyzer "custom_analyzer"}
+     :value {:type "string" :store "yes" :analyzer "custom_analyzer"}}}})
 
 (defn create-getclojure-index []
   (when-not (esi/exists? "getclojure")
     (esi/create "getclojure"
-                :settings {:index
-                           {:analysis {:analyzer clojure-analyzer
-                                       :tokenizer clojure-tokenizer}
-                            :filter clojure-filter}}
+                :settings {:index {:analysis {:analyzer custom-analyzer
+                                              :tokenizer custom-tokenizer}}}
                 :mappings mappings)))
 
 (defn add-to-index [env sexp-map]
@@ -45,8 +37,17 @@
         query (if (empty? q) "comp AND juxt" q)]
     (esd/search "getclojure"
                 "sexp"
-                :query (q/query-string :query query
-                                       :fields ["input^5" :value :output])
+                ;; :query (q/query-string :query query
+                ;;                        :fields ["input^5" :value :output]
+
+                ;; :query (q/text "_all" query :analyzer "custom_analyzer")
+                :query (q/filtered
+                        :query (q/dis-max :queries [(q/term :input query)
+                                                    (q/term :output query)
+                                                    (q/term :value query)]
+                                          :boost 1.2
+                                          :tie_breaker 0.7)
+                        :filter {:not (q/term :input ["macroexpand-1" "macroexpand" "macroexpand-all"])})
                 :from offset
                 :size 25)))
 
@@ -59,7 +60,7 @@
 (defn search-results-for [q page-num]
   (get-search-hits (search-sexps q page-num)))
 
-(comment "Development"
+(comment
   (esr/connect! "http://127.0.0.1:9200")
   (esi/delete "getclojure")
   (create-getclojure-index)
