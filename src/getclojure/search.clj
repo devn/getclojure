@@ -1,5 +1,6 @@
 (ns getclojure.search
-  (:require [clojurewerkz.elastisch.query :as q]
+  (:require [clojure.string :as string]
+            [clojurewerkz.elastisch.query :as q]
             [clojurewerkz.elastisch.rest.document :as esd]
             [clojurewerkz.elastisch.rest.index :as esi]
             [getclojure.util :as util]))
@@ -7,7 +8,10 @@
 (def custom-analyzer
   {:custom_analyzer {:type "custom"
                      :tokenizer "custom_tokenizer"
-                     :filter []}})
+                     :filter "custom_filter"}})
+
+(def custom-filter
+  {:custom_filter {:type "lowercase"}})
 
 (def custom-tokenizer
   {:custom_tokenizer {:type "pattern"
@@ -25,7 +29,8 @@
   (when-not (esi/exists? "getclojure")
     (esi/create "getclojure"
                 :settings {:index {:analysis {:analyzer custom-analyzer
-                                              :tokenizer custom-tokenizer}}}
+                                              :tokenizer custom-tokenizer
+                                              :filter custom-filter}}}
                 :mappings mappings)))
 
 (defn add-to-index [env sexp-map]
@@ -34,14 +39,22 @@
 ;; :from, :size
 (defn search-sexps [q page-num]
   (let [offset (* (Integer/parseInt page-num) 25)
-        query (if (empty? q) "comp AND juxt" q)]
+        query (if (empty? q) "comp AND juxt" q)
+        lowercased-query (string/lower-case query)]
     (esd/search "getclojure"
                 "sexp"
-                :query (q/dis-max :queries [(q/term :input query)
-                                            (q/text :input query)
-                                            (q/fuzzy-like-this-field :input {:like_text query})]
-                                  :boost 1.2
-                                  :tie_breaker 0.7)
+                :query (q/dis-max :queries [(q/term :input query
+                                                    :boost 2.0)
+                                            (q/term :input lowercased-query
+                                                    :boost 2.0)
+                                            (q/mlt-field :input {:like_text lowercased-query
+                                                                 :min_term_freq 1})
+                                            (q/flt-field :input {:like_text lowercased-query
+                                                                 :min_similarity 0.6})
+                                            (q/term :output query)
+                                            (q/term :output lowercased-query)
+                                            (q/term :value query)
+                                            (q/term :value lowercased-query)])
                 :from offset
                 :size 25)))
 
@@ -55,6 +68,7 @@
   (get-search-hits (search-sexps q page-num)))
 
 (comment
+  (require '[clojurewerkz.elastisch.rest :as esr])
   (esr/connect! "http://127.0.0.1:9200")
   (esi/delete "getclojure")
   (create-getclojure-index)
