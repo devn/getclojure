@@ -37,17 +37,11 @@
         query (if (empty? q) "comp AND juxt" q)]
     (esd/search "getclojure"
                 "sexp"
-                ;; :query (q/query-string :query query
-                ;;                        :fields ["input^5" :value :output]
-
-                ;; :query (q/text "_all" query :analyzer "custom_analyzer")
-                :query (q/filtered
-                        :query (q/dis-max :queries [(q/term :input query)
-                                                    (q/term :output query)
-                                                    (q/term :value query)]
-                                          :boost 1.2
-                                          :tie_breaker 0.7)
-                        :filter {:not (q/term :input ["macroexpand-1" "macroexpand" "macroexpand-all"])})
+                :query (q/dis-max :queries [(q/term :input query)
+                                            (q/text :input query)
+                                            (q/fuzzy-like-this-field :input {:like_text query})]
+                                  :boost 1.2
+                                  :tie_breaker 0.7)
                 :from offset
                 :size 25)))
 
