@@ -1,5 +1,5 @@
 #!/bin/sh
-SHA="157c9feaccb8"
+SHA="a4b12e969305"
 
 echo "Fetching Pygments..."
 curl https://bitbucket.org/birkenfeld/pygments-main/get/$SHA.tar.gz -o pygments.tar.gz
