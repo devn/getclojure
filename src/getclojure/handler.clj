@@ -1,6 +1,6 @@
 (ns getclojure.handler
   (:require [compojure.route :as route]
-            [monger.core :as esr]
+            [clojurewerkz.elastisch.rest :as esr]
             [noir.util.middleware :as middleware]
             [compojure.core :refer [defroutes]]
             [getclojure.db :refer [make-connection!]]
