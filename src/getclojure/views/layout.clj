@@ -12,7 +12,8 @@
 
 (defn header []
   [:header
-   (image {:class "getclojure-logo" :alt "Get Clojure"} "img/getclojure-logo.png")])
+   [:a {:href "/" :rel "home"}
+     (image {:class "getclojure-logo" :alt "Get Clojure"} "img/getclojure-logo.png")]])
 
 (defn search-form [& q]
   (let [query (first q)]
