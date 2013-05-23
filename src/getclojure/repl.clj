@@ -28,6 +28,7 @@
                    {:port port
                     :init init
                     :auto-reload? true
+                    :open-browser? false
                     :destroy destroy
                     :join true}))
     (println "Server started on port [" port "].")
