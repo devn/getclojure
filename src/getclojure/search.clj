@@ -47,10 +47,6 @@
                                                     :boost 2.0)
                                             (q/term :input lowercased-query
                                                     :boost 2.0)
-                                            (q/mlt-field :input {:like_text lowercased-query
-                                                                 :min_term_freq 1})
-                                            (q/flt-field :input {:like_text lowercased-query
-                                                                 :min_similarity 0.6})
                                             (q/term :output query)
                                             (q/term :output lowercased-query)
                                             (q/term :value query)
