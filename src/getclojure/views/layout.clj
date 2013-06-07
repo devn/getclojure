@@ -22,9 +22,9 @@
       [:get "/search"]
       (if query
         (text-field {:autocorrect "off" :autocapitalize "off" :autocomplete "off"
-                     :spellcheck "false" :placeholder "drop-while"} "q" query)
+                     :spellcheck "false" :autofocus false :placeholder "drop-while"} "q" query)
         (text-field {:autocorrect "off" :autocapitalize "off" :autocomplete "off"
-                     :spellcheck "false" :placeholder "drop-while"} "q"))
+                     :spellcheck "false" :autofocus true :placeholder "drop-while"} "q"))
       (hidden-field "num" 0)
       (submit-button {:id "search-box"} "search"))]))
 
