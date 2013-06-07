@@ -34,16 +34,38 @@
         num-pages (/ total-hits 25)
         prev-page-num (dec num)
         next-page-num (inc num)]
-    [:div#pagination
-     (link-to {:class "prev"}
-              (str "/search?" (generate-query-string {"q" q "num" prev-page-num}))
-              "<<-")
-     (map #(link-to {:class "page_num"}
-                    (str "/search?" (generate-query-string {"q" q "num" %})) %)
-          (range 0 num-pages))
-     (link-to {:class "next"}
-              (str "/search?" (generate-query-string {"q" q "num" next-page-num}))
-              "->>")]))
+    (when-not (< num-pages 1)
+      [:div#pagination
+       (when-not (= 0 num)
+         [:div.prev-links
+          (link-to {:class "first-page"}
+                   (str "/search?" (generate-query-string {"q" q "num" 0}))
+                   "<<- ")
+          (link-to {:class "prev"}
+                   (str "/search?" (generate-query-string {"q" q "num" prev-page-num}))
+                   "<- ")])
+       (let [page-links (map (fn [p-num]
+                               (link-to {:class "page_num"}
+                                        (str "/search?"
+                                             (generate-query-string
+                                              {"q" q "num" p-num}))
+                                        (inc p-num)))
+                             (range num num-pages))
+             num-page-links (count page-links)]
+         (if (< num-page-links 10)
+           page-links
+           (take 10 page-links)))
+       (when (<= next-page-num num-pages)
+         [:div.next-links
+          (link-to {:class "next"}
+                   (str "/search?" (generate-query-string {"q" q "num" next-page-num}))
+                   " ->")
+          (link-to {:class "last-page"}
+                   (str "/search?"
+                        (generate-query-string {"q" q "num" (-> (Math/floor num-pages)
+                                                                int
+                                                                str)}))
+                   " ->>")])])))
 
 (defn find-sexps-from-search [q page-num]
   (map #(mc/find-one-as-map "sexps" {:id %})
