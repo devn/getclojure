@@ -124,7 +124,7 @@ pre {
   padding-left: 5px;
 }
 
-.next-links > a:last-child {
+.next-links > a:last-child, .prev-links > a:first-child {
   font-weight: bold;
 }
 
