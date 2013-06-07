@@ -39,7 +39,7 @@
 ;; :from, :size
 (defn search-sexps [q page-num]
   (let [offset (* (Integer/parseInt page-num) 25)
-        query (if (empty? q) "comp AND juxt" q)
+        query (if (empty? q) "drop-while" q)
         lowercased-query (string/lower-case query)]
     (esd/search "getclojure"
                 "sexp"
