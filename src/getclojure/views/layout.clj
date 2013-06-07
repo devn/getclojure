@@ -94,6 +94,13 @@
    (image {:class "heart"} "img/heart.png" "heart")
    "Created with Love by '(Devin Walters)"])
 
+(defhtml on-github []
+  [:div.on-github
+   [:a {:href "https://github.com/devn/getclojure"}
+    [:img {:style "position: absolute; top: 0; right: 0; border: 0;"
+           :src "https://s3.amazonaws.com/github/ribbons/forkme_right_gray_6d6d6d.png"
+           :alt "Fork me on GitHub"}]]])
+
 (defhtml footer []
   [:footer (created-by) (powered-by)])
 
@@ -108,7 +115,9 @@
 
   ga('create', 'UA-41005509-1', 'getclojure.org');
   ga('send', 'pageview');"]]
-  [:body content
+  [:body
+   (on-github)
+   content
    (include-js "//ajax.googleapis.com/ajax/libs/jquery/1.9.0/jquery.min.js")])
 
 (defn common [& content]
