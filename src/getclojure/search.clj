@@ -3,7 +3,8 @@
             [clojurewerkz.elastisch.query :as q]
             [clojurewerkz.elastisch.rest.document :as esd]
             [clojurewerkz.elastisch.rest.index :as esi]
-            [getclojure.util :as util]))
+            [getclojure.util :as util]
+            [taoensso.timbre :refer [info]]))
 
 (def custom-analyzer
   {:custom_analyzer {:type "custom"
@@ -36,14 +37,33 @@
 (defn add-to-index [env sexp-map]
   (esd/put (name env) "sexp" (util/uuid) sexp-map))
 
-;; :from, :size
+(def special-characters
+  ["\\" "+" "-" "&&" "||" "!" "(" ")"
+   "{" "}" "[" "]" "^" "\"" "~"
+   "*" "?" ":" "<" ">"])
+
+(defn escape-character [cstring]
+  (apply str (map #(str "\\" %) cstring)))
+
+(defn encode-query [q]
+  (loop [[c & r] special-characters
+         out q]
+    (if c
+      (recur r (string/replace out c (escape-character c)))
+      out)))
+
 (defn search-sexps [q page-num]
+  (info "Requested Query: " q)
   (let [offset (* (Integer/parseInt page-num) 25)
-        query (if (empty? q) "drop-while" q)
-        lowercased-query (string/lower-case query)]
+        encoded-query (encode-query q)
+        q (if (empty? encoded-query)
+            "iterate AND range"
+            encoded-query)]
+    (info "Encoded Query: " q)
     (esd/search "getclojure"
                 "sexp"
-                :query (q/term :input [query lowercased-query])
+                :query (q/query-string :query q
+                                       :fields ["input^5" :value :output])
                 :from offset
                 :size 25)))
 
