@@ -23,6 +23,7 @@
   :plugins [[lein-ring "0.8.3"]]
   :ring {:handler getclojure.handler/app
          :init getclojure.handler/init}
+  :java-agents [[com.newrelic.agent.java/newrelic-agent "2.19.0"]]
   :profiles {:production {:ring {:open-browser? false
                                  :stacktraces?  false
                                  :auto-reload?  false}

@@ -33,7 +33,6 @@ common: &default_settings
   # Set to false to use the URI of a web request as the name of the transaction.
   # Default is true.
   enable_auto_transaction_naming: true
-  
  
   # Set the name of your application as you'd like it show up in New Relic.
   # if enable_auto_app_naming is false, the agent reports all data to this application.
@@ -42,7 +41,7 @@ common: &default_settings
   # For example, to report data to"My Application" and "My Application 2" use this:
   # app_name: My Application;My Application 2
   # This setting is required.
-  app_name: My Application
+  app_name: GetClojure
 
   # The agent uses its own log file to keep its logging
   # separate from that of your application.  Specify the log level here.
@@ -50,6 +49,11 @@ common: &default_settings
   # The levels in increasing order of verboseness are: off, severe, warning, info, fine, finer, finest
   # Default is info.
   log_level: info
+  
+  # Log all data to and from New Relic in plain text.
+  # This setting is dynamic, so changes do not require restarting your application.
+  # Default is false.
+  #audit_mode: true
   
   # The number of log files to use.
   # Default is 1.
@@ -67,23 +71,26 @@ common: &default_settings
   # Default is the logs directory in the newrelic.jar parent directory.
   #log_file_path:
   
-  # The agent communicates with New Relic via http by
-  # default.  If you want to communicate via https to increase
-  # security, then turn on SSL by setting this value to true.  Note,
-  # this will result in increased CPU overhead to perform the
-  # encryption involved in SSL communication, but this work is done
-  # asynchronously to the threads that process your application code,
-  # so it should not impact response times.
-  # Default is false.
-  ssl: false
+  # The agent communicates with New Relic via https by
+  # default.  If you want to communicate with newrelic via http,
+  # then turn off SSL by setting this value to false.
+  # This work is done asynchronously to the threads that process your
+  # application code, so response times will not be directly affected
+  # by this change.
+  # Default is true.
+  ssl: true
   
   # Proxy settings for connecting to the New Relic server.
   #
   # If a proxy is used, the host setting is required.  Other settings
-  # are optional.  Default port is 8080.
+  # are optional.  Default port is 8080.  The username and password
+  # settings will be used to authenticate to Basic Auth challenges
+  # from a proxy server.
   #
   # proxy_host: hostname
   # proxy_port: 8080
+  # proxy_user: username
+  # proxy_password: password
 
   # Tells transaction tracer and error collector (when enabled)
   # whether or not to capture HTTP params.  When true, frameworks can
@@ -112,7 +119,7 @@ common: &default_settings
     # New Relic. Valid values are any float value, or (default) "apdex_f",
     # which will use the threshold for the "Frustrated" Apdex level
     # (greater than four times the apdex_t value).
-    # Default is 2 seconds.
+    # Default is apdex_f.
     transaction_threshold: apdex_f
  
     # When transaction tracer is on, SQL statements can optionally be
@@ -147,6 +154,13 @@ common: &default_settings
     # not be captured.  Relevant only when `explain_enabled` is true.
     # Default is 0.5 seconds.
     explain_threshold: 0.5
+    
+    # Use this setting to control the variety of transaction traces.
+    # The higher the setting, the greater the variety.
+    # Set this to 0 to always report the slowest transaction trace.
+    # Default is 20.
+    top_n: 20
+    
   
   # Error collector captures information about uncaught exceptions and
   # sends them to New Relic for viewing
@@ -167,6 +181,15 @@ common: &default_settings
     # When this property is commented out it defaults to ignoring 404s.
     #
     # ignore_status_codes: 404
+
+  # Cross Application Tracing adds request and response headers to
+  # external calls using the Apache HttpClient libraries to provided better
+  # performance data when calling applications monitored by other New Relic Agents.
+  #
+  cross_application_tracer:
+    # Set to true to enable cross application tracing.
+    # Default is true.
+    enabled: true
 
   # Thread profiler measures wall clock time, CPU time, and method call counts
   # in your application's threads as they run.
@@ -204,15 +227,15 @@ common: &default_settings
 
 development:
   <<: *default_settings
-  app_name: My Application (Development)
+  app_name: GetClojure (Development)
 
 test:
   <<: *default_settings
-  app_name: My Application (Test)
+  app_name: GetClojure (Test)
 
 production:
   <<: *default_settings
 
 staging:
   <<: *default_settings
-  app_name: My Application (Staging)
+  app_name: GetClojure (Staging)
