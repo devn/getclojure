@@ -36,7 +36,7 @@
         next-page-num (inc num)]
     (when-not (< num-pages 1)
       [:div#pagination
-       (when-not (= 0 num)
+       (when-not (zero? num)
          [:div.prev-links
           (link-to {:class "first-page"}
                    (str "/search?" (generate-query-string {"q" q "num" 0}))

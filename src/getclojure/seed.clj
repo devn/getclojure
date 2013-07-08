@@ -30,9 +30,9 @@
 (defn clean-db! []
   (let [conn (make-connection!)
         env (:environment conn)]
-    (if (= :development env)
-      (do (mc/remove :users)
-          (mc/remove :sexps)))))
+    (when (= :development env)
+      (mc/remove :users)
+      (mc/remove :sexps))))
 
 (defn -main []
   (let [search-endpoint (or (System/getenv "BONSAI_URL")
