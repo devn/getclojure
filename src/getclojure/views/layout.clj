@@ -1,5 +1,6 @@
 (ns getclojure.views.layout
   (:require [monger.collection :as mc]
+            [getclojure.db :as db]
             [getclojure.search :refer [get-num-hits search-results-for]]
             [getclojure.util :refer [generate-query-string]]
             [hiccup.def :refer [defhtml]]
@@ -68,7 +69,7 @@
                    " ->>")])])))
 
 (defn find-sexps-from-search [q page-num]
-  (map #(mc/find-one-as-map "sexps" {:id %})
+  (map #(mc/find-one-as-map @db/db "sexps" {:id %})
        (map :id (search-results-for q page-num))))
 
 (defn search-results [q page-num]
