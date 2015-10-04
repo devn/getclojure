@@ -3,7 +3,7 @@
             [monger.collection :as mc]
             [clojurewerkz.elastisch.rest :refer [connect! delete]]
             [clojurewerkz.elastisch.rest.index :refer [exists?]]
-            [getclojure.db :refer [make-connection!]]
+            [getclojure.db :refer [make-connection!] :as db]
             [getclojure.models.sexp :refer [create-sexp!]]
             [getclojure.models.user :refer [create-user!]]
             [getclojure.search :refer [add-to-index
@@ -19,7 +19,7 @@
 (defn seed-sexp [sexp-map]
   (let [user (create-user! "admin@getclojure.org" "admin")]
     (try
-      (if-not (mc/any? "sexps" {:raw-input (:input sexp-map)})
+      (if-not (mc/any? @db/db "sexps" {:raw-input (:input sexp-map)})
         (let [id (:id (create-sexp! user sexp-map))]
           (info (add-to-index :getclojure (assoc sexp-map :id id)))))
       (catch Exception _ (str "[ERROR] Could not seed: " sexp-map)))))
@@ -31,8 +31,8 @@
   (let [conn (make-connection!)
         env (:environment conn)]
     (when (= :development env)
-      (mc/remove :users)
-      (mc/remove :sexps))))
+      (mc/remove @db/db :users)
+      (mc/remove @db/db :sexps))))
 
 (defn -main []
   (let [search-endpoint (or (System/getenv "BONSAI_URL")

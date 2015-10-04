@@ -5,6 +5,7 @@
             [monger.collection :as mc]
             [noir.session :as session]
             [getclojure.config :refer [config]]
+            [getclojure.db :as db]
             [getclojure.util :refer [inclusive-range]]
             [monger.query :refer [sort find paginate with-collection]]
             [validateur.validation :refer [format-of
@@ -20,7 +21,7 @@
    (format-of :username :format #"^[a-zA-Z0-9_]*$")))
 
 (defn unique-user? [username]
-  (nil? (mc/find-one-as-map "users" {:username username})))
+  (nil? (mc/find-one-as-map @db/db "users" {:username username})))
 
 (defn create-user! [email username]
   (let [name (s/lower-case username)
@@ -28,14 +29,14 @@
               :username name}
         errors (validate-user-map qmap)]
     (if (and (unique-user? name) (empty? errors))
-      (let [user (mc/insert-and-return "users" qmap)]
+      (let [user (mc/insert-and-return @db/db "users" qmap)]
         ;; TODO: Finish building out users
         ;;(session/put! :user (assoc qmap :id (str (:_id user))))
         user)
       errors)))
 
 (defn user-exists [email]
-  (when-let [{:keys [username _id]} (mc/find-one-as-map "users" {:email email})]
+  (when-let [{:keys [username _id]} (mc/find-one-as-map @db/db "users" {:email email})]
     (session/put! :user {:email email
                          :username username
                          :id (str _id)})
@@ -64,10 +65,10 @@
 
 ;; Queries
 (defn get-user [username]
-  (mc/find-one-as-map "users" {:username username}))
+  (mc/find-one-as-map @db/db "users" {:username username}))
 
 (defn get-user-by-id [id]
-  (mc/find-map-by-id "users" (ObjectId. id)))
+  (mc/find-map-by-id @db/db "users" (ObjectId. id)))
 
 (defn user-sexps [username page & [others]]
   (with-collection "sexps"
@@ -76,4 +77,4 @@
     (paginate :page page :per-page 10)))
 
 (defn count-user-sexps [username & [others]]
-  (mc/count "sexps" (merge {:user (:_id (get-user username))} others)))
+  (mc/count @db/db "sexps" (merge {:user (:_id (get-user username))} others)))

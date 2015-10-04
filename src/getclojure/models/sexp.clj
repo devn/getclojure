@@ -1,5 +1,6 @@
 (ns getclojure.models.sexp
   (:require [monger.collection :as mc]
+            [getclojure.db :as db]
             [getclojure.format :refer [format-input
                                        format-output
                                        format-value]]
@@ -19,7 +20,7 @@
               (or 0))))
 
 (defn sexp-exists? [{:keys [raw-input]}]
-  (mc/any? "sexps" {:raw-input raw-input}))
+  (mc/any? @db/db "sexps" {:raw-input raw-input}))
 
 (defn sexp-record-map [id user sexp-map]
   (let [{:keys [input value output]} sexp-map]
@@ -38,4 +39,4 @@
   (let [id (swap! sexp-id inc)
         sexp (sexp-record-map id user sexp-map)]
     (if-not (sexp-exists? sexp)
-      (mc/insert-and-return "sexps" sexp))))
+      (mc/insert-and-return @db/db "sexps" sexp))))
