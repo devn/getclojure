@@ -11,7 +11,7 @@
 
 (defn set-highest-sexp-id! []
   (reset! sexp-id
-          (-> (with-collection "sexps"
+          (-> (with-collection @db/db "sexps"
                 (find {})
                 (sort {:id -1})
                 (limit 1))

@@ -71,7 +71,7 @@
   (mc/find-map-by-id @db/db "users" (ObjectId. id)))
 
 (defn user-sexps [username page & [others]]
-  (with-collection "sexps"
+  (with-collection @db/db "sexps"
     (find (merge {:user (:_id (get-user username))} others))
     (sort {:date -1})
     (paginate :page page :per-page 10)))
