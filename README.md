@@ -19,7 +19,7 @@ Go to [GetClojure](http://getclojure.com) and start searching.
 In order to run locally in development mode you'll need to do the
 following:
 
-* Run ElasticSearch locally. Find it via your package manager.
+* Run ElasticSearch locally.
 * Run MongoDB locally. Find it via your package manager.
 * Run `./script/bootstrap.sh`
 * Seed the Database: `lein run -m getclojure.seed`
