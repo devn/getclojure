@@ -12,7 +12,7 @@
 
 (def env (env? mongo-uri))
 
-(def db (delay (mg/connect-via-uri mongo-uri)))
+(def db (delay (:db (mg/connect-via-uri mongo-uri))))
 
 (defn- make-indices []
   (mc/ensure-index @db "sexps" {:user 1})
