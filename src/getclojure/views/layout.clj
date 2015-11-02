@@ -18,6 +18,7 @@
 
 (defn search-form [& q]
   (let [query (first q)]
+    [:section#contact "608-729-4573"]
     [:section.search
      (form-to
       [:get "/search"]
