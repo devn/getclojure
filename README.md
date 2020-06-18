@@ -8,11 +8,7 @@ made searchable via ElasticSearch.
 
 ## Usage
 
-Go to [GetClojure](http://getclojure.com) and start searching.
-
-## Tips Welcome
-
-[![Support via Gittip](https://rawgithub.com/chris---/Donation-Badges/master/gittip.jpeg)](https://www.gittip.com/devn)
+Go to [GetClojure](http://getclojure.org) and start searching.
 
 ## Developers
 
