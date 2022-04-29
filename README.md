@@ -23,7 +23,7 @@ following:
 ## Thanks
 
 * To Jean Niklas L'Orange (hyPiRion) for helping me understand what
-  this string does in cl-format, and for fixing a related bug in the
+  this string does in `cl-format`, and for fixing a related bug in the
   Clojure pretty printer: ~<#(~;~@{~w~^ ~_~}~;)~:>
 * To Chris Houser for giving me a treasure trove of logs to harvest.
 
