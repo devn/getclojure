@@ -17,6 +17,9 @@
       (recur r (str/replace out c (escape-character c)))
       out)))
 
+(defn query [q page-num]
+  )
+
 (defn search-sexps [q page-num]
   (info "Requested Query: " q)
   (let [offset (* (Integer/parseInt page-num) 25)
@@ -40,10 +43,3 @@
 
 (defn search-results-for [q page-num]
   (get-search-hits (search-sexps q page-num)))
-
-(comment
-  (require '[clojurewerkz.elastisch.rest :as esr])
-  (esr/connect! "http://127.0.0.1:9200")
-  (esi/delete "getclojure")
-  (create-getclojure-index)
-)
