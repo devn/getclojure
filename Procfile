@@ -1,1 +1,1 @@
-web: ./script/bootstrap.sh && lein with-profile production trampoline ring server
+web: lein with-profile production trampoline ring server
