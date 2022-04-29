@@ -1,9 +1,7 @@
 (ns getclojure.util
-  (:require [clojure.string :as str])
-  (:import java.net.URLEncoder))
-
-(defn uuid []
-  (str (java.util.UUID/randomUUID)))
+  (:require
+   [clojure.string :as str])
+  (:import (java.net URLEncoder)))
 
 (defn url-encode
   "Returns an UTF-8 URL encoded version of the given string."
@@ -22,12 +20,6 @@
                               "="
                               (url-encode (str v)))]))
                     params)))
-
-(defn inclusive-range
-  ([] (inclusive-range 0 Double/POSITIVE_INFINITY 1))
-  ([end] (inclusive-range 0 end 1))
-  ([start end] (inclusive-range start end 1))
-  ([start end step] (range start (inc end) step)))
 
 (defn truncate
   "Provided `n-chars` and `x`, truncates at `n-chars` by adding an ellipsis."
