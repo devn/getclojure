@@ -7,7 +7,7 @@
 
 (defn url-encode
   "Returns an UTF-8 URL encoded version of the given string."
-  [unencoded]
+  [^String unencoded]
   (URLEncoder/encode unencoded "UTF-8"))
 
 (defn generate-query-string [params]

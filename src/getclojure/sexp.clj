@@ -1,20 +1,40 @@
 (ns getclojure.sexp
   (:refer-clojure :exclude [format eval])
   (:require
-   [outpace.config :refer [defconfig]]
-   [clojure.java.shell :as sh]
-   [clojure.pprint :as pp]
-   [sci.core :as sci]
-   [sci.impl.namespaces :as sci.ns]
-   [getclojure.util :as util]
    [cheshire.core :as json]
    [clojure.java.io :as io]
-   [clojure.string :as str])
+   [clojure.java.shell :as sh]
+   [clojure.pprint :as pp]
+   [clojure.string :as str]
+   [getclojure.util :as util]
+   [outpace.config :refer [defconfig]]
+   [sci.core :as sci])
   (:import
    (java.io StringWriter)
-   (java.util.concurrent TimeUnit FutureTask TimeoutException)))
+   (java.util.concurrent TimeUnit FutureTask TimeoutException)
+   (com.algolia.search SearchClient SearchIndex DefaultSearchClient)
+   (com.algolia.search.models.indexing SearchResult Query)))
 
-(defconfig algolia-public-api-key)
+(defconfig algolia-app-id)
+(defconfig algolia-admin-api-key)
+(defconfig algolia-index)
+
+(def search-client (DefaultSearchClient/create algolia-app-id algolia-admin-api-key))
+
+(def search-index (.initIndex ^SearchClient search-client "getclojure_production"))
+
+(defn search
+  ([q] (search q 0))
+  ([q page-num]
+   (let [res (.search ^SearchIndex search-index (.. (Query. q)
+                                                    (setAttributesToRetrieve ["formatted-input"
+                                                                              "formatted-output"
+                                                                              "formatted-value"])
+                                                    (setHitsPerPage (int 25))
+                                                    (setPage (int page-num))))]
+     {:hits       (.getHits ^SearchResult res)
+      :total-hits (.getNbHits ^SearchResult res)
+      :pages      (.getNbPages ^SearchResult res)})))
 
 (defn ^:private pygmentize
   [s]

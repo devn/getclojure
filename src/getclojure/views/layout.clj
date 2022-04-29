@@ -9,7 +9,8 @@
                         text-field]]
    [hiccup.page :refer [include-css include-js]]
    [clojure.java.io :as io]
-   [cheshire.core :as json]))
+   [cheshire.core :as json]
+   [getclojure.sexp :as sexp]))
 
 (defn header []
   [:header
@@ -29,62 +30,64 @@
       (hidden-field "num" 0)
       (submit-button {:id "search-box"} "search"))]))
 
-#_(defn pagination [q page-num]
-  (let [num (Integer/parseInt page-num)
-        total-hits (get-num-hits q page-num)
-        num-pages (/ total-hits 25)
-        prev-page-num (dec num)
-        next-page-num (inc num)]
-    (when-not (< num-pages 1)
+
+(defn pagination
+  [q page-num total-pages]
+  (let [page-num (Long/parseLong page-num)
+        prev-page-num (dec page-num)
+        next-page-num (inc page-num)]
+    (when-not (< total-pages 1)
       [:div#pagination
-       (when-not (zero? num)
+       (when-not (zero? total-pages)
          [:div.prev-links
           (link-to {:class "first-page"}
-                   (str "/search?" (generate-query-string {"q" q "num" 0}))
+                   (str "/search?" (generate-query-string {"q" q
+                                                           "num" 0}))
                    "<<- ")
           (link-to {:class "prev"}
-                   (str "/search?" (generate-query-string {"q" q "num" prev-page-num}))
+                   (str "/search?" (generate-query-string {"q" q
+                                                           "num" prev-page-num}))
                    "<- ")])
        (let [page-links (map (fn [p-num]
                                (link-to {:class "page_num"}
                                         (str "/search?"
                                              (generate-query-string
-                                              {"q" q "num" p-num}))
+                                              {"q" q
+                                               "num" p-num}))
                                         (inc p-num)))
-                             (range num num-pages))
+                             (range 0 total-pages))
              num-page-links (count page-links)]
          (if (< num-page-links 10)
            page-links
            (take 10 page-links)))
-       (when (<= next-page-num num-pages)
+       (when (<= next-page-num total-pages)
          [:div.next-links
           (link-to {:class "next"}
-                   (str "/search?" (generate-query-string {"q" q "num" next-page-num}))
+                   (str "/search?" (generate-query-string {"q" q
+                                                           "num" next-page-num}))
                    " ->")
           (link-to {:class "last-page"}
                    (str "/search?"
-                        (generate-query-string {"q" q "num" (-> (Math/floor num-pages)
-                                                                int
-                                                                str)}))
+                        (generate-query-string {"q" q "num" (dec total-pages)}))
                    " ->>")])])))
-
-#_(defn find-sexps-from-search [q page-num]
-  (map #(mc/find-one-as-map @db/db "sexps" {:id %})
-       (map :id (search-results-for q page-num))))
 
 (def temp-sexps (json/decode (slurp "output.json") true))
 
-(defn search-results [q page-num]
-  [:section.results
-   [:ul
-    (for [{:keys [formatted-input
-                  formatted-value
-                  formatted-output]} (take 25 (shuffle temp-sexps))]
-      [:li.result
-       formatted-input
-       formatted-value
-       formatted-output])]
-   #_(pagination q page-num)])
+(defn search-results
+  [q page-num]
+  (let [{:keys [hits pages]} (sexp/search q (Long/parseLong page-num))]
+    [:section.results
+     [:ul
+      (for [{:strs [formatted-input
+                    formatted-value
+                    formatted-output]} hits]
+        [:li.result
+         formatted-input
+         formatted-value
+         formatted-output])]
+     (pagination q page-num pages)]))
+
+(:hits (sexp/search "iterate" 0))
 
 (defhtml powered-by []
   [:a.powered-by-clojure {:href "http://clojure.org/"
