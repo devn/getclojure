@@ -1,25 +1,10 @@
 (ns getclojure.util
-  (:require [clojure.string :as str]
-            [markdown.core :as md]
-            [noir.io :as io])
+  (:require [clojure.string :as str])
   (:import java.net.URLEncoder))
 
 (defn uuid []
   (str (java.util.UUID/randomUUID)))
 
-(defn format-time
-  "formats the time using SimpleDateFormat, the default format is
-   \"dd MMM, yyyy\" and a custom one can be passed in as the second argument"
-  ([time] (format-time time "dd MMM, yyyy"))
-  ([time fmt]
-     (.format (new java.text.SimpleDateFormat fmt) time)))
-
-(defn md->html
-  "reads a markdown file from public/md and returns an HTML string"
-  [filename]
-  (md/md-to-html-string (io/slurp-resource filename)))
-
-;; Web Utils
 (defn url-encode
   "Returns an UTF-8 URL encoded version of the given string."
   [unencoded]
@@ -43,3 +28,10 @@
   ([end] (inclusive-range 0 end 1))
   ([start end] (inclusive-range start end 1))
   ([start end step] (range start (inc end) step)))
+
+(defn truncate
+  "Provided `n-chars` and `x`, truncates at `n-chars` by adding an ellipsis."
+  [n-chars x]
+  (if (> (count x) n-chars)
+    (str (subs x 0 n-chars) "...")
+    x))

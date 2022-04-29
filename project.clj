@@ -1,25 +1,18 @@
-(defproject getclojure "0.1.0"
+(defproject getclojure "2.0.0"
   :description "GetClojure"
   :url "http://getclojure.org"
   :license {:name "Eclipse Public License"
             :url "http://www.eclipse.org/legal/epl-v10.html"}
   :dependencies [[org.clojure/clojure "1.11.1"]
-                 [clojurewerkz/elastisch "3.0.1"]
-                 [clojail "1.0.6"]
-                 [com.novemberain/monger "3.5.0"]
-                 [com.novemberain/validateur "2.6.0"]
-                 [clj-config "0.2.0"]
-                 [org.clojars.semperos/enlive "1.0.1" :exclusions [org.clojure/clojure]]
-                 [me.raynes/conch "0.8.0"]
-                 [org.thnetos/cd-client "0.3.6"]
-                 ;; Web
-                 [lib-noir "0.9.9"]
-                 [com.cemerick/friend "0.2.3"]
+                 [org.babashka/sci "0.3.4"]
+                 [cheshire "5.10.2"]
+                 [ring/ring-jetty-adapter "1.9.5"]
+                 [ring/ring-defaults "0.3.3"]
                  [compojure "1.6.2"]
                  [hiccup "1.0.5"]
-                 [ring-server "0.5.0"]
-                 [com.taoensso/timbre "5.2.1"]
-                 [markdown-clj "1.11.0"]]
+                 [com.github.seancorfield/next.jdbc "1.2.780"]
+                 [org.postgresql/postgresql "42.3.4"]
+                 [com.outpace/config "0.13.5"]]
   :plugins [[lein-ring "0.8.3"]]
   :ring {:handler getclojure.handler/app
          :init getclojure.handler/init}

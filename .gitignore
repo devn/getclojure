@@ -15,3 +15,6 @@ pom.xml
 .lein-deps-sum
 .lein-repl-history
 /resources/pygments
+.lsp/**/*
+.clj-kondo/**/*
+.nrepl-port
