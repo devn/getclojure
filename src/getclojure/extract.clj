@@ -16,7 +16,7 @@
 (defn trim-nickname
   "Takes \"foo: \" and returns \"foo\"."
   [^String s]
-  (if s (str/replace s #": " "")))
+  (when s (str/replace s #": " "")))
 
 (defn trim-content
   "Trim the left and right sides of a string of its whitespace and

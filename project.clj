@@ -14,7 +14,8 @@
                  [org.postgresql/postgresql "42.3.4"]
                  [com.outpace/config "0.13.5"]
                  [com.algolia/algoliasearch-core "3.16.5"]
-                 [com.algolia/algoliasearch-java-net "3.16.5"]]
+                 [com.algolia/algoliasearch-java-net "3.16.5"]
+                 [enlive "1.1.6"]]
   :plugins [[lein-ring "0.8.3"]]
   :ring {:handler getclojure.handler/app
          :init getclojure.handler/init}
