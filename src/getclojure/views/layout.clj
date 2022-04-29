@@ -1,15 +1,15 @@
 (ns getclojure.views.layout
-  (:require [monger.collection :as mc]
-            [getclojure.db :as db]
-            [getclojure.search :refer [get-num-hits search-results-for]]
-            [getclojure.util :refer [generate-query-string]]
-            [hiccup.def :refer [defhtml]]
-            [hiccup.element :refer [image link-to]]
-            [hiccup.form :refer [form-to
-                                 hidden-field
-                                 submit-button
-                                 text-field]]
-            [hiccup.page :refer [include-css include-js]]))
+  (:require
+   [getclojure.util :refer [generate-query-string]]
+   [hiccup.def :refer [defhtml]]
+   [hiccup.element :refer [image link-to]]
+   [hiccup.form :refer [form-to
+                        hidden-field
+                        submit-button
+                        text-field]]
+   [hiccup.page :refer [include-css include-js]]
+   [clojure.java.io :as io]
+   [cheshire.core :as json]))
 
 (defn header []
   [:header
@@ -29,7 +29,7 @@
       (hidden-field "num" 0)
       (submit-button {:id "search-box"} "search"))]))
 
-(defn pagination [q page-num]
+#_(defn pagination [q page-num]
   (let [num (Integer/parseInt page-num)
         total-hits (get-num-hits q page-num)
         num-pages (/ total-hits 25)
@@ -68,19 +68,23 @@
                                                                 str)}))
                    " ->>")])])))
 
-(defn find-sexps-from-search [q page-num]
+#_(defn find-sexps-from-search [q page-num]
   (map #(mc/find-one-as-map @db/db "sexps" {:id %})
        (map :id (search-results-for q page-num))))
+
+(def temp-sexps (json/decode (slurp "output.json") true))
 
 (defn search-results [q page-num]
   [:section.results
    [:ul
-    (for [{:keys [input value output]} (find-sexps-from-search q page-num)]
+    (for [{:keys [formatted-input
+                  formatted-value
+                  formatted-output]} (take 25 (shuffle temp-sexps))]
       [:li.result
-       input
-       value
-       output])]
-   (pagination q page-num)])
+       formatted-input
+       formatted-value
+       formatted-output])]
+   #_(pagination q page-num)])
 
 (defhtml powered-by []
   [:a.powered-by-clojure {:href "http://clojure.org/"

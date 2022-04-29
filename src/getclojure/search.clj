@@ -1,41 +1,6 @@
 (ns getclojure.search
-  (:require [clojure.string :as string]
-            [clojurewerkz.elastisch.query :as q]
-            [clojurewerkz.elastisch.rest.document :as esd]
-            [clojurewerkz.elastisch.rest.index :as esi]
-            [getclojure.util :as util]
-            [taoensso.timbre :refer [info]]))
-
-(def custom-analyzer
-  {:custom_analyzer {:type "custom"
-                     :tokenizer "custom_tokenizer"
-                     :filter "custom_filter"}})
-
-(def custom-filter
-  {:custom_filter {:type "lowercase"}})
-
-(def custom-tokenizer
-  {:custom_tokenizer {:type "pattern"
-                      :pattern "[\\s\\(\\)\\[\\]\\{\\}]+"}})
-
-(def mappings
-  {:sexp
-   {:properties
-    {:id {:type "integer" :store "yes"}
-     :input {:type "string" :store "yes" :analyzer "custom_analyzer"}
-     :output {:type "string" :store "yes" :analyzer "custom_analyzer"}
-     :value {:type "string" :store "yes" :analyzer "custom_analyzer"}}}})
-
-(defn create-getclojure-index []
-  (when-not (esi/exists? "getclojure")
-    (esi/create "getclojure"
-                :settings {:index {:analysis {:analyzer custom-analyzer
-                                              :tokenizer custom-tokenizer
-                                              :filter custom-filter}}}
-                :mappings mappings)))
-
-(defn add-to-index [env sexp-map]
-  (esd/put (name env) "sexp" (util/uuid) sexp-map))
+  (:require [clojure.string :as str]
+            [getclojure.util :as util]))
 
 (def special-characters
   ["\\" "+" "-" "&&" "||" "!" "(" ")"
@@ -49,7 +14,7 @@
   (loop [[c & r] special-characters
          out q]
     (if c
-      (recur r (string/replace out c (escape-character c)))
+      (recur r (str/replace out c (escape-character c)))
       out)))
 
 (defn search-sexps [q page-num]
