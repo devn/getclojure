@@ -1,6 +1,7 @@
 (ns getclojure.extract
-  (:require [clojure.string :as str]
-            [net.cgrand.enlive-html :as enlive])
+  (:require
+   [clojure.string :as str]
+   [net.cgrand.enlive-html :as enlive])
   (:import (java.io File)))
 
 (defn get-lines
@@ -25,34 +26,48 @@
   (str/trimr (str/triml (str/trim-newline s))))
 
 (defn extract-sexps
-  "Extracts sexps. Using 0s and 1s, ostensibly."
+  "Extracts sexps. Using 0s and 1s, ostensibly.
+
+  Provided a string, hunts for s-expressions and returns them in a list. Returns
+  empty list if none are found."
   [^String string]
   (second
    (reduce (fn [[exp exps state cnt] c]
              (cond
-              (= state :escape)
-              [(.append exp c) exps :string cnt]
-              (= state :string) (cond
-                                 (= c \")
-                                 [(.append exp c) exps :code cnt]
-                                 (= c \\)
-                                 [(.append exp c) exps :escape cnt]
-                                 (= c \\)
-                                 [(.append exp c) exps :escape cnt]
-                                 :else
-                                 [(.append exp c) exps :string cnt])
-              (and (= cnt 1) (= c \)))
-              [(java.lang.StringBuilder.) (cons (str (.append exp c)) exps) :text 0]
-              (= c \()
-              [(.append exp c) exps :code (inc cnt)]
-              (and (> cnt 1) (= c \)))
-              [(.append exp c) exps :code (dec cnt)]
-              (and (> cnt 0) (= c \"))
-              [(.append exp c) exps :string cnt]
-              (> cnt 0)
-              [(.append exp c) exps :code cnt]
-              :else [exp exps state cnt]))
-           [(java.lang.StringBuilder.) '() :text 0]
+               (= state :escape)
+               [(.append exp c) exps :string cnt]
+
+               (= state :string) (cond
+                                   (= c \")
+                                   [(.append exp c) exps :code cnt]
+
+                                   (= c \\)
+                                   [(.append exp c) exps :escape cnt]
+
+                                   (= c \\)
+                                   [(.append exp c) exps :escape cnt]
+
+                                   :else
+                                   [(.append exp c) exps :string cnt])
+
+               (and (= cnt 1) (= c \)))
+               [(StringBuilder.) (cons (str (.append exp c)) exps) :text 0]
+
+               (= c \()
+               [(.append exp c) exps :code (inc cnt)]
+
+               (and (> cnt 1) (= c \)))
+               [(.append exp c) exps :code (dec cnt)]
+
+               (and (> cnt 0) (= c \"))
+               [(.append exp c) exps :string cnt]
+
+               (> cnt 0)
+               [(.append exp c) exps :code cnt]
+
+               :else [exp exps state cnt]))
+
+           [(StringBuilder.) '() :text 0]
            string)))
 
 (defn extracted-sexps-or-nil
@@ -67,11 +82,11 @@
         timestamp (text-for node :a)
         content   (trim-content (last (:content node)))
         sexps     (extracted-sexps-or-nil content)]
-    {:nickname  nickname,
-     :date      date,
-     :timestamp timestamp,
-     :content   content,
-     :sexp      sexps}))
+    {:nickname  nickname
+     :date      date
+     :timestamp timestamp
+     :content   content
+     :sexps     sexps}))
 
 (defn forward-propagate
   "If the keyword (kw) specified does not exist in the next map in the
@@ -89,8 +104,8 @@
     mapseq)))
 
 (defn logfile->mapseq
-  "Takes a java.io.File and returns a sequence of hash maps which have
-  the following keys: :nickname, :date, :timestamp, :content, :sexp."
+  "Takes a java.io.File and returns a sequence of hash maps which have the
+  following keys: :nickname, :date, :timestamp, :content, :sexps."
   [^File logfile]
   (let [parsed-date  (str/replace (.getName logfile) #"\.html" "")
         loglines     (get-lines logfile)
