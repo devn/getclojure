@@ -8,25 +8,26 @@
                         submit-button
                         text-field]]
    [hiccup.page :refer [include-css include-js]]
-   [clojure.java.io :as io]
    [cheshire.core :as json]
    [getclojure.sexp :as sexp]))
 
-(defn header []
+(defn header
+  []
   [:header
    [:a {:href "/" :rel "home"}
      (image {:class "getclojure-logo" :alt "Get Clojure"} "img/getclojure-logo.png")]])
 
-(defn search-form [& q]
+(defn search-form
+  [& q]
   (let [query (first q)]
     [:section.search
      (form-to
       [:get "/search"]
       (if query
         (text-field {:autocorrect "off" :autocapitalize "off" :autocomplete "off"
-                     :spellcheck "false" :placeholder "iterate AND range"} "q" query)
+                     :spellcheck "false" :placeholder "iterate +"} "q" query)
         (text-field {:autocorrect "off" :autocapitalize "off" :autocomplete "off"
-                     :spellcheck "false" :placeholder "iterate AND range"} "q"))
+                     :spellcheck "false" :placeholder "iterate +"} "q"))
       (hidden-field "num" 0)
       (submit-button {:id "search-box"} "search"))]))
 
@@ -71,8 +72,6 @@
                         (generate-query-string {"q" q "num" (dec total-pages)}))
                    " ->>")])])))
 
-(def temp-sexps (json/decode (slurp "output.json") true))
-
 (defn search-results
   [q page-num]
   (let [{:keys [hits pages]} (sexp/search q (Long/parseLong page-num))]
@@ -87,9 +86,8 @@
          formatted-output])]
      (pagination q page-num pages)]))
 
-(:hits (sexp/search "iterate" 0))
-
-(defhtml powered-by []
+(defhtml powered-by
+  []
   [:a.powered-by-clojure {:href "http://clojure.org/"
                           :title "Clojure"}
    (image {:height 32 :width 32}
@@ -97,22 +95,26 @@
           "Powered by Clojure")
    "Powered by Clojure"])
 
-(defhtml created-by []
+(defhtml created-by
+  []
   [:div.created-by
    (image {:class "heart"} "img/heart.png" "heart")
    "Created with Love by '(Devin Walters)"])
 
-(defhtml on-github []
+(defhtml on-github
+  []
   [:div.on-github
    [:a {:href "https://github.com/devn/getclojure"}
     [:img {:style "position: absolute; top: 0; right: 0; border: 0;"
            :src "https://s3.amazonaws.com/github/ribbons/forkme_right_gray_6d6d6d.png"
            :alt "Fork me on GitHub"}]]])
 
-(defhtml footer []
+(defhtml footer
+  []
   [:footer (created-by) (powered-by)])
 
-(defhtml base [& content]
+(defhtml base
+  [& content]
   [:head
    [:title "GetClojure"]
    (include-css "/css/screen.css" "/css/github.css")
