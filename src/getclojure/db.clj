@@ -3,7 +3,7 @@
    [outpace.config :refer [defconfig]]
    [next.jdbc :as jdbc]))
 
-(defconfig db-url "jdbc:postgresql://localhost:5432/getclojure?user=postgres&password=postgres")
+(defconfig db-url)
 
 (def db (delay (jdbc/get-datasource {:jdbcUrl db-url})))
 

@@ -1,3 +1,4 @@
 {
  getclojure.db/db-url #config/env "DB_URL"
+ getclojure.sexp/algolia-public-api-key #config/env "ALGOLIA_API_KEY"
 }

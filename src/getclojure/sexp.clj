@@ -1,6 +1,7 @@
 (ns getclojure.sexp
   (:refer-clojure :exclude [format eval])
   (:require
+   [outpace.config :refer [defconfig]]
    [clojure.java.shell :as sh]
    [clojure.pprint :as pp]
    [sci.core :as sci]
@@ -12,6 +13,8 @@
   (:import
    (java.io StringWriter)
    (java.util.concurrent TimeUnit FutureTask TimeoutException)))
+
+(defconfig algolia-public-api-key)
 
 (defn ^:private pygmentize
   [s]
