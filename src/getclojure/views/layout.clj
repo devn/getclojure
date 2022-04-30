@@ -60,7 +60,7 @@
                                                         {"q" q
                                                          "num" p-num}))
                                                   (inc p-num)))
-                             (range 0 total-pages))
+                             (range page-num total-pages))
              num-page-links (count page-links)]
          (if (< num-page-links 10)
            page-links
