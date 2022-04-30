@@ -37,14 +37,11 @@
                (= state :escape)
                [(.append exp c) exps :string cnt]
 
-               (= state :string) (cond
-                                   (= c \")
+               (= state :string) (case c
+                                   \"
                                    [(.append exp c) exps :code cnt]
 
-                                   (= c \\)
-                                   [(.append exp c) exps :escape cnt]
-
-                                   (= c \\)
+                                   \\
                                    [(.append exp c) exps :escape cnt]
 
                                    :else
