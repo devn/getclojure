@@ -20,19 +20,19 @@
 (defconfig algolia-admin-api-key)
 (defconfig algolia-index)
 
-(def search-client (DefaultSearchClient/create algolia-app-id algolia-admin-api-key))
+(def search-client (delay (DefaultSearchClient/create algolia-app-id algolia-admin-api-key)))
 
-(def search-index (.initIndex ^SearchClient search-client "getclojure_production"))
+(def search-index (delay (.initIndex ^SearchClient @search-client "getclojure_production")))
 
 (defn search
   ([q] (search q 0))
   ([q page-num]
-   (let [res (.search ^SearchIndex search-index (.. (Query. q)
-                                                    (setAttributesToRetrieve ["formatted-input"
-                                                                              "formatted-output"
-                                                                              "formatted-value"])
-                                                    (setHitsPerPage (int 25))
-                                                    (setPage (int page-num))))]
+   (let [res (.search ^SearchIndex @search-index (.. (Query. q)
+                                                     (setAttributesToRetrieve ["formatted-input"
+                                                                               "formatted-output"
+                                                                               "formatted-value"])
+                                                     (setHitsPerPage (int 25))
+                                                     (setPage (int page-num))))]
      {:hits       (.getHits ^SearchResult res)
       :total-hits (.getNbHits ^SearchResult res)
       :pages      (.getNbPages ^SearchResult res)})))
