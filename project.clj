@@ -18,15 +18,8 @@
                  [enlive "1.1.6"]]
   :plugins [[lein-ring "0.12.5"]]
   :ring {:handler getclojure.server/app
-         #_#_:init getclojure.server/init
          :port 8080}
-  :profiles {:production {:ring {:open-browser? false
-                                 :stacktraces?  false
-                                 :auto-reload?  false}
-                          :offline true
-                          :mirror {#"central|clojars"
-                                   "http://s3pository.herokuapp.com/clojure"}}
-             :dev {:dependencies [[ring-mock "0.1.5"]
+  :profiles {:dev {:dependencies [[ring-mock "0.1.5"]
                                   [ring/ring-devel "1.9.5"]
                                   [pjstadig/humane-test-output "0.11.0"]]
                    :injections [(require 'pjstadig.humane-test-output)
