@@ -27,5 +27,8 @@
                                    "http://s3pository.herokuapp.com/clojure"}}
              :dev {:dependencies [[ring-mock "0.1.5"]
                                   [ring/ring-devel "1.9.5"]
-                                  [org.clojure/data.csv "1.0.1"]]}}
+                                  [pjstadig/humane-test-output "0.11.0"]]
+                   :injections [(require 'pjstadig.humane-test-output)
+                                (pjstadig.humane-test-output/activate!)]
+                   :plugins [[com.jakemccrary/lein-test-refresh "0.25.0"]]}}
   :min-lein-version "2.0.0")

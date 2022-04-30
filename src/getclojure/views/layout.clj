@@ -30,7 +30,7 @@
       [:get "/search"]
       (if query
         (h.form/text-field text-field-opts "q" query)
-        (h.form/text-field (assoc text-field opts :autofocus "true") "q"))
+        (h.form/text-field (assoc text-field-opts :autofocus "true") "q"))
       (h.form/hidden-field "num" 0)
       (h.form/submit-button {:id "search-box"} "search"))]))
 
