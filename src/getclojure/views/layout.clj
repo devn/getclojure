@@ -12,19 +12,25 @@
   []
   [:header
    [:a {:href "/" :rel "home"}
-    (h.element/image {:class "getclojure-logo" :alt "Get Clojure"} "img/getclojure-logo.png")]])
+    (h.element/image {:class "getclojure-logo"
+                      :alt "Get Clojure"}
+                     "img/getclojure-logo.png")]])
 
 (defn search-form
   [& q]
-  (let [query (first q)]
+  (let [query (first q)
+        text-field-opts {:autocorrect "off"
+                         :autocapitalize "off"
+                         :autocomplete "off"
+                         :spellcheck "false"
+                         :autofocus "false"
+                         :placeholder "map iterate"}]
     [:section.search
      (h.form/form-to
       [:get "/search"]
       (if query
-        (h.form/text-field {:autocorrect "off" :autocapitalize "off" :autocomplete "off"
-                     :spellcheck "false" :placeholder "iterate +"} "q" query)
-        (h.form/text-field {:autocorrect "off" :autocapitalize "off" :autocomplete "off"
-                     :spellcheck "false" :placeholder "iterate +"} "q"))
+        (h.form/text-field text-field-opts "q" query)
+        (h.form/text-field (assoc text-field opts :autofocus "true") "q"))
       (h.form/hidden-field "num" 0)
       (h.form/submit-button {:id "search-box"} "search"))]))
 
@@ -38,22 +44,22 @@
        (when-not (zero? total-pages)
          [:div.prev-links
           (h.element/link-to {:class "first-page"}
-                   (str "/search?" (util/generate-query-string {"q" q
-                                                                "num" 0}))
-                   "<<- ")
+                             (str "/search?" (util/generate-query-string {"q" q
+                                                                          "num" 0}))
+                             "<<- ")
           (h.element/link-to {:class "prev"}
-                   (str "/search?" (util/generate-query-string {"q" q
-                                                                "num" (if (< prev-page-num 0)
-                                                                        0
-                                                                        prev-page-num)}))
-                   "<- ")])
+                             (str "/search?" (util/generate-query-string {"q" q
+                                                                          "num" (if (< prev-page-num 0)
+                                                                                  0
+                                                                                  prev-page-num)}))
+                             "<- ")])
        (let [page-links (map (fn [p-num]
                                (h.element/link-to {:class "page_num"}
-                                        (str "/search?"
-                                             (util/generate-query-string
-                                              {"q" q
-                                               "num" p-num}))
-                                        (inc p-num)))
+                                                  (str "/search?"
+                                                       (util/generate-query-string
+                                                        {"q" q
+                                                         "num" p-num}))
+                                                  (inc p-num)))
                              (range 0 total-pages))
              num-page-links (count page-links)]
          (if (< num-page-links 10)
@@ -62,14 +68,14 @@
        (when (<= next-page-num (dec total-pages))
          [:div.next-links
           (h.element/link-to {:class "next"}
-                   (str "/search?" (util/generate-query-string {"q" q
-                                                                "num" next-page-num}))
-                   " ->")
+                             (str "/search?" (util/generate-query-string {"q" q
+                                                                          "num" next-page-num}))
+                             " ->")
           (h.element/link-to {:class "last-page"}
-                   (str "/search?"
-                        (util/generate-query-string {"q" q
-                                                     "num" (dec total-pages)}))
-                   " ->>")])])))
+                             (str "/search?"
+                                  (util/generate-query-string {"q" q
+                                                               "num" (dec total-pages)}))
+                             " ->>")])])))
 
 (defn search-results
   [q page-num]
@@ -90,8 +96,8 @@
   [:a.powered-by-clojure {:href "http://clojure.org/"
                           :title "Clojure"}
    (h.element/image {:height 32 :width 32}
-          "img/clojure-icon.gif"
-          "Powered by Clojure")
+                    "img/clojure-icon.gif"
+                    "Powered by Clojure")
    "Powered by Clojure"])
 
 (h.def/defhtml created-by
@@ -110,7 +116,9 @@
 
 (h.def/defhtml footer
   []
-  [:footer (created-by) (powered-by)])
+  [:footer
+   (created-by)
+   (powered-by)])
 
 (h.def/defhtml base
   [& content]
