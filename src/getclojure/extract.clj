@@ -1,8 +1,15 @@
 (ns getclojure.extract
   (:require
+   [clojure.java.io :as io]
    [clojure.string :as str]
    [net.cgrand.enlive-html :as enlive])
   (:import (java.io File)))
+
+(defn local-logs
+  "Returns a collection of HTML files in the resources/logs directory."
+  []
+  (filter #(re-find #"\.*\.html" (str %))
+          (file-seq (io/as-file (io/resource "logs")))))
 
 (defn get-lines
   "Gets all of the 'p' tags from a logfile."
