@@ -7,4 +7,4 @@
 
 (def db (delay (jdbc/get-datasource {:jdbcUrl db-url})))
 
-(jdbc/execute! @db ["SELECT 1 as cool;"])
+#_(jdbc/execute! @db ["SELECT 1 as cool;"])
