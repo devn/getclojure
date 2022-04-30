@@ -1,5 +1,5 @@
 (ns getclojure.sexp
-  (:refer-clojure :exclude [format eval])
+  (:refer-clojure :exclude [eval])
   (:require
    [cheshire.core :as json]
    [clojure.java.io :as io]
@@ -15,6 +15,7 @@
    (com.algolia.search SearchClient SearchIndex DefaultSearchClient)
    (com.algolia.search.models.indexing SearchResult Query)))
 
+                                        ; SEARCH
 (defconfig algolia-app-id)
 (defconfig algolia-admin-api-key)
 (defconfig algolia-index)
@@ -35,6 +36,8 @@
      {:hits       (.getHits ^SearchResult res)
       :total-hits (.getNbHits ^SearchResult res)
       :pages      (.getNbPages ^SearchResult res)})))
+
+                                        ; FORMAT
 
 (defn ^:private pygmentize
   [s]
@@ -57,6 +60,22 @@
      (read-string
       (with-out-str (pp/with-pprint-dispatch pp/code-dispatch
                       (pp/pprint s)))))))
+
+(defn format-coll
+  [sexp-maps]
+  (doall
+   (pmap (fn [{:keys [input value output] :as m}]
+           (try (let [input-fmt (future (format-input input))
+                      value-fmt (future (format-value value))
+                      output-fmt (future (format-output output))]
+                  (merge m {:formatted-input @input-fmt
+                            :formatted-value @value-fmt
+                            :formatted-output @output-fmt}))
+                (catch Exception _e
+                  (println input value output))))
+         sexp-maps)))
+
+                                        ; EVALUATE
 
 (defn ^:private eval
   "Evaluate a string in SCI. Defined separately in case we want to supply
@@ -97,21 +116,6 @@
           []
           sexp-coll))
 
-(defn format
-  [sexp-maps]
-  (doall
-   (pmap (fn [{:keys [input value output] :as m}]
-           (try (let [input-fmt (future (format-input input))
-                      value-fmt (future (format-value value))
-                      output-fmt (future (format-output output))]
-                  (merge m
-                         {:formatted-input @input-fmt
-                          :formatted-value @value-fmt
-                          :formatted-output @output-fmt}))
-                (catch Exception _e
-                  (println input value output))))
-         sexp-maps)))
-
 (defn -main []
   ;; Generate json of all sexps for use in Algolia
   (spit "output.json"
@@ -127,7 +131,7 @@
                            (str/includes? input "fn*"))))
              (into #{})
              (run-coll 5000)
-             (format)
+             (format-coll)
              (json/encode)))
   (shutdown-agents)
   (System/exit 0))
