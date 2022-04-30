@@ -1,4 +1,4 @@
-(ns getclojure.core
+(ns getclojure.server
   (:require
    [getclojure.routes :as routes]
    [ring.adapter.jetty :as ring]
