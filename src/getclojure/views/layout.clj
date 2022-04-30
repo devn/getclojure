@@ -1,58 +1,56 @@
 (ns getclojure.views.layout
   (:require
-   [getclojure.util :refer [generate-query-string]]
-   [hiccup.def :refer [defhtml]]
-   [hiccup.element :refer [image link-to]]
-   [hiccup.form :refer [form-to
-                        hidden-field
-                        submit-button
-                        text-field]]
-   [hiccup.page :refer [include-css include-js]]
-   [cheshire.core :as json]
-   [getclojure.sexp :as sexp]))
+   [getclojure.sexp :as sexp]
+   [getclojure.util :as util]
+   [hiccup
+    [def :as h.def]
+    [element :as h.element]
+    [form :as h.form]
+    [page :as h.page]]))
 
 (defn header
   []
   [:header
    [:a {:href "/" :rel "home"}
-     (image {:class "getclojure-logo" :alt "Get Clojure"} "img/getclojure-logo.png")]])
+    (h.element/image {:class "getclojure-logo" :alt "Get Clojure"} "img/getclojure-logo.png")]])
 
 (defn search-form
   [& q]
   (let [query (first q)]
     [:section.search
-     (form-to
+     (h.form/form-to
       [:get "/search"]
       (if query
-        (text-field {:autocorrect "off" :autocapitalize "off" :autocomplete "off"
+        (h.form/text-field {:autocorrect "off" :autocapitalize "off" :autocomplete "off"
                      :spellcheck "false" :placeholder "iterate +"} "q" query)
-        (text-field {:autocorrect "off" :autocapitalize "off" :autocomplete "off"
+        (h.form/text-field {:autocorrect "off" :autocapitalize "off" :autocomplete "off"
                      :spellcheck "false" :placeholder "iterate +"} "q"))
-      (hidden-field "num" 0)
-      (submit-button {:id "search-box"} "search"))]))
-
+      (h.form/hidden-field "num" 0)
+      (h.form/submit-button {:id "search-box"} "search"))]))
 
 (defn pagination
   [q page-num total-pages]
   (let [page-num (Long/parseLong page-num)
         prev-page-num (dec page-num)
         next-page-num (inc page-num)]
-    (when-not (< total-pages 1)
+    (when-not (= total-pages 1)
       [:div#pagination
        (when-not (zero? total-pages)
          [:div.prev-links
-          (link-to {:class "first-page"}
-                   (str "/search?" (generate-query-string {"q" q
-                                                           "num" 0}))
+          (h.element/link-to {:class "first-page"}
+                   (str "/search?" (util/generate-query-string {"q" q
+                                                                "num" 0}))
                    "<<- ")
-          (link-to {:class "prev"}
-                   (str "/search?" (generate-query-string {"q" q
-                                                           "num" prev-page-num}))
+          (h.element/link-to {:class "prev"}
+                   (str "/search?" (util/generate-query-string {"q" q
+                                                                "num" (if (< prev-page-num 0)
+                                                                        0
+                                                                        prev-page-num)}))
                    "<- ")])
        (let [page-links (map (fn [p-num]
-                               (link-to {:class "page_num"}
+                               (h.element/link-to {:class "page_num"}
                                         (str "/search?"
-                                             (generate-query-string
+                                             (util/generate-query-string
                                               {"q" q
                                                "num" p-num}))
                                         (inc p-num)))
@@ -61,15 +59,16 @@
          (if (< num-page-links 10)
            page-links
            (take 10 page-links)))
-       (when (<= next-page-num total-pages)
+       (when (<= next-page-num (dec total-pages))
          [:div.next-links
-          (link-to {:class "next"}
-                   (str "/search?" (generate-query-string {"q" q
-                                                           "num" next-page-num}))
+          (h.element/link-to {:class "next"}
+                   (str "/search?" (util/generate-query-string {"q" q
+                                                                "num" next-page-num}))
                    " ->")
-          (link-to {:class "last-page"}
+          (h.element/link-to {:class "last-page"}
                    (str "/search?"
-                        (generate-query-string {"q" q "num" (dec total-pages)}))
+                        (util/generate-query-string {"q" q
+                                                     "num" (dec total-pages)}))
                    " ->>")])])))
 
 (defn search-results
@@ -86,22 +85,22 @@
          formatted-output])]
      (pagination q page-num pages)]))
 
-(defhtml powered-by
+(h.def/defhtml powered-by
   []
   [:a.powered-by-clojure {:href "http://clojure.org/"
                           :title "Clojure"}
-   (image {:height 32 :width 32}
+   (h.element/image {:height 32 :width 32}
           "img/clojure-icon.gif"
           "Powered by Clojure")
    "Powered by Clojure"])
 
-(defhtml created-by
+(h.def/defhtml created-by
   []
   [:div.created-by
-   (image {:class "heart"} "img/heart.png" "heart")
+   (h.element/image {:class "heart"} "img/heart.png" "heart")
    "Created with Love by '(Devin Walters)"])
 
-(defhtml on-github
+(h.def/defhtml on-github
   []
   [:div.on-github
    [:a {:href "https://github.com/devn/getclojure"}
@@ -109,15 +108,15 @@
            :src "https://s3.amazonaws.com/github/ribbons/forkme_right_gray_6d6d6d.png"
            :alt "Fork me on GitHub"}]]])
 
-(defhtml footer
+(h.def/defhtml footer
   []
   [:footer (created-by) (powered-by)])
 
-(defhtml base
+(h.def/defhtml base
   [& content]
   [:head
    [:title "GetClojure"]
-   (include-css "/css/screen.css" "/css/github.css")
+   (h.page/include-css "/css/screen.css" "/css/github.css")
    [:script "(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
   (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
   m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
@@ -128,7 +127,7 @@
   [:body
    (on-github)
    content
-   (include-js "//ajax.googleapis.com/ajax/libs/jquery/1.9.0/jquery.min.js")])
+   (h.page/include-js "//ajax.googleapis.com/ajax/libs/jquery/1.9.0/jquery.min.js")])
 
 (defn common [& content]
   (base
