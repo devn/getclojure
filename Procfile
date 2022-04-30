@@ -1,1 +1,1 @@
-web: lein with-profile production trampoline run -m getclojure.server
+web: lein ring server-headless

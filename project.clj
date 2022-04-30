@@ -16,9 +16,10 @@
                  [com.algolia/algoliasearch-core "3.16.5"]
                  [com.algolia/algoliasearch-java-net "3.16.5"]
                  [enlive "1.1.6"]]
-  :plugins [[lein-ring "0.8.3"]]
-  :ring {:handler getclojure.handler/app
-         :init getclojure.handler/init}
+  :plugins [[lein-ring "0.12.5"]]
+  :ring {:handler getclojure.server/app
+         #_#_:init getclojure.server/init
+         :port 8080}
   :profiles {:production {:ring {:open-browser? false
                                  :stacktraces?  false
                                  :auto-reload?  false}
