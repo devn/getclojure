@@ -45,9 +45,10 @@
 
 (defn ^:private format-input
   [s]
-  (pygmentize (with-out-str s
-                (pp/with-pprint-dispatch pp/code-dispatch
-                  (pp/pprint (read-string s))))))
+  (binding [*read-eval* false]
+    (pygmentize (with-out-str s
+                  (pp/with-pprint-dispatch pp/code-dispatch
+                    (pp/pprint (read-string s)))))))
 
 (defn ^:private format-value
   [s]
@@ -55,11 +56,12 @@
 
 (defn ^:private format-output
   [s]
-  (when-not (= s "\"\"")
-    (pygmentize
-     (read-string
-      (with-out-str (pp/with-pprint-dispatch pp/code-dispatch
-                      (pp/pprint s)))))))
+  (binding [*read-eval* false]
+    (when-not (= s "\"\"")
+      (pygmentize
+       (read-string
+        (with-out-str (pp/with-pprint-dispatch pp/code-dispatch
+                        (pp/pprint s))))))))
 
 (defn format-coll
   [sexp-maps]
