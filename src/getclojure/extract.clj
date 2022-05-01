@@ -78,8 +78,8 @@
   "Takes a string and returns the s-expressions that were extracted a
   sequence of string, otherwise it returns nil."
   [^String s]
-  (let [extracted-sexps (extract-sexps s)]
-    (when (seq extracted-sexps) extracted-sexps)))
+  (when-let [extracted-sexps (seq (extract-sexps s))]
+    extracted-sexps))
 
 (defn node->map [node date]
   (let [nickname  (trim-nickname (text-for node :b))
