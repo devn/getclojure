@@ -114,7 +114,7 @@
   (let [parsed-date  (str/replace (.getName logfile) #"\.html" "")
         loglines     (get-lines logfile)
         dated-mapseq (map #(node->map % parsed-date) loglines)]
-    (forward-propagate :nickname dated-mapseq)))
+    (forward-propagate dated-mapseq :nickname)))
 
 (defn logfiles->mapseqs
   "Takes a sequence of java.io.File objects and returns a sequence of
