@@ -8,17 +8,13 @@
   [^String unencoded]
   (URLEncoder/encode unencoded "UTF-8"))
 
-(defn generate-query-string [params]
+(defn generate-query-string
+  [params]
   (str/join "&"
             (mapcat (fn [[k v]]
-                      (if (sequential? v)
-                        (map #(str (url-encode (name %1))
-                                   "="
-                                   (url-encode (str %2)))
-                             (repeat k) v)
-                        [(str (url-encode (name k))
-                              "="
-                              (url-encode (str v)))]))
+                      [(str (url-encode (name k))
+                            "="
+                            (url-encode (str v)))])
                     params)))
 
 (defn truncate
