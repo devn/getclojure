@@ -8,12 +8,13 @@
    [clojure.string :as str]
    [getclojure.util :as util]
    [outpace.config :refer [defconfig]]
-   [sci.core :as sci])
+   [sci.core :as sci]
+   [taoensso.timbre :as log])
   (:import
-   (java.io StringWriter)
-   (java.util.concurrent TimeUnit FutureTask TimeoutException)
    (com.algolia.search SearchClient SearchIndex DefaultSearchClient)
-   (com.algolia.search.models.indexing SearchResult Query)))
+   (com.algolia.search.models.indexing SearchResult Query)
+   (java.io StringWriter)
+   (java.util.concurrent TimeUnit FutureTask TimeoutException)))
 
                                         ; SEARCH
 (defconfig algolia-app-id)
@@ -74,7 +75,9 @@
                             :formatted-value @value-fmt
                             :formatted-output @output-fmt}))
                 (catch Exception _e
-                  (println input value output))))
+                  (log/warn {:input input
+                             :value value
+                             :output output}))))
          sexp-maps)))
 
                                         ; EVALUATE

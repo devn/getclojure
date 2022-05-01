@@ -2,12 +2,13 @@
   (:require
    [getclojure.routes :as routes]
    [ring.adapter.jetty :as ring]
-   [ring.middleware.defaults :as ring.defaults]))
+   [ring.middleware.defaults :as ring.defaults]
+   [taoensso.timbre :as log]))
 
 (Thread/setDefaultUncaughtExceptionHandler
  (reify Thread$UncaughtExceptionHandler
    (uncaughtException [_ thread ex]
-     (println ex "Uncaught exception on" (.getName thread)))))
+     (log/error ex "Uncaught exception on" (.getName thread)))))
 
 (def app (ring.defaults/wrap-defaults
           #'routes/routes

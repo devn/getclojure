@@ -15,7 +15,8 @@
                  [com.outpace/config "0.13.5"]
                  [com.algolia/algoliasearch-core "3.16.5"]
                  [com.algolia/algoliasearch-java-net "3.16.5"]
-                 [enlive "1.1.6"]]
+                 [enlive "1.1.6"]
+                 [com.taoensso/timbre "5.2.1"]]
   :plugins [[lein-ring "0.12.5"]]
   :ring {:handler getclojure.server/app
          :port 8080}
