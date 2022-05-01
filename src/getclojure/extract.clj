@@ -122,7 +122,8 @@
   each log line encountered.
 
   Example:
-  (logs->mapseqs (map #(File. %) [\"pathto/file\" \"pathto/file2\"]))
+  (logfiles->mapseqs (map #(File. %) [\"pathto/file\" \"pathto/file2\"]))
   => ({:input \"(+ 1 1)\" ...} {:input \"(+ 1 2)\"})"
   [logfiles]
-  (doseq [logfile logfiles] (logfile->mapseq logfiles)))
+  (doseq [logfile logfiles]
+    (logfile->mapseq logfile)))

@@ -14,3 +14,9 @@
     (is (= "abc"
            (sut/truncate 4 "abc"))
         "Does not truncate when the string smaller the truncation value")))
+
+(deftest test-generate-query-string
+  (testing "It generates url-encoded query strings from maps"
+    (is (= "q=hi%21&num=42"
+           (sut/generate-query-string {:q "hi!"
+                                       :num 42})))))

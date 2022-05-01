@@ -9,6 +9,11 @@
   (URLEncoder/encode unencoded "UTF-8"))
 
 (defn generate-query-string
+  "Provided a map of `params`, produces a url-encoded query string.
+
+  Example:
+  (generate-query-string {:q \"hi!\" :num 42})
+  => \"q=hi%21&num=42\""
   [params]
   (str/join "&"
             (mapcat (fn [[k v]]
