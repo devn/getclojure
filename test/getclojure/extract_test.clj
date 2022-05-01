@@ -19,7 +19,10 @@
            (into #{} (subject/extract-sexps "(inc 1) blah blah () (inc 2)"))))
 
     (is (= (into #{} ["(+ (inc 1))" "(inc 2)"])
-           (into #{} (subject/extract-sexps "(+ (inc 1)) (inc 2)"))))))
+           (into #{} (subject/extract-sexps "(+ (inc 1)) (inc 2)"))))
+
+    (is (= ["(reverse \"abc\")"]
+           (subject/extract-sexps "(reverse \"abc\")")))))
 
 (deftest logfile->mapseq-test
   (testing "logfile->mapseq returns maps with expected data for our sample html file"
