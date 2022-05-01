@@ -1,22 +1,25 @@
 (ns getclojure.extract-test
   (:require
-   [clojure.test :refer [deftest testing is]]
+   [clojure.java.io :as io]
+   [clojure.test :refer [deftest testing is] :as test]
    [getclojure.extract :as subject]
-   [clojure.java.io :as io]))
+   [schema.test]))
+
+(test/use-fixtures :once schema.test/validate-schemas)
 
 (deftest extract-sexps-test
   (testing "We extract s-expressions from strings as expected."
     (is (= '()
            (subject/extract-sexps "")))
 
+    (is (= '()
+           (subject/extract-sexps nil)))
+
     (is (= (into #{} ["(inc 1)" "(inc 2)" "()"])
            (into #{} (subject/extract-sexps "(inc 1) blah blah () (inc 2)"))))
 
     (is (= (into #{} ["(+ (inc 1))" "(inc 2)"])
-           (into #{} (subject/extract-sexps "(+ (inc 1)) (inc 2)"))))
-
-    (is (= '()
-           (subject/extract-sexps nil)))))
+           (into #{} (subject/extract-sexps "(+ (inc 1)) (inc 2)"))))))
 
 (deftest logfile->mapseq-test
   (testing "logfile->mapseq returns maps with expected data for our sample html file"

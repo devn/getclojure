@@ -2,11 +2,12 @@
   (:require
    [clojure.java.io :as io]
    [clojure.string :as str]
-   [net.cgrand.enlive-html :as enlive])
+   [net.cgrand.enlive-html :as enlive]
+   [schema.core :as s])
   (:import (java.io File)))
 
 (defn local-logs
-  "Returns a collection of HTML files in the resources/logs directory."
+  "Returns a collection of HTML files in the logs directory."
   []
   (filter #(re-find #"\.*\.html" (str %))
           (file-seq (io/as-file (io/resource "logs")))))
@@ -75,13 +76,16 @@
            string)))
 
 (defn extracted-sexps-or-nil
-  "Takes a string and returns the s-expressions that were extracted a
-  sequence of string, otherwise it returns nil."
+  "Takes a string `s` and returns the s-expressions that were extracted as a
+  sequence of strings, otherwise returns nil."
   [^String s]
   (when-let [extracted-sexps (seq (extract-sexps s))]
     extracted-sexps))
 
-(defn node->map [node date]
+(defn node->map
+  "Provided a `node` and a `date` as a string, returns a map containing
+  `:nickname`, `:date`, `:timestamp`, `:content`, and `:sexps`."
+  [node date]
   (let [nickname  (trim-nickname (text-for node :b))
         timestamp (text-for node :a)
         content   (trim-content (last (:content node)))
@@ -93,8 +97,8 @@
      :sexps     sexps}))
 
 (defn forward-propagate
-  "If the keyword (kw) specified does not exist in the next map in the
-  sequence, use the previous value of the keyword (kw).
+  "If the keyword (`kw`) specified does not exist in the next map in the sequence,
+  use the previous value of the keyword (`kw`).
 
   Example:
   (forward-propagate :nickname '({:nickname \"Fred\"} {:nickname nil}))
@@ -107,14 +111,21 @@
     {}
     mapseq)))
 
-(defn logfile->mapseq
+(s/def Entries [{(s/required-key :nickname)  s/Str
+                 (s/required-key :date)      s/Str
+                 (s/required-key :timestamp) s/Str
+                 (s/required-key :content)   s/Str
+                 (s/required-key :sexps)     [s/Str]}])
+
+(s/defn logfile->mapseq :- Entries
   "Takes a java.io.File and returns a sequence of hash maps which have the
-  following keys: :nickname, :date, :timestamp, :content, :sexps."
+  following keys: `:nickname`, `:date`, `:timestamp`, `:content`, `:sexps`."
   [^File logfile]
   (let [parsed-date  (str/replace (.getName logfile) #"\.html" "")
         loglines     (get-lines logfile)
         dated-mapseq (map #(node->map % parsed-date) loglines)]
     (forward-propagate dated-mapseq :nickname)))
+
 
 (defn logfiles->mapseqs
   "Takes a sequence of java.io.File objects and returns a sequence of
