@@ -25,5 +25,6 @@
                                   [pjstadig/humane-test-output "0.11.0"]]
                    :injections [(require 'pjstadig.humane-test-output)
                                 (pjstadig.humane-test-output/activate!)]
-                   :plugins [[com.jakemccrary/lein-test-refresh "0.25.0"]]}}
+                   :plugins [[com.jakemccrary/lein-test-refresh "0.25.0"]]}
+             :test {:resource-paths ["test-resources"] }}
   :min-lein-version "2.0.0")
