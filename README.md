@@ -14,17 +14,15 @@ Go to [GetClojure](http://getclojure.org) and start searching.
 In order to run locally in development mode you'll need to do the
 following:
 
-* `docker-compose up -d`
 * `pip install pygments`
-* Capture the expressions: `lein run -m getclojure.sexp`
-* Start the server: `lein ring server`
+* `docker-compose up -d`
+* Capture the working expressions: `lein run -m getclojure.sexp`. Note: This writes to a file named `output.json` which is intended to be uploaded to Algolia.
+* Set the appropriate env vars in your `.envrc`.
+* Start the server: `lein ring server-headless`
 * Visit [localhost:8080](http://localhost:8080) and search.
 
 ## Thanks
 
-* To Jean Niklas L'Orange (hyPiRion) for helping me understand what
-  this string does in `cl-format`, and for fixing a related bug in the
-  Clojure pretty printer: ~<#(~;~@{~w~^ ~_~}~;)~:>
 * To Chris Houser for giving me a treasure trove of logs to harvest.
 
 ## YourKit
@@ -40,6 +38,6 @@ Java and .NET applications. Take a look at YourKit's leading software products:
 
 ## License
 
-Copyright © 2013 Devin Walters
+Copyright © 2022 Devin Walters
 
 Distributed under the Eclipse Public License, the same as Clojure.
