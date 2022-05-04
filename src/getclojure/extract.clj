@@ -80,25 +80,25 @@
   (when-let [extracted-sexps (seq (extract-sexps s))]
     extracted-sexps))
 
-(s/def Node {(s/required-key :tag) (s/eq :p)
-             (s/required-key :attrs) (s/maybe {s/Keyword s/Any})
-             (s/required-key :content) [(s/one {(s/required-key :tag) (s/eq :a)
-                                                (s/required-key :attrs) {(s/required-key :name) s/Str
-                                                                         (s/optional-key :class) s/Str}
-                                                (s/required-key :content) [s/Str]}
-                                               "timestamp")
-                                        (s/one s/Str "empty-or-message")
-                                        (s/optional {(s/required-key :tag) (s/eq :b)
-                                                     (s/required-key :attrs) (s/maybe {s/Keyword s/Any})
-                                                     (s/required-key :content) [s/Str]}
-                                                    "nickname")
-                                        (s/optional s/Str "message")]})
+(s/defschema Node {:tag (s/eq :p)
+                   :attrs (s/maybe {s/Keyword s/Any})
+                   :content [(s/one {:tag (s/eq :a)
+                                     :attrs {:name s/Str
+                                             (s/optional-key :class) s/Str}
+                                     :content [s/Str]}
+                                    "timestamp")
+                             (s/one s/Str "empty-or-message")
+                             (s/optional {:tag (s/eq :b)
+                                          :attrs (s/maybe {s/Keyword s/Any})
+                                          :content [s/Str]}
+                                         "nickname")
+                             (s/optional s/Str "message")]})
 
-(s/def NodeMap {:nickname (s/maybe s/Str)
-                :date s/Str
-                :timestamp s/Str
-                :content s/Str
-                :sexps [(s/maybe s/Str)]})
+(s/defschema NodeMap {:nickname (s/maybe s/Str)
+                      :date s/Str
+                      :timestamp s/Str
+                      :content s/Str
+                      :sexps [(s/maybe s/Str)]})
 
 (s/defn node->map :- NodeMap
   "Provided a `node` and a `date` as a string, returns a map containing
@@ -131,13 +131,13 @@
     {}
     mapseq)))
 
-(s/def Entry {:nickname  s/Str
-              :date      s/Str
-              :timestamp s/Str
-              :content   s/Str
-              :sexps     [(s/maybe s/Str)]})
+(s/defschema Entry {:nickname  s/Str
+                    :date      s/Str
+                    :timestamp s/Str
+                    :content   s/Str
+                    :sexps     [(s/maybe s/Str)]})
 
-(s/def Entries [Entry])
+(s/defschema Entries [Entry])
 
 (s/defn logfile->mapseq :- Entries
   "Takes a java.io.File and returns a sequence of hash maps which have the
