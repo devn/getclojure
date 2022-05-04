@@ -53,6 +53,8 @@
                                                                                   0
                                                                                   prev-page-num)}))
                              "<- ")])
+
+
        (let [page-links (map (fn [p-num]
                                (h.element/link-to {:class "page_num"}
                                                   (str "/search?"
@@ -65,6 +67,8 @@
          (if (< num-page-links 10)
            page-links
            (take 10 page-links)))
+
+
        (when (<= next-page-num (dec total-pages))
          [:div.next-links
           (h.element/link-to {:class "next"}
