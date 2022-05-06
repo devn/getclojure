@@ -16,14 +16,18 @@
    (java.io StringWriter)
    (java.util.concurrent TimeUnit FutureTask TimeoutException)))
 
+
                                         ; SEARCH
+
 (defconfig algolia-app-id)
 (defconfig algolia-admin-api-key)
 (defconfig algolia-index)
 
-(def search-client (delay (DefaultSearchClient/create algolia-app-id algolia-admin-api-key)))
+(def ^:private search-client
+  (delay (DefaultSearchClient/create algolia-app-id algolia-admin-api-key)))
 
-(def search-index (delay (.initIndex ^SearchClient @search-client "getclojure_production")))
+(def ^:private search-index
+  (delay (.initIndex ^SearchClient @search-client "getclojure_production")))
 
 (defn search
   ([q] (search q 0))
@@ -101,6 +105,8 @@
        :output (util/truncate 400 (pr-str (str w)))})))
 
 (defn ^:private thunk-timeout
+  "Cancelling a future is insufficient. See amalloy's answer on StackOverflow
+  here: https://stackoverflow.com/a/6697356"
   [thunk millis]
   (let [task (FutureTask. thunk)
         thread (Thread. task)]
@@ -109,11 +115,12 @@
          (catch TimeoutException _timeout-e
            (.cancel task true)
            (.stop thread))
-         (catch Exception _e
+         (catch Exception e
+           (log/warn e)
            (.cancel task true)
            (.stop thread)))))
 
-(defn run-coll
+(defn ^:private run-coll
   [timeout-millis sexp-coll]
   (reduce (fn [res m]
             (if-let [result (thunk-timeout (fn [] (run (:input m)))
