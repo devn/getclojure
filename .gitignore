@@ -16,3 +16,4 @@ pom.xml.asc
 .lsp/**/*
 .envrc
 .DS_Store
+output.json
