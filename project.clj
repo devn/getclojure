@@ -17,7 +17,8 @@
                  [com.algolia/algoliasearch-java-net "3.16.5"]
                  [enlive "1.1.6"]
                  [com.taoensso/timbre "5.2.1"]
-                 [prismatic/schema "1.2.1"]]
+                 [prismatic/schema "1.2.1"]
+                 [threatgrid/ductile "0.4.4"]]
   :plugins [[lein-ring "0.12.5"]]
   :ring {:handler getclojure.server/app
          :port 8080}

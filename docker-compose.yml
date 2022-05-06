@@ -11,5 +11,17 @@ services:
       - pgdata:/var/lib/postgresql/data
     restart: always
 
+  es7:
+    image: elasticsearch:7.10.1
+    environment:
+      - cluster.name=elasticsearch7
+      - discovery.type=single-node
+      - xpack.security.enabled=true
+      - xpack.security.authc.api_key.enabled=true
+      - ELASTIC_PASSWORD=ductile
+    ports:
+      - "9207:9200"
+      - "9307:9300"
+
 volumes:
   pgdata:
