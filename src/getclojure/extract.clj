@@ -3,14 +3,15 @@
    [clojure.java.io :as io]
    [clojure.string :as str]
    [net.cgrand.enlive-html :as enlive]
-   [schema.core :as s])
+   [schema.core :as s]
+   [taoensso.timbre :as log])
   (:import (java.io File)))
 
 (s/defn local-logs :- [File]
   "Returns a collection of HTML files in the logs directory."
   []
-  (filter #(re-find #"\.*\.html" (str %))
-          (file-seq (io/as-file (io/resource "logs")))))
+  (sort (filter #(re-find #"\.*\.html" (str %))
+                (file-seq (io/as-file (io/resource "logs"))))))
 
 (s/defn get-lines :- s/Any
   "Gets all of the 'p' tags from a logfile."
@@ -146,26 +147,33 @@
   (let [parsed-date  (str/replace (.getName logfile) #"\.html" "")
         loglines     (get-lines logfile)
         dated-mapseq (map #(node->map % parsed-date) loglines)]
+    (log/info logfile)
     (forward-propagate dated-mapseq :nickname)))
 
+(s/defn generate-full-input-file
+  []
+  (log/info "Generating \"resources/full-input.edn\" file")
+  (time (spit (io/file "resources/full-input.edn")
+              (->> (local-logs)
+                   (map logfile->mapseq)
+                   (apply concat)))))
 
-(defn logfiles->mapseqs
-  "Takes a sequence of java.io.File objects and returns a sequence of
-  sequences containing maps which contains extracted information from
-  each log line encountered.
+(s/defn generate-sexp-input-file
+  []
+  (log/info "Generating \"resources/sexps/input.edn\" file.")
+  (time (spit (io/file "resources/sexps/input.edn")
+              (into #{}
+                    (comp
+                     (filter #(seq (:sexps %)))
+                     (mapcat :sexps))
+                    (->> (local-logs)
+                         (map logfile->mapseq)
+                         (apply concat))))))
 
-  Example:
-  (logfiles->mapseqs (map #(File. %) [\"pathto/file\" \"pathto/file2\"]))
-  => ({:input \"(+ 1 1)\" ...} {:input \"(+ 1 2)\" ...} ...)"
-  [logfiles f]
-  (doseq [logfile logfiles]
-    (f (logfile->mapseq logfile))))
-
-(comment
-
-  (logfiles->mapseqs (local-logs)
-                     (fn [maps]
-                       (doseq [m maps]
-                         #_(take the Entry and put it in a database))))
-
-  )
+(defn -main [& args]
+  (let [op (first args)]
+    (case op
+      "full" (generate-full-input-file)
+      "sexps" (generate-sexp-input-file)))
+  (shutdown-agents)
+  (System/exit 0))
