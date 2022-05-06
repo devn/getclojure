@@ -3,10 +3,10 @@
   (:require
    [cheshire.core :as json]
    [clojure.java.io :as io]
-   [clojure.java.shell :as sh]
    [clojure.pprint :as pp]
    [clojure.string :as str]
    [getclojure.util :as util]
+   [libpython-clj2.require :refer [require-python]]
    [outpace.config :refer [defconfig]]
    [sci.core :as sci]
    [taoensso.timbre :as log])
@@ -40,9 +40,15 @@
 
                                         ; FORMAT
 
+(require-python 'pygments)
+(require-python 'pygments.lexers)
+(require-python 'pygments.formatters)
+
 (defn ^:private pygmentize
   [s]
-  (:out (sh/sh "pygmentize" "-fhtml" "-lclojure" :in s)))
+  (pygments/highlight s
+                      (pygments.lexers/get_lexer_by_name "Clojure")
+                      (pygments.formatters/get_formatter_by_name "html")))
 
 (defn ^:private format-input
   [s]
@@ -66,19 +72,15 @@
 
 (defn format-coll
   [sexp-maps]
-  (doall
-   (pmap (fn [{:keys [input value output] :as m}]
-           (try (let [input-fmt (future (format-input input))
-                      value-fmt (future (format-value value))
-                      output-fmt (future (format-output output))]
-                  (merge m {:formatted-input @input-fmt
-                            :formatted-value @value-fmt
-                            :formatted-output @output-fmt}))
-                (catch Exception _e
-                  (log/warn {:input input
-                             :value value
-                             :output output}))))
-         sexp-maps)))
+  (mapv (fn [{:keys [input value output] :as m}]
+          (try (merge m {:formatted-input (format-input input)
+                         :formatted-value (format-value value)
+                         :formatted-output (format-output output)})
+               (catch Exception _e
+                 (log/warn {:input input
+                            :value value
+                            :output output}))))
+        sexp-maps))
 
                                         ; EVALUATE
 
@@ -121,22 +123,34 @@
           []
           sexp-coll))
 
-(defn -main []
-  ;; Generate json of all sexps for use in Algolia
+(defn ^:private remove-junk [coll]
+  (remove (fn [{:keys [input]}]
+            (or (str/starts-with? input "(doc")
+                (str/starts-with? input "(source")
+                ;; NOTE: There's a problem with pprint code-dispatch when
+                ;; printing fn*. See:
+                ;; http://dev.clojure.org/jira/browse/CLJ-1181
+                (str/includes? input "fn*")))
+          coll))
+
+(defn build-formatted-collection
+  [filename]
+  (->> (io/resource filename)
+       slurp
+       read-string
+       remove-junk
+       (into #{})
+       (run-coll 5000)
+       (format-coll)))
+
+(defn generate-algolia-json-file
+  [filename]
   (spit "output.json"
-        (->> (io/resource "sexps/working-sexps.db")
-             slurp
-             read-string
-             (remove (fn [{:keys [input]}]
-                       (or (str/starts-with? input "(doc")
-                           (str/starts-with? input "(source")
-                           ;; NOTE: There's a problem with pprint code-dispatch when
-                           ;; printing fn*. See:
-                           ;; http://dev.clojure.org/jira/browse/CLJ-1181
-                           (str/includes? input "fn*"))))
-             (into #{})
-             (run-coll 5000)
-             (format-coll)
-             (json/encode)))
+        (->> (build-formatted-collection filename)
+             (json/encode))))
+
+(defn -main [& args]
+  (log/info "Generating algolia \"output.json\" file for directly loading into Algolia.")
+  (time (generate-algolia-json-file "sexps/working-sexps.db"))
   (shutdown-agents)
   (System/exit 0))
