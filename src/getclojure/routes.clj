@@ -17,7 +17,6 @@
 
 (defroutes routes
   (GET "/" [] (homepage))
-  (GET "/search" [q num]
-       (search-page q num))
+  (GET "/search" [q num] (search-page q num))
   (route/resources "/")
   (route/not-found "Route not found"))
