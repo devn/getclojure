@@ -153,10 +153,11 @@
 (s/defn generate-full-input-file
   []
   (log/info "Generating \"resources/full-input.edn\" file")
-  (time (spit (io/file "resources/full-input.edn")
+  (time (spit (io/file "resources/sexps/full-input.edn")
               (->> (local-logs)
                    (map logfile->mapseq)
-                   (apply concat)))))
+                   (apply concat)
+                   (into [])))))
 
 (s/defn generate-sexp-input-file
   []
