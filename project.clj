@@ -30,6 +30,14 @@
                                 (pjstadig.humane-test-output/activate!)]
                    :plugins [[com.jakemccrary/lein-test-refresh "0.25.0"]]}
              :test {:resource-paths ["test-resources"]}}
+  :aliases {"seed-elastic" ["trampoline" "run" "-m" "getclojure.elastic"]
+            ;; Extract from logs
+            "extract-full-input-file" ["trampoline" "run" "-m" "getclojure.extract" "full"]
+            "extract-sexp-input-file" ["trampoline" "run" "-m" "getclojure.extract" "input"]
+            ;; Generate files for seed, analysis, and presentation
+            "gen-working-sexps" ["trampoline" "run" "-m" "getclojure.sexp" "working"]
+            "gen-formatted-sexps" ["trampoline" "run" "-m" "getclojure.sexp" "formatted"]
+            "gen-algolia-json" ["trampoline" "run" "-m" "getclojure.sexp" "algolia"]}
   :jvm-opts ["--add-modules" "jdk.incubator.foreign"
              "--enable-native-access=ALL-UNNAMED"]
   :min-lein-version "2.0.0")
