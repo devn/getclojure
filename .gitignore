@@ -17,3 +17,4 @@ pom.xml.asc
 .envrc
 .DS_Store
 output.json
+resources/sexps/*.edn
