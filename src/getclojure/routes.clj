@@ -2,15 +2,17 @@
   (:require
    [compojure.core :refer [defroutes GET]]
    [compojure.route :as route]
-   [getclojure.views.layout :as layout]))
+   [getclojure.views.layout :as layout]
+   [schema.core :as s]))
 
-(defn homepage
+(s/defn homepage :- s/Str
   []
   (layout/common
    (layout/search-form)))
 
-(defn search-page
-  [q num]
+(s/defn search-page :- s/Str
+  [q :- s/Str
+   num :- s/Str]
   (layout/common
    (layout/search-form q)
    (layout/search-results q num)))

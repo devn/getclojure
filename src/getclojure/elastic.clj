@@ -64,10 +64,10 @@
       :total-pages (long (Math/ceil (/ total-hits num-per-page)))
       :total-hits total-hits})))
 
-#_(-> (search conn "iterate AND inc" 50))
+#_(-> (search conn "iterate AND inc" 3))
 
-(defn seed-sexps
-  [conn]
+(s/defn seed-sexps
+  [conn :- es.schemas/ESConn]
   (let [formatted-sexps (map (fn [m x]
                                (assoc m :n x))
                              (read-string (slurp (io/resource "sexps/formatted-sexps.edn")))
