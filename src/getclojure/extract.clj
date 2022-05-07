@@ -35,7 +35,7 @@
   [s :- s/Str]
   (str/trimr (str/triml (str/trim-newline s))))
 
-(s/defn extract-sexps :- (s/maybe [s/Str])
+(s/defn extract-sexps :- [s/Str]
   "Extracts sexps. Using 0s and 1s, ostensibly.
 
   Provided a string, hunts for s-expressions and returns them in a list. Returns
