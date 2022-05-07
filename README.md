@@ -9,6 +9,18 @@ then made searchable.
 
 Go to [GetClojure](http://getclojure.org) and start searching.
 
+## Project Overview
+
+| namespace | purpose |
+|--|--|
+| getclojure.elastic | Houses configuration, query, and seeding from files for elasticsearch |
+| getclojure.extract | Contains logic related to parsing clojure IRC logfiles and spitting out files for later consumption |
+| getclojure.routes | Routes for the application |
+| getclojure.server | The entrypoint for the server |
+| getclojure.sexp | Logic related to running s-expressions: sandboxing via SCI, formatting and printing, and production of files for later consumption|
+| getclojure.util | Everyone has a junk drawer. This is ours. |
+| getclojure.views.layout | Static HTML generation via Hiccup |
+
 ## Developers
 
 In order to run locally in development mode you'll need to do the
