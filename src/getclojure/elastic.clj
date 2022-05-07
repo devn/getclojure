@@ -85,7 +85,10 @@
 (defn -main
   [& _args]
   (log/info "Reseeding elasticsearch index...")
-  (es.index/delete! @conn "getclojure_custom")
+
+  (when (es.index/index-exists? @conn "getclojure_custom")
+    (es.index/delete! @conn "getclojure_custom"))
+
   (create-index-when-not-exists conn "getclojure_custom" elastic-config)
 
   (log/info "Seeding s-expressions in elasticsearch...")
