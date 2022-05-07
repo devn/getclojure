@@ -161,7 +161,10 @@
   [filename]
   (log/info "Generating algolia output.json")
   (time (spit "output.json"
-              (->> (generate-formatted-collection filename)
+              (->> (io/resource filename)
+                   slurp
+                   read-string
+                   format-coll
                    (json/encode)))))
 
 (defn generate-working-sexps-file
