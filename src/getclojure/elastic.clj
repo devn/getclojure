@@ -3,8 +3,8 @@
    [ductile.conn :as es.conn]
    [ductile.document :as es.doc]
    [ductile.index :as es.index]
-   [getclojure.sexp :as sexp]
-   [taoensso.timbre :as log]))
+   [taoensso.timbre :as log]
+   [clojure.java.io :as io]))
 
 (def conn (delay (es.conn/connect {:host "localhost"
                                    :port 9207
@@ -52,18 +52,22 @@
 
 (defn seed-sexps
   [conn]
-  (let [formatted-sexps (sexp/build-formatted-sexp-collection "sexps/working-sexps.db")
-        total (count formatted-sexps)
-        progress (atom 0)]
-    (log/infof "Total number of sexps: %d" total)
+  (let [formatted-sexps (map (fn [m x]
+                               (assoc m :n x))
+                             (read-string (slurp (io/resource "sexps/formatted-sexps.edn")))
+                             (iterate inc 1))
+        total-sexps (count formatted-sexps)]
     (doseq [doc formatted-sexps]
-      (swap! progress inc)
-      (when (= (mod @progress 100) 0)
-        (log/infof "Completed %d/%d" @progress total))
-      (es.doc/create-doc @conn "getclojure_custom" doc {:refresh "false"}))))
+      (let [n (:n doc)]
+        (when (= (mod n 1000) 0)
+          (log/infof "Seeded %d/%d expressions" n total-sexps)))
+      (es.doc/create-doc @conn
+                         "getclojure_custom"
+                         doc
+                         {:refresh "false"}))))
 
 (defn -main
-  [& args]
+  [& _args]
   (log/info "Reseeding elasticsearch index...")
   (es.index/delete! @conn "getclojure_custom")
   (create-index! conn "getclojure_custom" elastic-config)

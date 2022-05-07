@@ -115,15 +115,14 @@
          (catch TimeoutException _timeout-e
            (.cancel task true)
            (.stop thread))
-         (catch Exception e
-           (log/warn e)
+         (catch Exception _e
            (.cancel task true)
            (.stop thread)))))
 
 (defn ^:private run-coll
   [timeout-millis sexp-coll]
-  (reduce (fn [res m]
-            (if-let [result (thunk-timeout (fn [] (run (:input m)))
+  (reduce (fn [res s]
+            (if-let [result (thunk-timeout (fn [] (run s))
                                            timeout-millis)]
               (conj res result)
               res))
@@ -131,7 +130,7 @@
           sexp-coll))
 
 (defn ^:private remove-junk [coll]
-  (remove (fn [{:keys [input]}]
+  (remove (fn [input]
             (or (str/starts-with? input "(doc")
                 (str/starts-with? input "(source")
                 ;; NOTE: There's a problem with pprint code-dispatch when
@@ -140,24 +139,46 @@
                 (str/includes? input "fn*")))
           coll))
 
-(defn build-formatted-collection
+(defn working-sexps
   [filename]
   (->> (io/resource filename)
        slurp
        read-string
        remove-junk
        (into #{})
-       (run-coll 5000)
-       (format-coll)))
+       (run-coll 5000)))
+
+(defn generate-formatted-collection
+  [filename]
+  (log/info "Generating formatted-sexps.edn")
+  (time (spit "resources/sexps/formatted-sexps.edn"
+              (->> (io/resource filename)
+                   slurp
+                   read-string
+                   format-coll))))
 
 (defn generate-algolia-json-file
   [filename]
-  (spit "output.json"
-        (->> (build-formatted-collection filename)
-             (json/encode))))
+  (log/info "Generating algolia output.json")
+  (time (spit "output.json"
+              (->> (generate-formatted-collection filename)
+                   (json/encode)))))
+
+(defn generate-working-sexps-file
+  [filename]
+  (log/info "Generating working-sexps.edn")
+  (time (spit "resources/sexps/working-sexps.edn"
+              (working-sexps filename))))
 
 (defn -main [& args]
-  (log/info "Generating algolia \"output.json\" file for directly loading into Algolia.")
-  (time (generate-algolia-json-file "sexps/working-sexps.db"))
+  (let [op (first args)]
+    (case op
+      "working" (generate-working-sexps-file "sexps/input.edn")
+      "algolia" (generate-algolia-json-file "sexps/working-sexps.edn")
+      "formatted" (generate-formatted-collection "sexps/working-sexps.edn")
+      (do (println "Valid arguments: working, algolia, or formatted.")
+          (println " - `working` produces `sexps/working-sexps.edn` from `sexps/input.edn` which contains all s-expressions which run in SCI")
+          (println " - `algolia` produces `output.json` from `sexps/working-sexps.edn`for consumption by Algolia")
+          (println " - `formatted` produces `sexps/formatted-sexps.edn` from `sexps/working-sexps.edn`for ElasticSearch"))))
   (shutdown-agents)
   (System/exit 0))
