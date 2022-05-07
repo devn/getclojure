@@ -4,7 +4,7 @@
    [schema.core :as s])
   (:import (java.net URLEncoder)))
 
-(s/defn url-encode
+(s/defn url-encode :- s/Str
   "Returns an UTF-8 URL encoded version of the given string."
   [unencoded :- s/Str]
   (URLEncoder/encode unencoded "UTF-8"))

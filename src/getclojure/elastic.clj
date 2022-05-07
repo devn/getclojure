@@ -4,6 +4,8 @@
    [ductile.conn :as es.conn]
    [ductile.document :as es.doc]
    [ductile.index :as es.index]
+   [ductile.schemas :as es.schemas]
+   [schema.core :as s]
    [taoensso.timbre :as log]))
 
 (def conn (delay (es.conn/connect {:host "localhost"
@@ -30,15 +32,25 @@
                                              :formatted-value {:type :text :index false}
                                              :formatted-output {:type :text :index false}}}})
 
-(defn create-index-when-not-exists
-  [conn index-name elastic-config]
+(s/defn create-index-when-not-exists :- (s/maybe {s/Keyword s/Any})
+  [conn :- es.schemas/ESConn
+   index-name :- s/Str
+   elastic-config]
   (when-not (es.index/index-exists? @conn index-name)
     (es.index/create! @conn index-name elastic-config)))
 
-(defn search
-  ([conn query-string]
+(s/defschema SearchResponse
+  {:hits [{s/Keyword s/Any}]
+   :total-pages s/Num
+   :total-hits s/Num})
+
+(s/defn search :- SearchResponse
+  ([conn :- es.schemas/ESConn
+    query-string :- s/Str]
    (search conn query-string 0))
-  ([conn query-string page-num]
+  ([conn :- es.schemas/ESConn
+    query-string :- s/Str
+    page-num :- s/Num]
    (let [num-per-page 50
          {:keys [data paging]} (es.doc/query @conn
                                              "getclojure_custom"
