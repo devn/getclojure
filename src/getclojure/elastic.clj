@@ -1,10 +1,10 @@
 (ns getclojure.elastic
   (:require
+   [clojure.java.io :as io]
    [ductile.conn :as es.conn]
    [ductile.document :as es.doc]
    [ductile.index :as es.index]
-   [taoensso.timbre :as log]
-   [clojure.java.io :as io]))
+   [taoensso.timbre :as log]))
 
 (def conn (delay (es.conn/connect {:host "localhost"
                                    :port 9207
