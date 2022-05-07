@@ -80,7 +80,7 @@
           (try (merge m {:formatted-input (format-input input)
                          :formatted-value (format-value value)
                          :formatted-output (format-output output)})
-               (catch Exception _e
+               (catch Throwable _t
                  (log/warn {:input input
                             :value value
                             :output output}))))
