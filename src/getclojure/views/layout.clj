@@ -1,6 +1,6 @@
 (ns getclojure.views.layout
   (:require
-   [getclojure.sexp :as sexp]
+   [getclojure.elastic :as elastic]
    [getclojure.util :as util]
    [hiccup
     [def :as h.def]
@@ -24,15 +24,19 @@
                          :autocomplete "off"
                          :spellcheck "false"
                          :autofocus "false"
-                         :placeholder "map iterate"}]
+                         :placeholder "iterate AND inc"}]
     [:section.search
      (h.form/form-to
       [:get "/search"]
       (if query
-        (h.form/text-field text-field-opts "q" query)
+        (h.form/text-field (assoc text-field-opts
+                                  :value query)
+                           "q")
         (h.form/text-field (assoc text-field-opts :autofocus "true") "q"))
       (h.form/hidden-field "num" 0)
-      (h.form/submit-button {:id "search-box"} "search"))]))
+      [:input {:type "submit"
+               :id "search-box"
+               :value "search"}])]))
 
 (defn pagination
   [q page-num total-pages]
@@ -83,17 +87,17 @@
 
 (defn search-results
   [q page-num]
-  (let [{:keys [hits pages]} (sexp/search q (Long/parseLong page-num))]
+  (let [{:keys [hits total-pages]} (elastic/search elastic/conn q (Long/parseLong page-num))]
     [:section.results
      [:ul
-      (for [{:strs [formatted-input
+      (for [{:keys [formatted-input
                     formatted-value
                     formatted-output]} hits]
         [:li.result
          formatted-input
          formatted-value
          formatted-output])]
-     (pagination q page-num pages)]))
+     (pagination q page-num total-pages)]))
 
 (h.def/defhtml powered-by
   []
@@ -107,7 +111,7 @@
 (h.def/defhtml created-by
   []
   [:div.created-by
-   (h.element/image {:class "heart"} "img/heart.png" "heart")
+   (h.element/image {:class "heart" :alt "heart"} "img/heart.png")
    "Created with Love by '(Devin Walters)"])
 
 (h.def/defhtml on-github
@@ -138,8 +142,7 @@
   ga('send', 'pageview');"]]
   [:body
    (on-github)
-   content
-   (h.page/include-js "//ajax.googleapis.com/ajax/libs/jquery/1.9.0/jquery.min.js")])
+   content])
 
 (defn common [& content]
   (base

@@ -30,25 +30,29 @@
                                              :formatted-value {:type :text :index false}
                                              :formatted-output {:type :text :index false}}}})
 
-(defn create-index!
+(defn create-index-when-not-exists
   [conn index-name elastic-config]
   (when-not (es.index/index-exists? @conn index-name)
     (es.index/create! @conn index-name elastic-config)))
 
-#_(create-index! conn "getclojure_custom" elastic-config)
+(defn search
+  ([conn query-string]
+   (search conn query-string 0))
+  ([conn query-string page-num]
+   (let [num-per-page 50
+         {:keys [data paging]} (es.doc/query @conn
+                                             "getclojure_custom"
+                                             {:query_string {:query query-string
+                                                             :default_field "input"}}
+                                             {:limit num-per-page
+                                              :offset (* page-num num-per-page)})
+         {:keys [total-hits]} paging]
 
-#_(es.index/delete! @conn "getclojure_custom")
+     {:hits data
+      :total-pages (long (Math/ceil (/ total-hits num-per-page)))
+      :total-hits total-hits})))
 
-(defn search [conn query-string]
-  (es.doc/query @conn
-                "getclojure_custom"
-                {:query_string {:query query-string
-                                :default_field "input"}}
-                {:full-hits? true
-                 :limit 20
-                 :offset 0}))
-
-#_(-> (search conn "iterate AND inc") :data count)
+#_(-> (search conn "iterate AND inc" 50))
 
 (defn seed-sexps
   [conn]
@@ -63,14 +67,14 @@
           (log/infof "Seeded %d/%d expressions" n total-sexps)))
       (es.doc/create-doc @conn
                          "getclojure_custom"
-                         doc
+                         (dissoc doc :n)
                          {:refresh "false"}))))
 
 (defn -main
   [& _args]
   (log/info "Reseeding elasticsearch index...")
   (es.index/delete! @conn "getclojure_custom")
-  (create-index! conn "getclojure_custom" elastic-config)
+  (create-index-when-not-exists conn "getclojure_custom" elastic-config)
 
   (log/info "Seeding s-expressions in elasticsearch...")
   (log/info (time (seed-sexps conn)))
