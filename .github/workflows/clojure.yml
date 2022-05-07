@@ -13,6 +13,9 @@ jobs:
 
     steps:
     - uses: actions/checkout@v3
+    - uses: actions/setup-python@v3
+    - name: Install pygments
+      run: pip install pygments
     - name: Install dependencies
       run: lein deps
     - name: Run tests
