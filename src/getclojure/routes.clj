@@ -1,8 +1,8 @@
 (ns getclojure.routes
   (:require
-   [getclojure.views.layout :as layout]
    [compojure.core :refer [defroutes GET]]
-   [compojure.route :as route]))
+   [compojure.route :as route]
+   [getclojure.views.layout :as layout]))
 
 (defn homepage
   []
