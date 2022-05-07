@@ -3,10 +3,10 @@
   (:require
    [cheshire.core :as json]
    [clojure.java.io :as io]
-   [clojure.java.shell :as sh]
    [clojure.pprint :as pp]
    [clojure.string :as str]
    [getclojure.util :as util]
+   [libpython-clj2.require :refer [require-python]]
    [outpace.config :refer [defconfig]]
    [sci.core :as sci]
    [taoensso.timbre :as log])
@@ -16,14 +16,18 @@
    (java.io StringWriter)
    (java.util.concurrent TimeUnit FutureTask TimeoutException)))
 
+
                                         ; SEARCH
+
 (defconfig algolia-app-id)
 (defconfig algolia-admin-api-key)
 (defconfig algolia-index)
 
-(def search-client (delay (DefaultSearchClient/create algolia-app-id algolia-admin-api-key)))
+(def ^:private search-client
+  (delay (DefaultSearchClient/create algolia-app-id algolia-admin-api-key)))
 
-(def search-index (delay (.initIndex ^SearchClient @search-client "getclojure_production")))
+(def ^:private search-index
+  (delay (.initIndex ^SearchClient @search-client "getclojure_production")))
 
 (defn search
   ([q] (search q 0))
@@ -40,9 +44,15 @@
 
                                         ; FORMAT
 
+(require-python 'pygments)
+(require-python 'pygments.lexers)
+(require-python 'pygments.formatters)
+
 (defn ^:private pygmentize
   [s]
-  (:out (sh/sh "pygmentize" "-fhtml" "-lclojure" :in s)))
+  (pygments/highlight s
+                      (pygments.lexers/get_lexer_by_name "Clojure")
+                      (pygments.formatters/get_formatter_by_name "html")))
 
 (defn ^:private format-input
   [s]
@@ -66,19 +76,15 @@
 
 (defn format-coll
   [sexp-maps]
-  (doall
-   (pmap (fn [{:keys [input value output] :as m}]
-           (try (let [input-fmt (future (format-input input))
-                      value-fmt (future (format-value value))
-                      output-fmt (future (format-output output))]
-                  (merge m {:formatted-input @input-fmt
-                            :formatted-value @value-fmt
-                            :formatted-output @output-fmt}))
-                (catch Exception _e
-                  (log/warn {:input input
-                             :value value
-                             :output output}))))
-         sexp-maps)))
+  (mapv (fn [{:keys [input value output] :as m}]
+          (try (merge m {:formatted-input (format-input input)
+                         :formatted-value (format-value value)
+                         :formatted-output (format-output output)})
+               (catch Throwable _t
+                 (log/warn {:input input
+                            :value value
+                            :output output}))))
+        sexp-maps))
 
                                         ; EVALUATE
 
@@ -99,6 +105,8 @@
        :output (util/truncate 400 (pr-str (str w)))})))
 
 (defn ^:private thunk-timeout
+  "Cancelling a future is insufficient. See amalloy's answer on StackOverflow
+  here: https://stackoverflow.com/a/6697356"
   [thunk millis]
   (let [task (FutureTask. thunk)
         thread (Thread. task)]
@@ -111,32 +119,66 @@
            (.cancel task true)
            (.stop thread)))))
 
-(defn run-coll
+(defn ^:private run-coll
   [timeout-millis sexp-coll]
-  (reduce (fn [res m]
-            (if-let [result (thunk-timeout (fn [] (run (:input m)))
+  (reduce (fn [res s]
+            (if-let [result (thunk-timeout (fn [] (run s))
                                            timeout-millis)]
               (conj res result)
               res))
           []
           sexp-coll))
 
-(defn -main []
-  ;; Generate json of all sexps for use in Algolia
-  (spit "output.json"
-        (->> (io/resource "sexps/working-sexps.db")
-             slurp
-             read-string
-             (remove (fn [{:keys [input]}]
-                       (or (str/starts-with? input "(doc")
-                           (str/starts-with? input "(source")
-                           ;; NOTE: There's a problem with pprint code-dispatch when
-                           ;; printing fn*. See:
-                           ;; http://dev.clojure.org/jira/browse/CLJ-1181
-                           (str/includes? input "fn*"))))
-             (into #{})
-             (run-coll 5000)
-             (format-coll)
-             (json/encode)))
+(defn ^:private remove-junk [coll]
+  (remove (fn [input]
+            (or (str/starts-with? input "(doc")
+                (str/starts-with? input "(source")
+                ;; NOTE: There's a problem with pprint code-dispatch when
+                ;; printing fn*. See:
+                ;; http://dev.clojure.org/jira/browse/CLJ-1181
+                (str/includes? input "fn*")))
+          coll))
+
+(defn working-sexps
+  [filename]
+  (->> (io/resource filename)
+       slurp
+       read-string
+       remove-junk
+       (into #{})
+       (run-coll 5000)))
+
+(defn generate-formatted-collection
+  [filename]
+  (log/info "Generating formatted-sexps.edn")
+  (time (spit "resources/sexps/formatted-sexps.edn"
+              (->> (io/resource filename)
+                   slurp
+                   read-string
+                   format-coll))))
+
+(defn generate-algolia-json-file
+  [filename]
+  (log/info "Generating algolia output.json")
+  (time (spit "output.json"
+              (->> (generate-formatted-collection filename)
+                   (json/encode)))))
+
+(defn generate-working-sexps-file
+  [filename]
+  (log/info "Generating working-sexps.edn")
+  (time (spit "resources/sexps/working-sexps.edn"
+              (working-sexps filename))))
+
+(defn -main [& args]
+  (let [op (first args)]
+    (case op
+      "working" (generate-working-sexps-file "sexps/input.edn")
+      "algolia" (generate-algolia-json-file "sexps/working-sexps.edn")
+      "formatted" (generate-formatted-collection "sexps/working-sexps.edn")
+      (do (println "Valid arguments: working, algolia, or formatted.")
+          (println " - `working` produces `sexps/working-sexps.edn` from `sexps/input.edn` which contains all s-expressions which run in SCI")
+          (println " - `algolia` produces `output.json` from `sexps/working-sexps.edn`for consumption by Algolia")
+          (println " - `formatted` produces `sexps/formatted-sexps.edn` from `sexps/working-sexps.edn`for ElasticSearch"))))
   (shutdown-agents)
   (System/exit 0))

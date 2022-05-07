@@ -17,7 +17,9 @@
                  [com.algolia/algoliasearch-java-net "3.16.5"]
                  [enlive "1.1.6"]
                  [com.taoensso/timbre "5.2.1"]
-                 [prismatic/schema "1.2.1"]]
+                 [prismatic/schema "1.2.1"]
+                 [threatgrid/ductile "0.4.4"]
+                 [clj-python/libpython-clj "2.018"]]
   :plugins [[lein-ring "0.12.5"]]
   :ring {:handler getclojure.server/app
          :port 8080}
@@ -27,5 +29,7 @@
                    :injections [(require 'pjstadig.humane-test-output)
                                 (pjstadig.humane-test-output/activate!)]
                    :plugins [[com.jakemccrary/lein-test-refresh "0.25.0"]]}
-             :test {:resource-paths ["test-resources"] }}
+             :test {:resource-paths ["test-resources"]}}
+  :jvm-opts ["--add-modules" "jdk.incubator.foreign"
+             "--enable-native-access=ALL-UNNAMED"]
   :min-lein-version "2.0.0")
