@@ -151,30 +151,38 @@
     (forward-propagate dated-mapseq :nickname)))
 
 (s/defn generate-full-input-file
+  "Writes out all of the information we find in the logfile, not just the
+  s-expressions so that we may search by nickname, for a particular date, etc."
   []
   (log/info "Generating \"resources/full-input.edn\" file")
-  (time (spit (io/file "resources/sexps/full-input.edn")
-              (->> (local-logs)
-                   (map logfile->mapseq)
-                   (apply concat)
-                   (into [])))))
+  (spit (io/file "resources/sexps/full-input.edn")
+        (->> (local-logs)
+             (map logfile->mapseq)
+             (apply concat)
+             (into []))))
 
 (s/defn generate-sexp-input-file
+  "Write to resources/sexps/input.edn a set containing all of the s-expressions
+  we parsed from all of our logfiles."
   []
   (log/info "Generating \"resources/sexps/input.edn\" file.")
-  (time (spit (io/file "resources/sexps/input.edn")
-              (into #{}
-                    (comp
-                     (filter #(seq (:sexps %)))
-                     (mapcat :sexps))
-                    (->> (local-logs)
-                         (map logfile->mapseq)
-                         (apply concat))))))
+  (spit (io/file "resources/sexps/input.edn")
+        (into #{}
+              (comp
+               (filter #(seq (:sexps %)))
+               (mapcat :sexps))
+              (->> (local-logs)
+                   (map logfile->mapseq)
+                   (apply concat)))))
 
 (defn -main [& args]
   (let [op (first args)]
     (case op
       "full" (generate-full-input-file)
-      "sexps" (generate-sexp-input-file)))
+      "sexps" (generate-sexp-input-file)
+      (do (println "Valid arguments: full, sexps")
+          (println " - `sexps` produces `sexps/input.edn` which contains all s-expressions from all logfiles.")
+          (println " - `full` produces `sexps/full-input.edn` which contains the full set of Entries from all logfiles."))))
+
   (shutdown-agents)
   (System/exit 0))
