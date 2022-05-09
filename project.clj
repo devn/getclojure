@@ -1,11 +1,10 @@
-(defproject getclojure "2.0.0"
+(defproject getclojure "3.0.0"
   :description "GetClojure"
   :url "http://getclojure.org"
   :license {:name "Eclipse Public License"
             :url "http://www.eclipse.org/legal/epl-v10.html"}
   :dependencies [[org.clojure/clojure "1.11.1"]
                  [org.babashka/sci "0.3.5"]
-                 [cheshire "5.10.2"]
                  [ring/ring-jetty-adapter "1.9.5"]
                  [ring/ring-defaults "0.3.3"]
                  [compojure "1.6.2"]
@@ -13,8 +12,6 @@
                  [com.github.seancorfield/next.jdbc "1.2.780"]
                  [org.postgresql/postgresql "42.3.4"]
                  [com.outpace/config "0.13.5"]
-                 [com.algolia/algoliasearch-core "3.16.5"]
-                 [com.algolia/algoliasearch-java-net "3.16.5"]
                  [enlive "1.1.6"]
                  [com.taoensso/timbre "5.2.1"]
                  [prismatic/schema "1.2.1"]
@@ -39,8 +36,7 @@
             "extract-sexp-input-file" ["trampoline" "run" "-m" "getclojure.extract" "sexps"]
             ;; Generate files for seed, analysis, and presentation
             "gen-working-sexps" ["trampoline" "run" "-m" "getclojure.sexp" "working"]
-            "gen-formatted-sexps" ["trampoline" "run" "-m" "getclojure.sexp" "formatted"]
-            "gen-algolia-json" ["trampoline" "run" "-m" "getclojure.sexp" "algolia"]}
+            "gen-formatted-sexps" ["trampoline" "run" "-m" "getclojure.sexp" "formatted"]}
   :jvm-opts ["--add-modules" "jdk.incubator.foreign"
              "--enable-native-access=ALL-UNNAMED"]
   :min-lein-version "2.0.0")
