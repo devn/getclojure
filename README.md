@@ -13,8 +13,10 @@ Go to [GetClojure](http://getclojure.org) and start searching.
 
 | namespace | purpose |
 |--|--|
+| getclojure.config | Where any globally-necessary project configuration and functions live |
 | getclojure.elastic | Houses configuration, query, and seeding from files for elasticsearch |
 | getclojure.extract | Contains logic related to parsing clojure IRC logfiles and spitting out files for later consumption |
+| getclojure.format | Logic for formatting s-expressions |
 | getclojure.routes | Routes for the application |
 | getclojure.server | The entrypoint for the server |
 | getclojure.sexp | Logic related to running s-expressions: sandboxing via SCI, formatting and printing, and production of files for later consumption|
@@ -23,18 +25,20 @@ Go to [GetClojure](http://getclojure.org) and start searching.
 
 ## Developers
 
-In order to run locally in development mode you'll need to do the
-following:
+In order to run locally in development mode you'll need to do the following:
 
 * `pip install pygments`
 * `docker-compose up -d`
-* Capture the working expressions: `lein run -m getclojure.sexp`. Note: This writes to a file named `output.json` which is intended to be uploaded to Algolia.
-* Set the appropriate env vars in your `.envrc`.
+* Download the [logs](https://www.dropbox.com/s/19yy3zn5nh8a1gr/clojure-irc-logs.tar.gz?dl=0) and extract them into the `resources/logs` directory.
+* Capture the working expressions: `lein extract-sexp-input-file`. Grab a cup of coffee. This takes about 10min on my machine.
+* Set the appropriate env vars in your `.envrc`. If you don't use [direnv](https://direnv.net/), you'll need to export `APP_ENV=development` and `INDEX_NAME=getclojure.`
+* Run `lein gen-working-sexps`, `lein gen-formatted-sexps`, and finally `lein seed-elastic`.
 * Start the server: `lein ring server-headless`
 * Visit [localhost:8080](http://localhost:8080) and search.
 
 ## Thanks
 
+* To borkdude for providing so much great open source software to the Clojure community.
 * To Chris Houser for giving me a treasure trove of logs to harvest.
 
 ## YourKit
