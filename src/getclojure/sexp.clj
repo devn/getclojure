@@ -12,7 +12,6 @@
    [sci.core :as sci]
    [taoensso.timbre :as log])
   (:import
-   (clojure.lang MapEntry)
    (com.algolia.search SearchClient SearchIndex DefaultSearchClient)
    (com.algolia.search.models.indexing SearchResult Query)
    (java.io StringWriter)
@@ -95,57 +94,6 @@
   [sexp-str]
   (sci/eval-string sexp-str))
 
-(defn quick-pr-str
-  ([data]
-   (let [acc (StringBuilder.)]
-     (quick-pr-str acc data)
-     (.toString acc)))
-  ([^StringBuilder acc data]
-   (cond
-     (string? data)
-     (do
-       (.append acc \")
-       (.append acc ^String data)
-       (.append acc \"))
-     (map? data)
-     (do
-       (.append acc \{)
-       (doseq [^MapEntry kv data]
-         (quick-pr-str acc (.key kv))
-         (.append acc \space)
-         (quick-pr-str acc (.val kv))
-         (.append acc \space))
-       (.append acc \}))
-     (vector? data)
-     (do
-       (.append acc \[)
-       (doseq [v data]
-         (quick-pr-str acc v)
-         (.append acc \space))
-       (.append acc \]))
-     (set? data)
-     (do
-       (.append acc "#{")
-       (doseq [v data]
-         (quick-pr-str acc v)
-         (.append acc \space))
-       (.append acc \}))
-     (seq? data)
-     (do
-       (.append acc \()
-       (doseq [v data]
-         (quick-pr-str acc v)
-         (.append acc \space))
-       (.append acc \)))
-     (integer? data)
-     (.append acc ^Integer data)
-     (float? data)
-     (.append acc ^Float data)
-     (keyword? data)
-     (.append acc ^String (str data))
-     :else
-     (.append acc data))))
-
 (defn ^:private run
   "Runs a string like \"(inc 1)\" in SCI, and returns a map containing its :input,
   :output, and :value."
@@ -153,8 +101,8 @@
   (with-open [w (new StringWriter)]
     (sci/binding [sci/out w]
       {:input sexp-str
-       :value (util/truncate 400 (quick-pr-str (eval sexp-str)))
-       :output (util/truncate 400 (quick-pr-str (str w)))})))
+       :value (util/truncate 400 (pr-str (eval sexp-str)))
+       :output (util/truncate 400 (pr-str (str w)))})))
 
 (defn ^:private thunk-timeout
   "Cancelling a future is insufficient. See amalloy's answer on StackOverflow
