@@ -25,7 +25,10 @@
          :port 8080}
   :profiles {:dev {:dependencies [[ring-mock "0.1.5"]
                                   [ring/ring-devel "1.9.5"]
-                                  [pjstadig/humane-test-output "0.11.0"]]
+                                  [pjstadig/humane-test-output "0.11.0"]
+                                  [criterium "0.4.6"]
+                                  [com.clojure-goes-fast/clj-async-profiler "0.5.1"]]
+                   :jvm-opts ["-Djdk.attach.allowAttachSelf"]
                    :injections [(require 'pjstadig.humane-test-output)
                                 (pjstadig.humane-test-output/activate!)]
                    :plugins [[com.jakemccrary/lein-test-refresh "0.25.0"]]}
