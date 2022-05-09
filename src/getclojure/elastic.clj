@@ -98,19 +98,11 @@
 
 (s/defn seed-sexps
   [conn :- es.schemas/ESConn]
-  (let [formatted-sexps (map (fn [m x]
-                               (assoc m :n x))
-                             (read-string (slurp (io/resource "sexps/formatted-sexps.edn")))
-                             (iterate inc 1))
-        total-sexps (count formatted-sexps)]
-    (doseq [doc formatted-sexps]
-      (let [n (:n doc)]
-        (when (= (mod n 1000) 0)
-          (log/infof "Seeded %d/%d expressions" n total-sexps)))
-      (es.doc/create-doc @conn
-                         index-name
-                         (dissoc doc :n)
-                         {:refresh "false"}))))
+  (let [sexps (read-string (slurp (io/resource "sexps/formatted-sexps.edn")))]
+    (doseq [chunk (partition-all 1000 sexps)]
+      (es.doc/bulk @conn
+                   {:create (mapv #(assoc % :_index index-name) chunk)}
+                   {}))))
 
 (defn -main
   [& _args]
