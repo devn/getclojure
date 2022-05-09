@@ -96,8 +96,6 @@
       :total-pages (long (Math/ceil (/ total-hits num-per-page)))
       :total-hits total-hits})))
 
-#_(-> (search conn "iterate AND inc" 3))
-
 (s/defn seed-sexps
   [conn :- es.schemas/ESConn]
   (let [formatted-sexps (map (fn [m x]
@@ -129,3 +127,7 @@
   (log/info "Completed seeding s-expressiong in elasticsearch")
   (shutdown-agents)
   (System/exit 0))
+
+(comment
+  #_(-> (search conn "iterate AND inc" 3))
+  )
