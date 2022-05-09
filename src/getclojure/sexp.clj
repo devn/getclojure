@@ -13,30 +13,32 @@
    (java.io StringWriter)
    (java.util.concurrent TimeUnit FutureTask TimeoutException)))
 
-(s/set-fn-validation! true)
-
-                                        ; EVALUATE
-
-(defn ^:private eval
+(s/defn ^:private eval :- s/Any
   "Evaluate a string in SCI. Defined separately in case we want to supply
   additional options to sci/eval-string in the future."
-  [sexp-str]
+  [sexp-str :- s/Str]
   (sci/eval-string sexp-str))
 
-(defn ^:private run
+(s/defschema SexpResult
+  {:input s/Str
+   :output s/Str
+   :value s/Str})
+
+(s/defn ^:private run :- SexpResult
   "Runs a string like \"(inc 1)\" in SCI, and returns a map containing its :input,
   :output, and :value."
-  [sexp-str]
+  [sexp-str :- s/Str]
   (with-open [w (new StringWriter)]
     (sci/binding [sci/out w]
       {:input sexp-str
        :value (util/truncate 400 (pr-str (eval sexp-str)))
        :output (util/truncate 400 (pr-str (str w)))})))
 
-(defn ^:private thunk-timeout
+(s/defn ^:private thunk-timeout :- s/Any
   "Cancelling a future is insufficient. See amalloy's answer on StackOverflow
   here: https://stackoverflow.com/a/6697356"
-  [thunk millis]
+  [thunk
+   millis :- s/Num]
   (let [task (FutureTask. thunk)
         thread (Thread. task)]
     (try (.start thread)
@@ -48,8 +50,14 @@
            (.cancel task true)
            (.stop thread)))))
 
-(defn ^:private run-coll
-  [timeout-millis sexp-coll]
+(s/defschema SexpColl
+  (s/conditional sequential? [s/Str] set? #{s/Str}))
+
+(s/defn ^:private run-coll :- [SexpResult]
+  "Provided `timeout-millis` and a collection of s-expressions, runs each
+  expression in SCI, returning only the ones that successfully run."
+  [timeout-millis :- s/Num
+   sexp-coll :- SexpColl]
   (persistent!
    (reduce (fn [res s]
              (if-let [result (thunk-timeout (fn [] (run s))
@@ -59,8 +67,8 @@
            (transient [])
            sexp-coll)))
 
-(defn ^:private remove-junk
-  [coll]
+(s/defn ^:private remove-junk :- SexpColl
+  [coll :- SexpColl]
   (remove (fn [input]
             (or (str/starts-with? input "(doc")
                 (str/starts-with? input "(source")
@@ -70,38 +78,66 @@
                 (str/includes? input "fn*")))
           coll))
 
-(defn working-sexps
-  [filename]
+(s/defschema FormattedSexpResult
+  (merge SexpResult
+         {:formatted-input s/Str
+          :formatted-value s/Str
+          :formatted-output (s/maybe s/Str)}))
+
+(s/defn format-coll :- [FormattedSexpResult]
+  [sexp-maps :- [SexpResult]]
+  (mapv (fn [{:keys [input value output] :as m}]
+          (try (merge m {:formatted-input (fmt/input input)
+                         :formatted-value (fmt/value value)
+                         :formatted-output (fmt/output output)})
+               (catch Throwable _t
+                 (log/warn {:input input
+                            :value value
+                            :output output}))))
+        sexp-maps))
+
+(s/defn read-file :- s/Any
+  [filename :- s/Str]
   (->> (io/resource filename)
        slurp
-       read-string
+       read-string))
+
+(s/defn working-sexps :- [SexpResult]
+  "Provided a `filename`, reads a file containing a collection of s-expressions
+  as strings. Runs each s-expression in SCI. Returns a collection of evaluated
+  s-expressions."
+  [filename :- s/Str]
+  (->> (read-file filename)
        remove-junk
        (run-coll 250)))
 
-(defn generate-formatted-collection
-  [filename]
+(s/defn generate-formatted-collection
+  "Provided a `filename`, reads a file containing a collection of maps of the
+  form {:input ... :output ... :value ...} and writes to a file the formatted
+  collection of the form: [{:input ... :value ... :output ... :formatted-input
+  ... :formatted-value ... :formatted-output ...}]"
+  [filename :- s/Str]
   (log/info "Generating formatted-sexps.edn")
-  (time (spit "resources/sexps/formatted-sexps.edn"
-              (->> (io/resource filename)
-                   slurp
-                   read-string
-                   format-coll))))
+  (spit "resources/sexps/formatted-sexps.edn"
+        (format-coll (read-file filename))))
 
-(defn generate-algolia-json-file
-  [filename]
+(s/defn generate-algolia-json-file
+  "Provided a `filename`, reads a file containing a collection of maps of the
+  form {:input ... :output ... :value ...} and writes to a file a json-encoded
+  collection of the form: [{\"input\" ... \"value\" ... \"output\" ...
+  \"formatted-input\" ... \"formatted-value\" ... \"formatted-output\" ...}] for
+  uploading to an algolia index."
+  [filename :- s/Str]
   (log/info "Generating algolia output.json")
-  (time (spit "output.json"
-              (->> (io/resource filename)
-                   slurp
-                   read-string
-                   format-coll
-                   (json/encode)))))
+  (spit "output.json"
+        (->> (read-file filename)
+             format-coll
+             (json/encode))))
 
-(defn generate-working-sexps-file
-  [filename]
+(s/defn generate-working-sexps-file
+  [filename :- s/Str]
   (log/info "Generating working-sexps.edn")
-  (time (spit "resources/sexps/working-sexps.edn"
-              (working-sexps filename))))
+  (spit "resources/sexps/working-sexps.edn" (working-sexps filename)))
 
 (defn -main [& args]
   (let [op (first args)]
@@ -115,3 +151,17 @@
           (println " - `formatted` produces `sexps/formatted-sexps.edn` from `sexps/working-sexps.edn`for ElasticSearch"))))
   (shutdown-agents)
   (System/exit 0))
+
+(comment
+  (require '[criterium.core :as criterium])
+
+  (criterium/quick-bench
+   (inc 1))
+
+  (require '[clj-async-profiler.core :as prof])
+  (prof/profile {:width 2500 :min-width 3}
+                (working-sexps "sexps/input.edn"))
+
+  (def server (prof/serve-files 8081))
+
+  )
