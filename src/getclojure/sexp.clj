@@ -13,6 +13,9 @@
    (java.io StringWriter)
    (java.util.concurrent TimeUnit FutureTask TimeoutException)))
 
+(def default-truncation-length 400)
+(def default-timeout-millis 250)
+
 (s/defn ^:private eval :- s/Any
   "Evaluate a string in SCI. Defined separately in case we want to supply
   additional options to sci/eval-string in the future."
@@ -121,7 +124,7 @@
   [filename :- s/Str]
   (->> (read-resource filename)
        remove-junk
-       (run-coll 400 250)))
+       (run-coll default-truncation-length default-timeout-millis)))
 
 (s/defn generate-formatted-collection
   "Provided a `filename`, reads a file containing a collection of maps of the
@@ -163,6 +166,7 @@
           (println " - `working` produces `sexps/working-sexps.edn` from `sexps/input.edn` which contains all s-expressions which run in SCI")
           (println " - `algolia` produces `output.json` from `sexps/working-sexps.edn` for consumption by Algolia")
           (println " - `formatted` produces `sexps/formatted-sexps.edn` from `sexps/working-sexps.edn` for ElasticSearch"))))
+
   (shutdown-agents)
   (System/exit 0))
 
