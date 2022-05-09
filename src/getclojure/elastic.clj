@@ -5,17 +5,49 @@
    [ductile.document :as es.doc]
    [ductile.index :as es.index]
    [ductile.schemas :as es.schemas]
+   [getclojure.config :as config]
+   [outpace.config :refer (defconfig)]
    [schema.core :as s]
    [taoensso.timbre :as log]))
 
-(def conn (delay (es.conn/connect {:host "localhost"
-                                   :port 9207
-                                   :version 7
-                                   :protocol :http
-                                   :timeout 20000
-                                   :auth {:type :basic-auth
-                                          :params {:user "elastic"
-                                                   :pwd "ductile"}}})))
+(defconfig elastic-url)
+(defconfig index-name)
+
+(s/defschema ParsedElasticURL
+  {:host s/Str
+   :user s/Str
+   :port s/Num
+   :pass s/Str})
+
+(s/defn parse-elastic-url :- ParsedElasticURL
+  [url :- s/Str]
+  (let [[_ user pass host port] (re-matches #"https://(\w+):(\w+)@(.*):(\d+)" url)]
+    {:host host
+     :user user
+     :port (Integer/parseInt port)
+     :pass pass}))
+
+(s/defn make-conn
+  []
+  (let [base-conn {:host "localhost"
+                   :port 9207
+                   :version 7
+                   :protocol :http
+                   :timeout 20000
+                   :auth {:type :basic-auth
+                          :params {:user "elastic"
+                                   :pwd "ductile"}}}]
+    (if (config/development?)
+      base-conn
+      (let [{:keys [host user pass port]} (parse-elastic-url elastic-url)]
+        (-> base-conn
+            (update-in [:host] (constantly host))
+            (update-in [:port] (constantly port))
+            (update-in [:protocol] (constantly :https))
+            (update-in [:auth :params :user] (constantly user))
+            (update-in [:auth :params :pwd] (constantly pass)))))))
+
+(def conn (delay (es.conn/connect (make-conn))))
 
 (def elastic-config {:settings {:number_of_shards 5
                                 :number_of_replicas 1
@@ -53,7 +85,7 @@
     page-num :- s/Num]
    (let [num-per-page 50
          {:keys [data paging]} (es.doc/query @conn
-                                             "getclojure_custom"
+                                             index-name
                                              {:query_string {:query query-string
                                                              :default_field "input"}}
                                              {:limit num-per-page
@@ -78,7 +110,7 @@
         (when (= (mod n 1000) 0)
           (log/infof "Seeded %d/%d expressions" n total-sexps)))
       (es.doc/create-doc @conn
-                         "getclojure_custom"
+                         index-name
                          (dissoc doc :n)
                          {:refresh "false"}))))
 
@@ -86,10 +118,10 @@
   [& _args]
   (log/info "Reseeding elasticsearch index...")
 
-  (when (es.index/index-exists? @conn "getclojure_custom")
-    (es.index/delete! @conn "getclojure_custom"))
+  (when (es.index/index-exists? @conn index-name)
+    (es.index/delete! @conn index-name))
 
-  (create-index-when-not-exists conn "getclojure_custom" elastic-config)
+  (create-index-when-not-exists conn index-name elastic-config)
 
   (log/info "Seeding s-expressions in elasticsearch...")
   (log/info (time (seed-sexps conn)))
