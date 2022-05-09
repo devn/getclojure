@@ -1,7 +1,6 @@
 (ns getclojure.sexp
   (:refer-clojure :exclude [eval])
   (:require
-   [cheshire.core :as json]
    [clojure.java.io :as io]
    [clojure.string :as str]
    [getclojure.format :as fmt]
@@ -138,19 +137,6 @@
        format-coll
        (spit "resources/sexps/formatted-sexps.edn")))
 
-(s/defn generate-algolia-json-file
-  "Provided a `filename`, reads a file containing a collection of maps of the
-  form {:input ... :output ... :value ...} and writes to a file a json-encoded
-  collection of the form: [{\"input\" ... \"value\" ... \"output\" ...
-  \"formatted-input\" ... \"formatted-value\" ... \"formatted-output\" ...}] for
-  uploading to an algolia index."
-  [filename :- s/Str]
-  (log/info "Generating algolia output.json")
-  (spit "output.json"
-        (->> (read-resource filename)
-             format-coll
-             (json/encode))))
-
 (s/defn generate-working-sexps-file
   [filename :- s/Str]
   (log/info "Generating working-sexps.edn")
@@ -160,11 +146,9 @@
   (let [op (first args)]
     (case op
       "working" (generate-working-sexps-file "sexps/input.edn")
-      "algolia" (generate-algolia-json-file "sexps/working-sexps.edn")
       "formatted" (generate-formatted-collection "sexps/working-sexps.edn")
-      (do (println "Valid arguments: working, algolia, or formatted.")
+      (do (println "Valid arguments: working, formatted.")
           (println " - `working` produces `sexps/working-sexps.edn` from `sexps/input.edn` which contains all s-expressions which run in SCI")
-          (println " - `algolia` produces `output.json` from `sexps/working-sexps.edn` for consumption by Algolia")
           (println " - `formatted` produces `sexps/formatted-sexps.edn` from `sexps/working-sexps.edn` for ElasticSearch"))))
 
   (shutdown-agents)
