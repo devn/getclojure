@@ -199,8 +199,7 @@
        slurp
        read-string
        remove-junk
-       (into #{})
-       (run-coll 5000)))
+       (run-coll 250)))
 
 (defn generate-formatted-collection
   [filename]
