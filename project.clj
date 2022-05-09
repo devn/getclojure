@@ -36,7 +36,7 @@
   :aliases {"seed-elastic" ["trampoline" "run" "-m" "getclojure.elastic"]
             ;; Extract from logs
             "extract-full-input-file" ["trampoline" "run" "-m" "getclojure.extract" "full"]
-            "extract-sexp-input-file" ["trampoline" "run" "-m" "getclojure.extract" "input"]
+            "extract-sexp-input-file" ["trampoline" "run" "-m" "getclojure.extract" "sexps"]
             ;; Generate files for seed, analysis, and presentation
             "gen-working-sexps" ["trampoline" "run" "-m" "getclojure.sexp" "working"]
             "gen-formatted-sexps" ["trampoline" "run" "-m" "getclojure.sexp" "formatted"]
