@@ -1,4 +1,4 @@
-(defproject getclojure "2.0.0"
+(defproject getclojure "3.0.0"
   :description "GetClojure"
   :url "http://getclojure.org"
   :license {:name "Eclipse Public License"
