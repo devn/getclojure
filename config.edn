@@ -1,6 +1,5 @@
 {
- getclojure.db/db-url #config/env "DB_URL"
- getclojure.sexp/algolia-app-id #config/env "ALGOLIA_APP_ID"
- getclojure.sexp/algolia-admin-api-key #config/env "ALGOLIA_ADMIN_API_KEY"
- getclojure.sexp/algolia-index #config/env "ALGOLIA_INDEX"
+ getclojure.algolia/algolia-app-id #config/env "ALGOLIA_APP_ID"
+ getclojure.algolia/algolia-admin-api-key #config/env "ALGOLIA_ADMIN_API_KEY"
+ getclojure.algolia/algolia-index #config/env "ALGOLIA_INDEX"
 }

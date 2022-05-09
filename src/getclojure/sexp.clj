@@ -3,88 +3,17 @@
   (:require
    [cheshire.core :as json]
    [clojure.java.io :as io]
-   [clojure.pprint :as pp]
    [clojure.string :as str]
+   [getclojure.format :as fmt]
    [getclojure.util :as util]
-   [libpython-clj2.require :refer [require-python]]
-   [outpace.config :refer [defconfig]]
    [schema.core :as s]
    [sci.core :as sci]
    [taoensso.timbre :as log])
   (:import
-   (com.algolia.search SearchClient SearchIndex DefaultSearchClient)
-   (com.algolia.search.models.indexing SearchResult Query)
    (java.io StringWriter)
    (java.util.concurrent TimeUnit FutureTask TimeoutException)))
 
-                                        ; SEARCH
-
-(defconfig algolia-app-id)
-(defconfig algolia-admin-api-key)
-(defconfig algolia-index)
-
-(def ^:private search-client
-  (delay (DefaultSearchClient/create algolia-app-id algolia-admin-api-key)))
-
-(def ^:private search-index
-  (delay (.initIndex ^SearchClient @search-client "getclojure_production")))
-
-(defn search
-  ([q] (search q 0))
-  ([q page-num]
-   (let [res (.search ^SearchIndex @search-index (.. (Query. q)
-                                                     (setAttributesToRetrieve ["formatted-input"
-                                                                               "formatted-output"
-                                                                               "formatted-value"])
-                                                     (setHitsPerPage (int 25))
-                                                     (setPage (int page-num))))]
-     {:hits       (.getHits ^SearchResult res)
-      :total-hits (.getNbHits ^SearchResult res)
-      :pages      (.getNbPages ^SearchResult res)})))
-
-                                        ; FORMAT
-
-(require-python 'pygments)
-(require-python 'pygments.lexers)
-(require-python 'pygments.formatters)
-
-(defn ^:private pygmentize
-  [s]
-  (pygments/highlight s
-                      (pygments.lexers/get_lexer_by_name "Clojure")
-                      (pygments.formatters/get_formatter_by_name "html")))
-
-(defn ^:private format-input
-  [s]
-  (binding [*read-eval* false]
-    (pygmentize (with-out-str s
-                  (pp/with-pprint-dispatch pp/code-dispatch
-                    (pp/pprint (read-string s)))))))
-
-(defn ^:private format-value
-  [s]
-  (pygmentize s))
-
-(defn ^:private format-output
-  [s]
-  (binding [*read-eval* false]
-    (when-not (= s "\"\"")
-      (pygmentize
-       (read-string
-        (with-out-str (pp/with-pprint-dispatch pp/code-dispatch
-                        (pp/pprint s))))))))
-
-(defn format-coll
-  [sexp-maps]
-  (mapv (fn [{:keys [input value output] :as m}]
-          (try (merge m {:formatted-input (format-input input)
-                         :formatted-value (format-value value)
-                         :formatted-output (format-output output)})
-               (catch Throwable _t
-                 (log/warn {:input input
-                            :value value
-                            :output output}))))
-        sexp-maps))
+(s/set-fn-validation! true)
 
                                         ; EVALUATE
 
