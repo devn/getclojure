@@ -27,15 +27,21 @@
 (s/defn ^:private run :- SexpResult
   "Runs a string like \"(inc 1)\" in SCI, and returns a map containing its :input,
   :output, and :value."
-  [sexp-str :- s/Str]
+  [sexp-str :- s/Str
+   truncation-length :- s/Num]
   (with-open [w (new StringWriter)]
     (sci/binding [sci/out w]
       {:input sexp-str
-       :value (util/truncate 400 (pr-str (eval sexp-str)))
-       :output (util/truncate 400 (pr-str (str w)))})))
+       :value (util/truncate truncation-length (pr-str (eval sexp-str)))
+       :output (util/truncate truncation-length (pr-str (str w)))})))
 
 (s/defn ^:private thunk-timeout :- s/Any
-  "Cancelling a future is insufficient. See amalloy's answer on StackOverflow
+  "Provided a `thunk` (fn [] ...) where ... is any expression, and `millis` is
+  the number of milliseconds we'll wait before cancelling our task and the
+  thread it runs in, returns the result of the expression inside the thunk
+  unless it throws an Exception or does not complete within `millis`.
+
+  Cancelling a future is insufficient. See amalloy's answer on StackOverflow
   here: https://stackoverflow.com/a/6697356"
   [thunk
    millis :- s/Num]
@@ -56,11 +62,12 @@
 (s/defn ^:private run-coll :- [SexpResult]
   "Provided `timeout-millis` and a collection of s-expressions, runs each
   expression in SCI, returning only the ones that successfully run."
-  [timeout-millis :- s/Num
+  [truncation-length :- s/Num
+   timeout-millis :- s/Num
    sexp-coll :- SexpColl]
   (persistent!
    (reduce (fn [res s]
-             (if-let [result (thunk-timeout (fn [] (run s))
+             (if-let [result (thunk-timeout (fn [] (run s truncation-length))
                                             timeout-millis)]
                (conj! res result)
                res))
@@ -68,6 +75,8 @@
            sexp-coll)))
 
 (s/defn ^:private remove-junk :- SexpColl
+  "Provided a collection of strings, removes strings which are not interesting
+  examples of expressions to search for."
   [coll :- SexpColl]
   (remove (fn [input]
             (or (str/starts-with? input "(doc")
@@ -85,6 +94,9 @@
           :formatted-output (s/maybe s/Str)}))
 
 (s/defn format-coll :- [FormattedSexpResult]
+  "Provided a collection of s-expression maps, returns a map containing the
+  formatted versions alongside the original input, output, and value. Logs a
+  warning for expressions which fail formatting."
   [sexp-maps :- [SexpResult]]
   (mapv (fn [{:keys [input value output] :as m}]
           (try (merge m {:formatted-input (fmt/input input)
@@ -96,7 +108,7 @@
                             :output output}))))
         sexp-maps))
 
-(s/defn read-file :- s/Any
+(s/defn read-resource :- s/Any
   [filename :- s/Str]
   (->> (io/resource filename)
        slurp
@@ -107,9 +119,9 @@
   as strings. Runs each s-expression in SCI. Returns a collection of evaluated
   s-expressions."
   [filename :- s/Str]
-  (->> (read-file filename)
+  (->> (read-resource filename)
        remove-junk
-       (run-coll 250)))
+       (run-coll 400 250)))
 
 (s/defn generate-formatted-collection
   "Provided a `filename`, reads a file containing a collection of maps of the
@@ -118,8 +130,10 @@
   ... :formatted-value ... :formatted-output ...}]"
   [filename :- s/Str]
   (log/info "Generating formatted-sexps.edn")
-  (spit "resources/sexps/formatted-sexps.edn"
-        (format-coll (read-file filename))))
+  (->> filename
+       read-resource
+       format-coll
+       (spit "resources/sexps/formatted-sexps.edn")))
 
 (s/defn generate-algolia-json-file
   "Provided a `filename`, reads a file containing a collection of maps of the
@@ -130,7 +144,7 @@
   [filename :- s/Str]
   (log/info "Generating algolia output.json")
   (spit "output.json"
-        (->> (read-file filename)
+        (->> (read-resource filename)
              format-coll
              (json/encode))))
 
@@ -147,8 +161,8 @@
       "formatted" (generate-formatted-collection "sexps/working-sexps.edn")
       (do (println "Valid arguments: working, algolia, or formatted.")
           (println " - `working` produces `sexps/working-sexps.edn` from `sexps/input.edn` which contains all s-expressions which run in SCI")
-          (println " - `algolia` produces `output.json` from `sexps/working-sexps.edn`for consumption by Algolia")
-          (println " - `formatted` produces `sexps/formatted-sexps.edn` from `sexps/working-sexps.edn`for ElasticSearch"))))
+          (println " - `algolia` produces `output.json` from `sexps/working-sexps.edn` for consumption by Algolia")
+          (println " - `formatted` produces `sexps/formatted-sexps.edn` from `sexps/working-sexps.edn` for ElasticSearch"))))
   (shutdown-agents)
   (System/exit 0))
 

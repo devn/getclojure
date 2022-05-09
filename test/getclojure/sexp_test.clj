@@ -12,12 +12,41 @@
       (is (= {:input inc-expr
               :output "\"\""
               :value "2"}
-             (#'sut/run inc-expr)))
+             (#'sut/run inc-expr 100)))
 
       (is (= {:input println-expr
               :output "\"100\\n\""
               :value "nil"}
-             (#'sut/run println-expr)))
+             (#'sut/run println-expr 100)))
+
+      (is (= {:input "(println \"1234567890\")"
+              :output "\"1234..."
+              :value "nil"}
+             (#'sut/run "(println \"1234567890\")" 5))
+          "Truncation happens at the specified length")
 
       (is (thrown? clojure.lang.ExceptionInfo
-                   (#'sut/run spit-expr))))))
+                   (#'sut/run spit-expr 10))))))
+
+(deftest test-thunk-timeout
+  (testing "thunk-timeout times out"
+    (is (= 2
+           (#'sut/thunk-timeout (fn [] (inc 1)) 10)))
+
+    (is (= nil
+           (#'sut/thunk-timeout (fn [] (Thread/sleep 15)) 10)))
+
+    (is (= nil
+           (#'sut/thunk-timeout (fn [] (throw (Exception. "Something went wrong."))) 10)))))
+
+(deftest test-run-coll
+  (testing "run-coll runs a collection of s-expression strings"
+    (is (= [{:input "(inc 1)", :value "2", :output "\"\""}
+            {:input "(inc 3)", :value "4", :output "\"\""}]
+           (#'sut/run-coll 10 10 ["(inc 1)" "(inc 3)"])))))
+
+(deftest remove-junk-test
+  (let [input-sexps ["(doc +)" "(source +)" "(fn* [x] (inc x))" "(inc 1)"]]
+    (testing "We remove things from the input expression set which aren't interesting"
+      (is (= ["(inc 1)"]
+             (#'sut/remove-junk input-sexps))))))
