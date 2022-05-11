@@ -30,6 +30,8 @@
                                 (pjstadig.humane-test-output/activate!)]
                    :plugins [[com.jakemccrary/lein-test-refresh "0.25.0"]]}
              :test {:resource-paths ["test-resources"]}}
+  :test-selectors {:default (complement :integration)
+                   :integration :integration}
   :aliases {"seed-elastic" ["trampoline" "run" "-m" "getclojure.elastic"]
             ;; Extract from logs
             "extract-full-input-file" ["trampoline" "run" "-m" "getclojure.extract" "full"]

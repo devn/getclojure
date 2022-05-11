@@ -4,7 +4,6 @@
    [ductile.conn :as es.conn]
    [ductile.document :as es.doc]
    [ductile.index :as es.index]
-   [ductile.schemas :as es.schemas]
    [getclojure.config :as config]
    [outpace.config :refer (defconfig)]
    [schema.core :as s]
@@ -12,6 +11,7 @@
 
 (defconfig elastic-url)
 (defconfig index-name)
+(def num-per-page 50)
 
 (s/defschema ParsedElasticURL
   {:host s/Str
@@ -64,8 +64,8 @@
                                              :formatted-value {:type :text :index false}
                                              :formatted-output {:type :text :index false}}}})
 
-(s/defn create-index-when-not-exists :- (s/maybe {s/Keyword s/Any})
-  [conn :- es.schemas/ESConn
+(s/defn create-index-when-not-exists! :- (s/maybe {s/Keyword s/Any})
+  [conn :- clojure.lang.Delay
    index-name :- s/Str
    elastic-config]
   (when-not (es.index/index-exists? @conn index-name)
@@ -77,14 +77,13 @@
    :total-hits s/Num})
 
 (s/defn search :- SearchResponse
-  ([conn :- es.schemas/ESConn
+  ([conn :- clojure.lang.Delay
     query-string :- s/Str]
    (search conn query-string 0))
-  ([conn :- es.schemas/ESConn
+  ([conn :- clojure.lang.Delay
     query-string :- s/Str
     page-num :- s/Num]
-   (let [num-per-page 50
-         {:keys [data paging]} (es.doc/query @conn
+   (let [{:keys [data paging]} (es.doc/query @conn
                                              index-name
                                              {:query_string {:query query-string
                                                              :default_field "input"}}
@@ -96,8 +95,16 @@
       :total-pages (long (Math/ceil (/ total-hits num-per-page)))
       :total-hits total-hits})))
 
-(s/defn seed-sexps
-  [conn :- es.schemas/ESConn]
+(s/defn seed-sexp-coll
+  [conn :- clojure.lang.Delay
+   coll :- [{s/Keyword s/Any}]]
+  (doseq [chunk (partition-all 1000 coll)]
+    (es.doc/bulk @conn
+                 {:create (mapv #(assoc % :_index index-name) chunk)}
+                 {})))
+
+(s/defn seed-sexps-from-file
+  [conn :- clojure.lang.Delay]
   (let [sexps (read-string (slurp (io/resource "sexps/formatted-sexps.edn")))]
     (doseq [chunk (partition-all 1000 sexps)]
       (es.doc/bulk @conn
@@ -106,19 +113,22 @@
 
 (defn -main
   [& _args]
-  (log/info "Reseeding elasticsearch index...")
+  (log/info "Reseeding elasticsearch index from file...")
 
   (when (es.index/index-exists? @conn index-name)
+    (log/infof "%s index exists, deleting..." index-name)
     (es.index/delete! @conn index-name))
 
-  (create-index-when-not-exists conn index-name elastic-config)
+  (es.index/create! @conn index-name elastic-config)
 
   (log/info "Seeding s-expressions in elasticsearch...")
-  (log/info (time (seed-sexps conn)))
+  (log/info (seed-sexps-from-file conn))
 
   (log/info "Completed seeding s-expressiong in elasticsearch")
+
   (shutdown-agents)
   (System/exit 0))
+
 
 (comment
   #_(-> (search conn "iterate AND inc" 3))
