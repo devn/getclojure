@@ -151,14 +151,18 @@
     (forward-propagate dated-mapseq :nickname)))
 
 (s/defn all-sexps
-  []
-  (into #{}
-        (comp
-         (filter #(seq (:sexps %)))
-         (mapcat :sexps))
-        (->> (take 25 (local-logs))
-             (map logfile->mapseq)
-             (apply concat))))
+  ([& [limit]]
+   (let [local-logfiles (local-logs)
+         logfiles-to-read (if limit
+                            (take limit local-logfiles)
+                            local-logfiles)]
+     (into #{}
+           (comp
+            (filter #(seq (:sexps %)))
+            (mapcat :sexps))
+           (->> logfiles-to-read
+                (map logfile->mapseq)
+                (apply concat))))))
 
 (s/defn generate-full-input-file
   "Writes out all of the information we find in the logfile, not just the

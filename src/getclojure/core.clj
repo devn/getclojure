@@ -6,10 +6,17 @@
 
 (defn -main
   [& args]
-  (elastic/delete-and-recreate-index! elastic/conn)
-  (->> (extract/all-sexps)
-       sexp/filtered-run-coll
-       sexp/format-coll
-       (elastic/seed-sexp-coll elastic/conn))
-  (shutdown-agents)
-  (System/exit 0))
+  (let [num-logs (read-string (first args))
+        sexps (if (= num-logs :all)
+                (extract/all-sexps)
+                (extract/all-sexps num-logs))]
+
+    (elastic/delete-and-recreate-index! elastic/conn)
+
+    (->> sexps
+         sexp/filtered-run-coll
+         sexp/format-coll
+         (elastic/seed-sexp-coll elastic/conn))
+
+    (shutdown-agents)
+    (System/exit 0)))
