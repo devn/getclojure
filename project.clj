@@ -16,7 +16,8 @@
                  [com.taoensso/timbre "5.2.1"]
                  [prismatic/schema "1.2.1"]
                  [threatgrid/ductile "0.4.4"]
-                 [clj-python/libpython-clj "2.018"]]
+                 [clj-python/libpython-clj "2.018"]
+                 [zprint "1.2.3"]]
   :plugins [[lein-ring "0.12.5"]]
   :ring {:handler getclojure.server/app
          :port 8080}

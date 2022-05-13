@@ -1,7 +1,8 @@
 (ns getclojure.format
   (:require
-   [clojure.pprint :as pp]
-   [libpython-clj2.require :refer [require-python]]))
+   [clojure.string :as str]
+   [libpython-clj2.require :refer [require-python]]
+   [zprint.core :as zp]))
 
 (require-python 'pygments)
 (require-python 'pygments.lexers)
@@ -16,19 +17,17 @@
 (defn input
   [s]
   (binding [*read-eval* false]
-    (pygmentize (with-out-str s
-                  (pp/with-pprint-dispatch pp/code-dispatch
-                    (pp/pprint (read-string s)))))))
+    (pygmentize (zp/zprint-str s {:parse-string? true}))))
 
 (defn value
   [s]
-  (pygmentize s))
+  (binding [*read-eval* false]
+    (if-not (str/ends-with? s "...")
+      (pygmentize (zp/zprint-str s {:parse-string? true}))
+      (pygmentize s))))
 
 (defn output
   [s]
   (binding [*read-eval* false]
     (when-not (= s "\"\"")
-      (pygmentize
-       (read-string
-        (with-out-str (pp/with-pprint-dispatch pp/code-dispatch
-                        (pp/pprint s))))))))
+      (pygmentize (read-string (zp/zprint-str s))))))

@@ -19,7 +19,7 @@
   "Evaluate a string in SCI. Defined separately in case we want to supply
   additional options to sci/eval-string in the future."
   [sexp-str :- s/Str]
-  (sci/eval-string sexp-str))
+  (sci/eval-string sexp-str {:deny ['print-method 'print-dup]}))
 
 (s/defschema SexpResult
   {:input s/Str
