@@ -110,6 +110,18 @@
                             :output output}))))
         sexp-maps))
 
+(s/defn filter-obj-values
+  [coll]
+  (filter #(not (str/starts-with? (:value %) "#object"))
+          coll))
+
+(s/defn filtered-run-coll
+  [sexp-coll]
+  (->> sexp-coll
+       remove-junk
+       (run-coll default-truncation-length default-timeout-millis)
+       filter-obj-values))
+
 (s/defn read-resource :- s/Any
   [filename :- s/Str]
   (->> (io/resource filename)

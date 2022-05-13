@@ -150,6 +150,16 @@
     (log/info logfile)
     (forward-propagate dated-mapseq :nickname)))
 
+(s/defn all-sexps
+  []
+  (into #{}
+        (comp
+         (filter #(seq (:sexps %)))
+         (mapcat :sexps))
+        (->> (take 25 (local-logs))
+             (map logfile->mapseq)
+             (apply concat))))
+
 (s/defn generate-full-input-file
   "Writes out all of the information we find in the logfile, not just the
   s-expressions so that we may search by nickname, for a particular date, etc."

@@ -111,15 +111,19 @@
                    {:create (mapv #(assoc % :_index index-name) chunk)}
                    {}))))
 
+(defn delete-and-recreate-index! [conn]
+  (log/infof "\"%s\" index exists, deleting..." index-name)
+  (when (es.index/index-exists? @conn index-name)
+    (log/infof "\"%s\" index exists, deleting..." index-name)
+    (es.index/delete! @conn index-name)
+    (log/infof "Creating index \"%s\"..." index-name)
+    (es.index/create! @conn index-name elastic-config)))
+
 (defn -main
   [& _args]
   (log/info "Reseeding elasticsearch index from file...")
 
-  (when (es.index/index-exists? @conn index-name)
-    (log/infof "%s index exists, deleting..." index-name)
-    (es.index/delete! @conn index-name))
-
-  (es.index/create! @conn index-name elastic-config)
+  (delete-and-recreate-index! conn)
 
   (log/info "Seeding s-expressions in elasticsearch...")
   (log/info (seed-sexps-from-file conn))
