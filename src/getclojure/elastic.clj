@@ -111,8 +111,8 @@
                    {:create (mapv #(assoc % :_index index-name) chunk)}
                    {}))))
 
-(defn delete-and-recreate-index! [conn]
-  (log/infof "\"%s\" index exists, deleting..." index-name)
+(s/defn delete-and-recreate-index!
+  [conn :- clojure.lang.Delay]
   (when (es.index/index-exists? @conn index-name)
     (log/infof "\"%s\" index exists, deleting..." index-name)
     (es.index/delete! @conn index-name)
@@ -122,12 +122,10 @@
 (defn -main
   [& _args]
   (log/info "Reseeding elasticsearch index from file...")
-
   (delete-and-recreate-index! conn)
 
   (log/info "Seeding s-expressions in elasticsearch...")
-  (log/info (seed-sexps-from-file conn))
-
+  (seed-sexps-from-file conn)
   (log/info "Completed seeding s-expressiong in elasticsearch")
 
   (shutdown-agents)
