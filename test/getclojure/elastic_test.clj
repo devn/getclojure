@@ -12,14 +12,14 @@
 
 (def test-index "test-index")
 
-(defn elastic-fixture [f]
-  (let [conn (es.conn/connect (sut/make-conn))]
-    (es.index/create! conn test-index sut/elastic-config)
-    (f)
-    (es.index/delete! conn test-index)
-    (es.conn/close conn)))
+;; (defn elastic-fixture [f]
+;;   (let [conn (es.conn/connect (sut/make-conn))]
+;;     (es.index/create! conn test-index sut/elastic-config)
+;;     (f)
+;;     (es.index/delete! conn test-index)
+;;     (es.conn/close conn)))
 
-(use-fixtures :once elastic-fixture)
+;; (use-fixtures :once elastic-fixture)
 
 (deftest parse-elastic-url-test
   (testing "It parses an elastic URL like the one we encounter from Bonsai on Heroku"
