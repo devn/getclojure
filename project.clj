@@ -9,8 +9,6 @@
                  [ring/ring-defaults "0.3.3"]
                  [compojure "1.6.2"]
                  [hiccup "1.0.5"]
-                 [com.github.seancorfield/next.jdbc "1.2.780"]
-                 [org.postgresql/postgresql "42.3.4"]
                  [com.outpace/config "0.13.5"]
                  [enlive "1.1.6"]
                  [com.taoensso/timbre "5.2.1"]
