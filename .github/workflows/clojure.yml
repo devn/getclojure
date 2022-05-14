@@ -27,4 +27,4 @@ jobs:
     - name: Run tests
       env:
         APP_ENV: test
-      run: lein test
+      run: lein test :all
