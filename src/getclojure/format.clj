@@ -2,6 +2,7 @@
   (:require
    [clojure.string :as str]
    [libpython-clj2.require :refer [require-python]]
+   [schema.core :as s]
    [zprint.core :as zp]))
 
 (require-python 'pygments)
@@ -14,20 +15,20 @@
                       (pygments.lexers/get_lexer_by_name "Clojure")
                       (pygments.formatters/get_formatter_by_name "html")))
 
-(defn input
-  [s]
+(s/defn input :- s/Str
+  [s :- s/Str]
   (binding [*read-eval* false]
     (pygmentize (zp/zprint-str s {:parse-string? true}))))
 
-(defn value
-  [s]
+(s/defn value :- s/Str
+  [s :- s/Str]
   (binding [*read-eval* false]
     (if-not (str/ends-with? s "...")
       (pygmentize (zp/zprint-str s {:parse-string? true}))
       (pygmentize s))))
 
-(defn output
-  [s]
+(s/defn output :- (s/maybe s/Str)
+  [s :- s/Str]
   (binding [*read-eval* false]
     (when-not (= s "\"\"")
       (pygmentize (read-string (zp/zprint-str s))))))
