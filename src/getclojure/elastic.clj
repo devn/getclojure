@@ -1,13 +1,13 @@
 (ns getclojure.elastic
   (:require
+   [clojure.string :as str]
    [ductile.conn :as es.conn]
    [ductile.document :as es.doc]
    [ductile.index :as es.index]
    [getclojure.config :as config]
    [outpace.config :refer (defconfig)]
    [schema.core :as s]
-   [taoensso.timbre :as log]
-   [clojure.string :as str]))
+   [taoensso.timbre :as log]))
 
 (defconfig elastic-url "https://abc123:def456@example.com:443")
 (defconfig index-name "getclojure")
