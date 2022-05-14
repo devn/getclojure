@@ -32,10 +32,7 @@
   :test-selectors {:default (complement :integration)
                    :integration :integration}
   :aliases {"seed-elastic-full" ["trampoline" "run" "-m" "getclojure.seed" ":all"]
-            "seed-elastic-partial" ["trampoline" "run" "-m" "getclojure.seed"]
-            ;; Extract from logs
-            "extract-full-input-file" ["trampoline" "run" "-m" "getclojure.extract" "full"]
-            "extract-sexp-input-file" ["trampoline" "run" "-m" "getclojure.extract" "sexps"]}
+            "seed-elastic-partial" ["trampoline" "run" "-m" "getclojure.seed"]}
   :jvm-opts ["--add-modules" "jdk.incubator.foreign"
              "--enable-native-access=ALL-UNNAMED"]
   :min-lein-version "2.0.0")
