@@ -1,7 +1,10 @@
 (ns getclojure.sexp-test
   (:require
-   [clojure.test :refer (deftest testing is)]
-   [getclojure.sexp :as sut]))
+   [clojure.test :refer (deftest testing is use-fixtures)]
+   [getclojure.sexp :as sut]
+   [schema.test :refer (validate-schemas)]))
+
+(use-fixtures :once validate-schemas)
 
 (deftest test-run
   (testing "We capture input, output, and value for s-expressions"
@@ -53,9 +56,15 @@
 
 (deftest remove-junk-values-test
   (testing "We remove items where the value of the SCI run produces a function"
-    (is (= [{:value "ok"}]
-           (sut/remove-junk-values [{:value "#object[...]"}
-                                    {:value "ok"}])))))
+    (is (= [{:input ""
+             :value "ok"
+             :output ""}]
+           (sut/remove-junk-values [{:input ""
+                                     :value "#object[...]"
+                                     :output ""}
+                                    {:input ""
+                                     :value "ok"
+                                     :output ""}])))))
 
 (deftest filtered-run-coll-test
   (let [input ["(fn [x])" "(source +)" "(fn* [x] (inc x))" "(inc 1)"]]
