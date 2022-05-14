@@ -82,33 +82,31 @@
   (with-redefs [sut/num-per-page 2
                 sut/index-name test-index]
     (let [index test-index
-          conn (es.conn/connect (sut/make-conn))
+          conn (delay (es.conn/connect (sut/make-conn)))
           sexps (mapv (fn [s] {:input s})
                       ["fred" "fred" "fred" "wilma" "barney" "betty" "+ - ~ * :"])
-          _ (es.doc/bulk conn
-                         {:create (mapv #(assoc % :_index index) sexps)}
-                         {:refresh "wait_for"})]
+          _ (sut/seed conn sexps {:refresh "wait_for"})]
       (is (= {:hits [{:input "fred"}
                      {:input "fred"}]
               :total-pages 2
               :total-hits 3}
-             (sut/search (delay conn) "fred" 0))
+             (sut/search conn "fred" 0))
           "It returns the first page of fred results")
 
       (is (= {:hits [{:input "fred"}]
               :total-pages 2
               :total-hits 3}
-             (sut/search (delay conn) "fred" 1))
+             (sut/search conn "fred" 1))
           "It shows our third result for fred on the second page")
 
       (is (= {:hits []
               :total-pages 0
               :total-hits 0}
-             (sut/search (delay conn) "bambam"))
+             (sut/search conn "bambam"))
           "It returns no results, 0 pages, and 0 hits when we can't find anything matching")
 
       (is (= {:hits [{:input "+ - ~ * :"}]
               :total-pages 1
               :total-hits 1}
-             (sut/search (delay conn) "+ - ~ * :"))
+             (sut/search conn "+ - ~ * :"))
           "It escapes query strings of special characters that may show up in a search"))))

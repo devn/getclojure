@@ -112,13 +112,17 @@
 
 (s/defn seed
   "Provided a connection and a collection of maps, does a bulk create"
-  [conn :- clojure.lang.Delay
-   coll :- [{s/Keyword s/Any}]]
-  (log/info "Seeding elaticsearch...")
-  (doseq [chunk (partition-all 1000 coll)]
-    (es.doc/bulk @conn
-                 {:create (mapv #(assoc % :_index index-name) chunk)}
-                 {})))
+  ([conn :- clojure.lang.Delay
+    coll :- [{s/Keyword s/Any}]]
+   (seed conn coll {}))
+  ([conn :- clojure.lang.Delay
+    coll :- [{s/Keyword s/Any}]
+    opts :- {s/Keyword s/Any}]
+   (log/info "Seeding elaticsearch...")
+   (doseq [chunk (partition-all 1000 coll)]
+     (es.doc/bulk @conn
+                  {:create (mapv #(assoc % :_index index-name) chunk)}
+                  opts))))
 
 (comment
   (-> (search conn "iterate AND inc" 0))
