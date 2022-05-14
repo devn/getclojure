@@ -5,7 +5,6 @@
    [getclojure.elastic :as sut]
    [schema.test :refer (validate-schemas)]
    [ductile.conn :as es.conn]
-   [ductile.document :as es.doc]
    [ductile.index :as es.index]))
 
 (use-fixtures :once validate-schemas)
