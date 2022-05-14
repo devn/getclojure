@@ -45,8 +45,22 @@
             {:input "(inc 3)", :value "4", :output "\"\""}]
            (#'sut/run-coll 10 10 ["(inc 1)" "(inc 3)"])))))
 
-(deftest remove-junk-test
+(deftest remove-junk-sexps-test
   (let [input-sexps ["(doc +)" "(source +)" "(fn* [x] (inc x))" "(inc 1)"]]
     (testing "We remove things from the input expression set which aren't interesting"
       (is (= ["(inc 1)"]
              (#'sut/remove-junk-sexps input-sexps))))))
+
+(deftest remove-junk-values-test
+  (testing "We remove items where the value of the SCI run produces a function"
+    (is (= [{:value "ok"}]
+           (sut/remove-junk-values [{:value "#object[...]"}
+                                    {:value "ok"}])))))
+
+(deftest filtered-run-coll-test
+  (let [input ["(fn [x])" "(source +)" "(fn* [x] (inc x))" "(inc 1)"]]
+    (testing "Full filtering process around SCI"
+      (is (= [{:input "(inc 1)"
+               :value "2"
+               :output "\"\""}]
+             (sut/filtered-run-coll input))))))
