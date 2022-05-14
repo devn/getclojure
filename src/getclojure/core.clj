@@ -16,7 +16,7 @@
     (->> sexps
          sexp/filtered-run-coll
          sexp/format-coll
-         (elastic/seed-sexp-coll elastic/conn))
+         (elastic/seed elastic/conn))
 
     (shutdown-agents)
     (System/exit 0)))

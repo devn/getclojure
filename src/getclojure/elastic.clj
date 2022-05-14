@@ -1,6 +1,5 @@
 (ns getclojure.elastic
   (:require
-   [clojure.java.io :as io]
    [ductile.conn :as es.conn]
    [ductile.document :as es.doc]
    [ductile.index :as es.index]
@@ -64,19 +63,14 @@
                                              :formatted-value {:type :text :index false}
                                              :formatted-output {:type :text :index false}}}})
 
-(s/defn create-index-when-not-exists! :- (s/maybe {s/Keyword s/Any})
-  [conn :- clojure.lang.Delay
-   index-name :- s/Str
-   elastic-config]
-  (when-not (es.index/index-exists? @conn index-name)
-    (es.index/create! @conn index-name elastic-config)))
-
 (s/defschema SearchResponse
   {:hits [{s/Keyword s/Any}]
    :total-pages s/Num
    :total-hits s/Num})
 
 (s/defn search :- SearchResponse
+  "Provided a connection and query string, searches for records matching the
+  query string."
   ([conn :- clojure.lang.Delay
     query-string :- s/Str]
    (search conn query-string 0))
@@ -95,23 +89,8 @@
       :total-pages (long (Math/ceil (/ total-hits num-per-page)))
       :total-hits total-hits})))
 
-(s/defn seed-sexp-coll
-  [conn :- clojure.lang.Delay
-   coll :- [{s/Keyword s/Any}]]
-  (doseq [chunk (partition-all 1000 coll)]
-    (es.doc/bulk @conn
-                 {:create (mapv #(assoc % :_index index-name) chunk)}
-                 {})))
-
-(s/defn seed-sexps-from-file
-  [conn :- clojure.lang.Delay]
-  (let [sexps (read-string (slurp (io/resource "sexps/formatted-sexps.edn")))]
-    (doseq [chunk (partition-all 1000 sexps)]
-      (es.doc/bulk @conn
-                   {:create (mapv #(assoc % :_index index-name) chunk)}
-                   {}))))
-
 (s/defn delete-and-recreate-index!
+  "Provided a connection, deletes and recreates `index-name` if it exists."
   [conn :- clojure.lang.Delay]
   (when (es.index/index-exists? @conn index-name)
     (log/infof "\"%s\" index exists, deleting..." index-name)
@@ -119,18 +98,15 @@
     (log/infof "Creating index \"%s\"..." index-name)
     (es.index/create! @conn index-name elastic-config)))
 
-(defn -main
-  [& _args]
-  (log/info "Reseeding elasticsearch index from file...")
-  (delete-and-recreate-index! conn)
-
-  (log/info "Seeding s-expressions in elasticsearch...")
-  (seed-sexps-from-file conn)
-  (log/info "Completed seeding s-expressiong in elasticsearch")
-
-  (shutdown-agents)
-  (System/exit 0))
-
+(s/defn seed
+  "Provided a connection and a collection of maps, does a bulk create"
+  [conn :- clojure.lang.Delay
+   coll :- [{s/Keyword s/Any}]]
+  (log/info "Seeding elaticsearch...")
+  (doseq [chunk (partition-all 1000 coll)]
+    (es.doc/bulk @conn
+                 {:create (mapv #(assoc % :_index index-name) chunk)}
+                 {})))
 
 (comment
   #_(-> (search conn "iterate AND inc" 3))

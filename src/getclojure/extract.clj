@@ -151,18 +151,18 @@
     (forward-propagate dated-mapseq :nickname)))
 
 (s/defn all-sexps
-  ([& [limit]]
-   (let [local-logfiles (local-logs)
-         logfiles-to-read (if limit
-                            (take limit local-logfiles)
-                            local-logfiles)]
-     (into #{}
-           (comp
-            (filter #(seq (:sexps %)))
-            (mapcat :sexps))
-           (->> logfiles-to-read
-                (map logfile->mapseq)
-                (apply concat))))))
+  "Optionally provided a limit. Returns all s-expressions found in logfiles on
+  disk. When provided a limit, searchs in `limit` number of logfiles."
+  [& [limit]]
+  (let [local-logfiles (local-logs)
+        logfiles-to-read (if limit
+                           (take limit local-logfiles)
+                           local-logfiles)]
+    (into #{}
+          (comp
+           (filter #(seq (:sexps %)))
+           (mapcat :sexps))
+          (mapcat logfile->mapseq logfiles-to-read))))
 
 (s/defn generate-full-input-file
   "Writes out all of the information we find in the logfile, not just the
@@ -181,13 +181,7 @@
   []
   (log/info "Generating \"resources/sexps/input.edn\" file.")
   (spit (io/file "resources/sexps/input.edn")
-        (into #{}
-              (comp
-               (filter #(seq (:sexps %)))
-               (mapcat :sexps))
-              (->> (local-logs)
-                   (map logfile->mapseq)
-                   (apply concat)))))
+        (all-sexps)))
 
 (defn -main [& args]
   (let [op (first args)]

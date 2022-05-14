@@ -1,7 +1,6 @@
 (ns getclojure.sexp
   (:refer-clojure :exclude [eval])
   (:require
-   [clojure.java.io :as io]
    [clojure.string :as str]
    [getclojure.format :as fmt]
    [getclojure.util :as util]
