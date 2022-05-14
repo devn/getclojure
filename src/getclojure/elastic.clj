@@ -6,7 +6,8 @@
    [getclojure.config :as config]
    [outpace.config :refer (defconfig)]
    [schema.core :as s]
-   [taoensso.timbre :as log]))
+   [taoensso.timbre :as log]
+   [clojure.string :as str]))
 
 (defconfig elastic-url "https://abc123:def456@example.com:443")
 (defconfig index-name "getclojure")
@@ -68,6 +69,17 @@
    :total-pages s/Num
    :total-hits s/Num})
 
+(s/defn escape-query-chars :- s/Str
+  "Given a query string, escapes a subset of the special characters that overlap
+  with valid clojure searches."
+  [query-string :- s/Str]
+  (let [special-chars ["+" "*" ":" "-" "~"]]
+    (loop [[character & xs] special-chars
+           qstring query-string]
+      (if character
+        (recur xs (str/replace qstring character (str "\\" character)))
+        qstring))))
+
 (s/defn search :- SearchResponse
   "Provided a connection and query string, searches for records matching the
   query string."
@@ -79,7 +91,7 @@
     page-num :- s/Num]
    (let [{:keys [data paging]} (es.doc/query @conn
                                              index-name
-                                             {:query_string {:query query-string
+                                             {:query_string {:query (escape-query-chars query-string)
                                                              :default_field "input"}}
                                              {:limit num-per-page
                                               :offset (* page-num num-per-page)})
