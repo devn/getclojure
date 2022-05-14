@@ -8,8 +8,8 @@
    [schema.core :as s]
    [taoensso.timbre :as log]))
 
-(defconfig elastic-url)
-(defconfig index-name)
+(defconfig elastic-url "https://abc123:def456@example.com:443")
+(defconfig index-name "getclojure")
 (def num-per-page 50)
 
 (s/defschema ParsedElasticURL

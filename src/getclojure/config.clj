@@ -4,4 +4,6 @@
 
 (defconfig env)
 
-(defn development? [] (= env "development"))
+(defn development? []
+  (or (= env "development")
+      (= env "test")))

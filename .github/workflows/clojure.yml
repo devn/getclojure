@@ -23,4 +23,6 @@ jobs:
     - name: Install dependencies
       run: lein deps
     - name: Run tests
+      env:
+        APP_ENV: test
       run: lein test
