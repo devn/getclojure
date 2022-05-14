@@ -171,8 +171,7 @@
   (log/info "Generating \"resources/full-input.edn\" file")
   (spit (io/file "resources/sexps/full-input.edn")
         (->> (local-logs)
-             (map logfile->mapseq)
-             (apply concat)
+             (mapcat logfile->mapseq)
              (into []))))
 
 (s/defn generate-sexp-input-file
