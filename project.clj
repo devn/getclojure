@@ -27,7 +27,8 @@
                    :jvm-opts ["-Djdk.attach.allowAttachSelf"]
                    :injections [(require 'pjstadig.humane-test-output)
                                 (pjstadig.humane-test-output/activate!)]
-                   :plugins [[com.jakemccrary/lein-test-refresh "0.25.0"]]}
+                   :plugins [[com.jakemccrary/lein-test-refresh "0.25.0"]
+                             [lein-cloverage "1.2.3"]]}
              :test {:resource-paths ["test-resources"]}}
   :test-selectors {:default (complement :integration)
                    :integration :integration}

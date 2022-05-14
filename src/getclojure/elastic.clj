@@ -109,5 +109,5 @@
                  {})))
 
 (comment
-  #_(-> (search conn "iterate AND inc" 3))
+  (-> (search conn "iterate AND inc" 0))
   )
