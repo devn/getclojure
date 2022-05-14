@@ -49,4 +49,4 @@
   (let [input-sexps ["(doc +)" "(source +)" "(fn* [x] (inc x))" "(inc 1)"]]
     (testing "We remove things from the input expression set which aren't interesting"
       (is (= ["(inc 1)"]
-             (#'sut/remove-junk input-sexps))))))
+             (#'sut/remove-junk-sexps input-sexps))))))

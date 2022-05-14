@@ -75,7 +75,7 @@
            (transient [])
            sexp-coll)))
 
-(s/defn ^:private remove-junk :- SexpColl
+(s/defn remove-junk-sexps :- SexpColl
   "Provided a collection of strings, removes strings which are not interesting
   examples of expressions to search for."
   [coll :- SexpColl]
@@ -87,6 +87,24 @@
                 ;; http://dev.clojure.org/jira/browse/CLJ-1181
                 (str/includes? input "fn*")))
           coll))
+
+(s/defn remove-junk-values :- [SexpResult]
+  "Provided a collection of `SexpResult` maps, removes expressions whose values
+  we're not interested in."
+  [sexp-coll :- [SexpResult]]
+  (remove (fn [m]
+            (str/starts-with? (:value m) "#object"))
+          sexp-coll))
+
+(s/defn filtered-run-coll :- [SexpResult]
+  "Provided a collection of s-expression strings, removes expressions we're not
+  interested in, runs them in SCI, and removes expressions which contain values
+  we're not interested in."
+  [sexp-coll :- SexpColl]
+  (->> sexp-coll
+       remove-junk-sexps
+       (run-coll default-truncation-length default-timeout-millis)
+       remove-junk-values))
 
 (s/defschema FormattedSexpResult
   (merge SexpResult
@@ -109,62 +127,6 @@
                             :output output}))))
         sexp-maps))
 
-(s/defn filter-obj-values
-  [coll]
-  (filter #(not (str/starts-with? (:value %) "#object"))
-          coll))
-
-(s/defn filtered-run-coll
-  [sexp-coll]
-  (->> sexp-coll
-       remove-junk
-       (run-coll default-truncation-length default-timeout-millis)
-       filter-obj-values))
-
-(s/defn read-resource :- s/Any
-  [filename :- s/Str]
-  (->> (io/resource filename)
-       slurp
-       read-string))
-
-(s/defn working-sexps :- [SexpResult]
-  "Provided a `filename`, reads a file containing a collection of s-expressions
-  as strings. Runs each s-expression in SCI. Returns a collection of evaluated
-  s-expressions."
-  [filename :- s/Str]
-  (->> (read-resource filename)
-       remove-junk
-       (run-coll default-truncation-length default-timeout-millis)))
-
-(s/defn generate-formatted-collection
-  "Provided a `filename`, reads a file containing a collection of maps of the
-  form {:input ... :output ... :value ...} and writes to a file the formatted
-  collection of the form: [{:input ... :value ... :output ... :formatted-input
-  ... :formatted-value ... :formatted-output ...}]"
-  [filename :- s/Str]
-  (log/info "Generating formatted-sexps.edn")
-  (->> filename
-       read-resource
-       format-coll
-       (spit "resources/sexps/formatted-sexps.edn")))
-
-(s/defn generate-working-sexps-file
-  [filename :- s/Str]
-  (log/info "Generating working-sexps.edn")
-  (spit "resources/sexps/working-sexps.edn" (working-sexps filename)))
-
-(defn -main [& args]
-  (let [op (first args)]
-    (case op
-      "working" (generate-working-sexps-file "sexps/input.edn")
-      "formatted" (generate-formatted-collection "sexps/working-sexps.edn")
-      (do (println "Valid arguments: working, formatted.")
-          (println " - `working` produces `sexps/working-sexps.edn` from `sexps/input.edn` which contains all s-expressions which run in SCI")
-          (println " - `formatted` produces `sexps/formatted-sexps.edn` from `sexps/working-sexps.edn` for ElasticSearch"))))
-
-  (shutdown-agents)
-  (System/exit 0))
-
 (comment
   (require '[criterium.core :as criterium])
 
@@ -172,8 +134,9 @@
    (inc 1))
 
   (require '[clj-async-profiler.core :as prof])
-  (prof/profile {:width 2500 :min-width 3}
-                (working-sexps "sexps/input.edn"))
+  (prof/profile {:width 2500 :min-width 5}
+                (format-coll (filtered-run-coll ["(inc 1)"
+                                                 "(doall (range))"])))
 
   (def server (prof/serve-files 8081))
 
