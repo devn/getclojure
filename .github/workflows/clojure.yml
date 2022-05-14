@@ -20,6 +20,8 @@ jobs:
     - uses: actions/setup-python@v3
     - name: Install pygments
       run: pip install pygments
+    - name: Docker compose
+      run: docker-compose up -d
     - name: Install dependencies
       run: lein deps
     - name: Run tests

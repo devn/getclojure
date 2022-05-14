@@ -1,16 +1,6 @@
 version: '3.1'
 
 services:
-  db:
-    image: postgres:13
-    ports:
-      - "5432:5432/tcp"
-    environment:
-      POSTGRES_PASSWORD: postgres
-    volumes:
-      - pgdata:/var/lib/postgresql/data
-    restart: always
-
   es7:
     image: elasticsearch:7.10.1
     environment:
@@ -22,6 +12,3 @@ services:
     ports:
       - "9207:9200"
       - "9307:9300"
-
-volumes:
-  pgdata:
