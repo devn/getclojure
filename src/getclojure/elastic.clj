@@ -73,7 +73,7 @@
   "Given a query string, escapes a subset of the special characters that overlap
   with valid clojure searches."
   [query-string :- s/Str]
-  (let [special-chars ["+" "*" ":" "-" "~"]]
+  (let [special-chars ["+" "*" ":" "-" "~" "<" ">" "="]]
     (loop [[character & xs] special-chars
            qstring query-string]
       (if character
