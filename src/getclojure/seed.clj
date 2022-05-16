@@ -4,17 +4,21 @@
    [getclojure.sexp :as sexp]
    [getclojure.elastic :as elastic]))
 
-(defn seed [num-logs]
-  (let [sexps (if (= num-logs :all)
-                (extract/all-sexps)
-                (extract/all-sexps num-logs))]
+(defn seed
+  ([num-logs]
+   (seed num-logs {}))
+  ([num-logs opts]
+   (let [sexps (if (= num-logs :all)
+                 (extract/all-sexps)
+                 (extract/all-sexps num-logs))]
 
-    (elastic/delete-and-recreate-index! elastic/conn)
+     (elastic/delete-and-recreate-index! elastic/conn)
 
-    (->> sexps
-         sexp/filtered-run-coll
-         sexp/format-coll
-         (elastic/seed elastic/conn))))
+     (elastic/seed elastic/conn
+                   (->> sexps
+                        sexp/filtered-run-coll
+                        sexp/format-coll)
+                   opts))))
 
 (defn -main
   [& args]

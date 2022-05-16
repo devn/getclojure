@@ -1,7 +1,10 @@
 (ns getclojure.util-test
   (:require
-   [clojure.test :refer (deftest testing is)]
-   [getclojure.util :as sut]))
+   [clojure.test :refer (deftest testing is use-fixtures)]
+   [getclojure.util :as sut]
+   [schema.test :refer (validate-schemas)]))
+
+(use-fixtures :once validate-schemas)
 
 (deftest test-truncate
   (testing "It truncates strings"

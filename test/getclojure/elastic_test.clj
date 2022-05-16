@@ -1,24 +1,17 @@
 (ns getclojure.elastic-test
   (:require
    [clojure.test :refer (deftest testing is use-fixtures)]
+   [ductile.conn :as es.conn]
    [getclojure.config]
    [getclojure.elastic :as sut]
    [schema.test :refer (validate-schemas)]
-   [ductile.conn :as es.conn]
-   [ductile.index :as es.index]))
+   [getclojure.test-helpers :as test-helpers]))
 
 (use-fixtures :once validate-schemas)
 
 (def test-index "test-index")
 
-(defn elastic-fixture [f]
-  (let [conn (es.conn/connect (sut/make-conn))]
-    (es.index/create! conn test-index sut/elastic-config)
-    (f)
-    (es.index/delete! conn test-index)
-    (es.conn/close conn)))
-
-(use-fixtures :once elastic-fixture)
+(use-fixtures :once test-helpers/elastic-fixture)
 
 (deftest parse-elastic-url-test
   (testing "It parses an elastic URL like the one we encounter from Bonsai on Heroku"
@@ -80,8 +73,7 @@
 (deftest ^:integration elastic-integration-test
   (with-redefs [sut/num-per-page 2
                 sut/index-name test-index]
-    (let [index test-index
-          conn (delay (es.conn/connect (sut/make-conn)))
+    (let [conn (delay (es.conn/connect (sut/make-conn)))
           sexps (mapv (fn [s] {:input s})
                       ["fred" "fred" "fred" "wilma" "barney" "betty" "+ - ~ * :"])
           _ (sut/seed conn sexps {:refresh "wait_for"})]
