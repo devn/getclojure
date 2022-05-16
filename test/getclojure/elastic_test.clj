@@ -8,9 +8,6 @@
    [getclojure.test-helpers :as test-helpers]))
 
 (use-fixtures :once validate-schemas)
-
-(def test-index "test-index")
-
 (use-fixtures :once test-helpers/elastic-fixture)
 
 (deftest parse-elastic-url-test
@@ -72,7 +69,7 @@
 
 (deftest ^:integration elastic-integration-test
   (with-redefs [sut/num-per-page 2
-                sut/index-name test-index]
+                sut/index-name "test-index"]
     (let [conn (delay (es.conn/connect (sut/make-conn)))
           sexps (mapv (fn [s] {:input s})
                       ["fred" "fred" "fred" "wilma" "barney" "betty" "+ - ~ * :"])
