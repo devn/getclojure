@@ -9,6 +9,7 @@
     [page :as h.page]]))
 
 (defn header
+  "Header!"
   []
   [:header
    [:a {:href "/" :rel "home"}
@@ -17,9 +18,9 @@
                      "img/getclojure-logo.png")]])
 
 (defn search-form
+  "Optionally provided a query, spits out the search box section of the page."
   [& q]
-  (let [query (first q)
-        text-field-opts {:autocorrect "off"
+  (let [text-field-opts {:autocorrect "off"
                          :autocapitalize "off"
                          :autocomplete "off"
                          :spellcheck "false"
@@ -28,9 +29,9 @@
     [:section.search
      (h.form/form-to
       [:get "/search"]
-      (if query
+      (if (seq q)
         (h.form/text-field (assoc text-field-opts
-                                  :value query)
+                                  :value (first q))
                            "q")
         (h.form/text-field (assoc text-field-opts :autofocus "true") "q"))
       (h.form/hidden-field "num" 0)
@@ -39,6 +40,8 @@
                :value "search"}])]))
 
 (defn pagination
+  "Provided a query string, a page number, and a total number of pages, returns
+  the HTML for pagination links on the page."
   [q page-num total-pages]
   (let [page-num (Long/parseLong page-num)
         prev-page-num (dec page-num)
@@ -86,6 +89,8 @@
                              " ->>")])])))
 
 (defn search-results
+  "Provided a query and a page number, generates the HTML for each s-expression
+  result."
   [q page-num]
   (let [{:keys [hits total-pages]} (elastic/search elastic/conn q (Long/parseLong page-num))]
     [:section.results
@@ -103,9 +108,10 @@
   []
   [:a.powered-by-clojure {:href "http://clojure.org/"
                           :title "Clojure"}
-   (h.element/image {:height 32 :width 32}
-                    "img/clojure-icon.gif"
-                    "Powered by Clojure")
+   (h.element/image {:height 32
+                     :width 32
+                     :alt "Powered by Clojure"}
+                    "img/clojure-icon.gif")
    "Powered by Clojure"])
 
 (h.def/defhtml created-by
@@ -144,7 +150,9 @@
    (on-github)
    content])
 
-(defn common [& content]
+(defn common
+  "The common wrapper around every page's content."
+  [& content]
   (base
    (header)
    [:div#content content]
