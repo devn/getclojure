@@ -7,7 +7,7 @@
                  [org.babashka/sci "0.3.5"]
                  [ring/ring-jetty-adapter "1.9.5"]
                  [ring/ring-defaults "0.3.3"]
-                 [compojure "1.6.2"]
+                 [compojure "1.6.3"]
                  [hiccup "1.0.5"]
                  [com.outpace/config "0.13.5"]
                  [enlive "1.1.6"]
