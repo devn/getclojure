@@ -125,5 +125,5 @@
                   opts))))
 
 (comment
-  (-> (search conn "iterate AND inc" 0))
+  (search conn "inc" 0)
   )

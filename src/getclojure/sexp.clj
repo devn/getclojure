@@ -41,7 +41,6 @@
       (let [i sexp-str
             v (util/truncate truncation-length (pr-str (eval sexp-str)))
             o (util/truncate truncation-length (pr-str (str w)))]
-        #_(log/info i v o)
         {:input i
          :value v
          :output o}))))
@@ -151,8 +150,3 @@
   (def server (prof/serve-files 8081))
 
   )
-
-;; (sci/eval-string "(-> 1 inc inc)") ;; => 3
-;; (sci/eval-string "(alter-meta! #'-> dissoc :macro)") ;; => nil
-;; (sci/eval-string "(-> 1 inc inc)") ;; => #function[clojure.core/inc]
-;; (sci/eval-string "(alter-meta! #'-> assoc :macro true)") ;; => nil
