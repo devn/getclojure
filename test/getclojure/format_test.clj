@@ -14,6 +14,10 @@
     (is (= "<div class=\"highlight\"><pre><span></span><span class=\"mi\">2</span><span class=\"w\"></span>\n</pre></div>\n"
            (sut/value "2")))
 
+    (is (= "<div class=\"highlight\"><pre><span></span><span class=\"mi\">2222</span><span class=\"nv\">...</span><span class=\"w\"></span>\n</pre></div>\n"
+           (sut/value "2222..."))
+        "Pygmentize, but don't attempt to parse the string if it's a truncated value")
+
     (is (= "<div class=\"highlight\"><pre><span></span><span class=\"s\">&quot;Hello, world!&quot;</span><span class=\"w\"></span>\n</pre></div>\n"
            (sut/output "\"Hello, world!\"")))
 
