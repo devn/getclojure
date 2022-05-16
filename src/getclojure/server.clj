@@ -17,11 +17,3 @@
 (defn -main []
   (ring/run-jetty #'app {:port 8080
                          :join? false}))
-
-(comment
-
-  (def server (ring/run-jetty #'app {:port 8080
-                                     :join? false}))
-  (.stop server)
-
-  )
