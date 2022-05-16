@@ -1,4 +1,4 @@
-(ns getclojure.views.layout
+(ns getclojure.layout
   (:require
    [getclojure.elastic :as elastic]
    [getclojure.util :as util]
@@ -6,7 +6,8 @@
     [def :as h.def]
     [element :as h.element]
     [form :as h.form]
-    [page :as h.page]]))
+    [page :as h.page]]
+   [schema.core :as s]))
 
 (defn header
   "Header!"
@@ -39,53 +40,67 @@
                :id "search-box"
                :value "search"}])]))
 
+(s/defn calculate-pagination :- {s/Keyword s/Any}
+  [page-num :- s/Str
+   total-pages :- s/Num]
+  (let [page-num (Long/parseLong page-num)]
+    {:show-pagination? (not (< total-pages 2))
+     :show-previous-links? (not (< total-pages 2))
+     :first-page 0
+     :previous-page (if (< (dec page-num) 0)
+                      0
+                      (dec page-num))
+     :page-numbers-to-show (let [page-nums (range page-num total-pages)]
+                             (if (< (count page-nums) 10)
+                               page-nums
+                               (take 10 page-nums)))
+     :show-next-links? (<= (inc page-num) (dec total-pages))
+     :next-page (inc page-num)
+     :last-page (dec total-pages)}))
+
 (defn pagination
   "Provided a query string, a page number, and a total number of pages, returns
   the HTML for pagination links on the page."
   [q page-num total-pages]
-  (let [page-num (Long/parseLong page-num)
-        prev-page-num (dec page-num)
-        next-page-num (inc page-num)]
-    (when-not (= total-pages 1)
+  (let [{:keys [show-pagination?
+                show-previous-links?
+                first-page
+                previous-page
+                page-numbers-to-show
+                show-next-links?
+                next-page
+                last-page]} (calculate-pagination page-num total-pages)]
+    (when show-pagination?
       [:div#pagination
-       (when-not (zero? total-pages)
+       (when show-previous-links?
          [:div.prev-links
           (h.element/link-to {:class "first-page"}
                              (str "/search?" (util/generate-query-string {"q" q
-                                                                          "num" 0}))
+                                                                          "num" first-page}))
                              "<<- ")
           (h.element/link-to {:class "prev"}
                              (str "/search?" (util/generate-query-string {"q" q
-                                                                          "num" (if (< prev-page-num 0)
-                                                                                  0
-                                                                                  prev-page-num)}))
+                                                                          "num" previous-page}))
                              "<- ")])
 
 
-       (let [page-links (map (fn [p-num]
-                               (h.element/link-to {:class "page_num"}
-                                                  (str "/search?"
-                                                       (util/generate-query-string
-                                                        {"q" q
-                                                         "num" p-num}))
-                                                  (inc p-num)))
-                             (range page-num total-pages))
-             num-page-links (count page-links)]
-         (if (< num-page-links 10)
-           page-links
-           (take 10 page-links)))
+       (for [p-num page-numbers-to-show]
+         (h.element/link-to {:class "page_num"}
+                            (str "/search?" (util/generate-query-string {"q" q
+                                                                         "num" p-num}))
+                            (inc p-num)))
 
 
-       (when (<= next-page-num (dec total-pages))
+       (when show-next-links?
          [:div.next-links
           (h.element/link-to {:class "next"}
                              (str "/search?" (util/generate-query-string {"q" q
-                                                                          "num" next-page-num}))
+                                                                          "num" next-page}))
                              " ->")
           (h.element/link-to {:class "last-page"}
                              (str "/search?"
                                   (util/generate-query-string {"q" q
-                                                               "num" (dec total-pages)}))
+                                                               "num" last-page}))
                              " ->>")])])))
 
 (defn search-results

@@ -17,12 +17,12 @@ Go to [GetClojure](http://getclojure.org) and start searching.
 | getclojure.elastic | Houses configuration, query, and seeding from files for elasticsearch |
 | getclojure.extract | Contains logic related to parsing clojure IRC logfiles and spitting out files for later consumption |
 | getclojure.format | Logic for formatting and syntax highlighting s-expressions |
+| getclojure.layout | Static HTML generation via hiccup |
 | getclojure.routes | Routes for the application |
 | getclojure.seed | Runs the full ETL pipeline from logs to seeding elasticsearch |
 | getclojure.server | The entrypoint for the server |
 | getclojure.sexp | Logic related to running s-expressions: sandboxing via SCI |
 | getclojure.util | Everyone has a junk drawer. This is ours. |
-| getclojure.views.layout | Static HTML generation via Hiccup |
 
 ## Developers
 

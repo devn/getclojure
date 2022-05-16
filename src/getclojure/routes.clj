@@ -2,7 +2,7 @@
   (:require
    [compojure.core :refer [defroutes GET]]
    [compojure.route :as route]
-   [getclojure.views.layout :as layout]
+   [getclojure.layout :as layout]
    [schema.core :as s]))
 
 (s/defn homepage :- s/Str
