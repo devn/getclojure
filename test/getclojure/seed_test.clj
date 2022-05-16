@@ -20,4 +20,16 @@
             conn (delay (es.conn/connect (elastic/make-conn)))
             _ (sut/seed 1 {:refresh "wait_for"})]
         (is (= 3
-               (es.doc/count-docs @conn index)))))))
+               (es.doc/count-docs @conn index)))
+        (is (= {:hits
+                [{:input "(inc 1)"
+                  :value "2"
+                  :output "\"\""
+                  :formatted-input
+                  "<div class=\"highlight\"><pre><span></span><span class=\"p\">(</span><span class=\"nb\">inc </span><span class=\"mi\">1</span><span class=\"p\">)</span><span class=\"w\"></span>\n</pre></div>\n"
+                  :formatted-value
+                  "<div class=\"highlight\"><pre><span></span><span class=\"mi\">2</span><span class=\"w\"></span>\n</pre></div>\n"
+                  :formatted-output nil}]
+                :total-pages 1
+                :total-hits 1}
+               (elastic/search conn "inc")))))))
