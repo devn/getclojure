@@ -27,7 +27,7 @@
                        first
                        read-string)]
       (seed num-logs))
-    (println "Usage: lein seed-elastic-full OR lein seed-elastic-partial $NUMBER_OF_LOGFILES_TO_SEED"))
+    (println "Usage: lein seed :all OR lein seed $NUMBER_OF_LOGFILES_TO_READ_SEXPS_FROM"))
 
   (shutdown-agents)
   (System/exit 0))

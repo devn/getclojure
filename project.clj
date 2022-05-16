@@ -24,6 +24,7 @@
                                   [pjstadig/humane-test-output "0.11.0"]
                                   [criterium "0.4.6"]
                                   [com.clojure-goes-fast/clj-async-profiler "0.5.1"]]
+                   ;; the following is required for clj-async-profiler
                    :jvm-opts ["-Djdk.attach.allowAttachSelf"]
                    :injections [(require 'pjstadig.humane-test-output)
                                 (pjstadig.humane-test-output/activate!)]
@@ -32,8 +33,8 @@
              :test {:resource-paths ["test-resources"]}}
   :test-selectors {:default (complement :integration)
                    :integration :integration}
-  :aliases {"seed-elastic-full" ["trampoline" "run" "-m" "getclojure.seed" ":all"]
-            "seed-elastic-partial" ["trampoline" "run" "-m" "getclojure.seed"]}
+  :aliases {"seed" ["trampoline" "run" "-m" "getclojure.seed"]}
+  ;; libpython-clj requires some special options
   :jvm-opts ["--add-modules" "jdk.incubator.foreign"
              "--enable-native-access=ALL-UNNAMED"]
   :min-lein-version "2.0.0")
