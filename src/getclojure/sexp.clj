@@ -16,9 +16,15 @@
 
 (s/defn ^:private eval :- s/Any
   "Evaluate a string in SCI. Defined separately in case we want to supply
-  additional options to sci/eval-string in the future."
+  additional options to sci/eval-string in the future. Note: We deny
+  print-method and print-dup due to them modifying the hierarchy of the host and
+  leaking across evaluations. alter-meta! is also disallowed as it spans
+  evaluations.
+
+  print-method, print-dup: https://github.com/babashka/sci/issues/726
+  alter-meta!: https://github.com/babashka/sci/issues/733"
   [sexp-str :- s/Str]
-  (sci/eval-string sexp-str {:deny ['print-method 'print-dup]}))
+  (sci/eval-string sexp-str {:deny ['print-method 'print-dup 'alter-meta!]}))
 
 (s/defschema SexpResult
   {:input s/Str
@@ -32,9 +38,13 @@
    truncation-length :- s/Num]
   (with-open [w (new StringWriter)]
     (sci/binding [sci/out w]
-      {:input sexp-str
-       :value (util/truncate truncation-length (pr-str (eval sexp-str)))
-       :output (util/truncate truncation-length (pr-str (str w)))})))
+      (let [i sexp-str
+            v (util/truncate truncation-length (pr-str (eval sexp-str)))
+            o (util/truncate truncation-length (pr-str (str w)))]
+        #_(log/info i v o)
+        {:input i
+         :value v
+         :output o}))))
 
 (s/defn ^:private thunk-timeout :- s/Any
   "Provided a `thunk` (fn [] ...) where ... is any expression, and `millis` is
@@ -141,3 +151,8 @@
   (def server (prof/serve-files 8081))
 
   )
+
+;; (sci/eval-string "(-> 1 inc inc)") ;; => 3
+;; (sci/eval-string "(alter-meta! #'-> dissoc :macro)") ;; => nil
+;; (sci/eval-string "(-> 1 inc inc)") ;; => #function[clojure.core/inc]
+;; (sci/eval-string "(alter-meta! #'-> assoc :macro true)") ;; => nil
