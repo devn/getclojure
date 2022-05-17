@@ -28,11 +28,12 @@ Go to [GetClojure](http://getclojure.org) and start searching.
 
 In order to run locally in development mode you'll need to do the following:
 
-* `pip install pygments`: There are a variety of options for keeping your python envs separate. virtualenv, pyenv, etc. Use whatever works for you. Note that you'll need python 3.X or later. In addition, a libpython file is required.
+* OpenJDK 17. No guarantees it works with older JVMs.
+* `pip install pygments`: There are a variety of options for keeping your python envs separate. virtualenv, pyenv, etc. Use whatever works for you. Note that you'll need python 3.X or later.
 * `docker-compose up -d`: Runs elasticsearch.
 * Download the [logs](https://www.dropbox.com/s/19yy3zn5nh8a1gr/clojure-irc-logs.tar.gz?dl=0) and extract them into the `resources/logs` directory.
 * Set the appropriate env vars in your `.envrc`. If you don't use [direnv](https://direnv.net/), you'll need to export `APP_ENV=development` and `INDEX_NAME=getclojure.`
-* Run `lein seed-elastic-partial 25` to get the s-expressions found in the first 25 logfiles, or `lein seed-elastic-full` to run the entire pipeline across all local logfiles.
+* Run `lein seed 25` to get the s-expressions found in the first 25 logfiles, or `lein seed :all` to run the entire pipeline across all local logfiles.
 * Start the server: `lein ring server-headless`
 * Visit [localhost:8080](http://localhost:8080) and search.
 
