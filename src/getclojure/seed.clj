@@ -23,9 +23,7 @@
 (defn -main
   [& args]
   (if (seq args)
-    (let [num-logs (-> args
-                       first
-                       read-string)]
+    (let [num-logs (-> args first read-string)]
       (seed num-logs))
     (println "Usage: lein seed :all OR lein seed $NUMBER_OF_LOGFILES_TO_READ_SEXPS_FROM"))
 
