@@ -10,7 +10,7 @@
 (s/defn local-logs :- [File]
   "Returns a collection of HTML files in the logs directory."
   []
-  (sort (filter #(re-find #"\.*\.html" (str %))
+  (sort (filter #(re-find #".*\.html" (str %))
                 (file-seq (io/as-file (io/resource "logs"))))))
 
 (s/defn get-lines :- s/Any
